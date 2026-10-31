@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth";
 import { deleteProperty, regenerateSlug, setModule, setPublished } from "../actions";
 import { PropertyForm } from "../property-form";
@@ -20,18 +20,26 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
   const { error } = await searchParams;
   const { supabase } = await requireAdmin();
 
-  const [{ data: property }, { data: hosts }, { data: modules }, { data: sections }] = await Promise.all([
-    supabase.from("properties").select("*").eq("id", id).maybeSingle(),
-    supabase.from("hosts").select("id, name").order("name"),
-    supabase.from("property_modules").select("module_key, is_active").eq("property_id", id),
-    supabase.from("guide_sections").select("*").eq("property_id", id).order("position").order("created_at"),
-  ]);
+  const [{ data: property }, { data: hosts }, { data: modules }, { data: sections }, { data: selectedPlaces }] =
+    await Promise.all([
+      supabase.from("properties").select("*").eq("id", id).maybeSingle(),
+      supabase.from("hosts").select("id, name").order("name"),
+      supabase.from("property_modules").select("module_key, is_active").eq("property_id", id),
+      supabase.from("guide_sections").select("*").eq("property_id", id).order("position").order("created_at"),
+      supabase.from("property_places").select("is_favorite, places(category, archived_at)").eq("property_id", id),
+    ]);
   if (!property) notFound();
 
   const missing = missingForPublication(property, sections ?? []);
   const published = property.status === "published";
   const placesActive = modules?.some((m) => m.module_key === "places" && m.is_active) ?? false;
   const guidePath = `/g/${property.slug}`;
+  const placeStats = {
+    total: selectedPlaces?.length ?? 0,
+    favorites: selectedPlaces?.filter((p) => p.is_favorite).length ?? 0,
+    health: selectedPlaces?.filter((p) => p.places?.category === "health").length ?? 0,
+    archived: selectedPlaces?.filter((p) => p.places?.archived_at).length ?? 0,
+  };
   const errorMessage = typeof error === "string" ? errors[error] : undefined;
 
   return (
@@ -87,15 +95,30 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
       </section>
 
       <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">
-        <h2 className="text-2xl">Modules</h2>
-        <form action={setModule.bind(null, property.id, "places", !placesActive)} className="flex flex-wrap items-center gap-3">
-          <span>
-            Bonnes adresses : <strong>{placesActive ? "activé" : "désactivé"}</strong>
-          </span>
-          <Button type="submit" variant="secondary">
-            {placesActive ? "Désactiver" : "Activer"}
-          </Button>
-        </form>
+        <h2 className="text-2xl">Bonnes adresses</h2>
+        <p className="text-sm">
+          {placeStats.total} adresse(s) choisie(s), dont {placeStats.favorites} coup(s) de cœur
+          {placeStats.health > 0 && ` et ${placeStats.health} pour les urgences`}.
+          {placeStats.archived > 0 && (
+            <span className="text-info"> {placeStats.archived} archivée(s), donc masquée(s).</span>
+          )}
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <ButtonLink href={`/admin/logements/${property.id}/adresses`} variant="secondary">
+            Choisir les adresses
+          </ButtonLink>
+          <form action={setModule.bind(null, property.id, "places", !placesActive)} className="flex flex-wrap items-center gap-3">
+            <span>
+              Module : <strong>{placesActive ? "activé" : "désactivé"}</strong>
+            </span>
+            <Button type="submit" variant="secondary">
+              {placesActive ? "Désactiver" : "Activer"}
+            </Button>
+          </form>
+        </div>
+        {!placesActive && (
+          <p className="text-sm text-muted">Module désactivé : seules les adresses Santé (urgences) restent visibles.</p>
+        )}
       </section>
 
       <SectionsPanel propertyId={property.id} sections={sections ?? []} />
