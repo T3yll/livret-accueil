@@ -1,186 +1,547 @@
-// Types de la base. Écrits à la main au format de `supabase gen types` en attendant
-// le projet cloud : à régénérer avec `npm run db:types` après chaque migration.
-
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-
-type Timestamps = { created_at: string; updated_at: string };
-
-type HostRow = {
-  id: string;
-  name: string;
-  contact_name: string | null;
-  phone: string | null;
-  email: string | null;
-  notes: string | null;
-} & Timestamps;
-
-type PropertyRow = {
-  id: string;
-  host_id: string;
-  name: string;
-  slug: string;
-  address: string | null;
-  postal_code: string | null;
-  city: string | null;
-  lat: number | null;
-  lng: number | null;
-  cover_photo_path: string | null;
-  cover_photo_alt_fr: string | null;
-  cover_photo_alt_en: string | null;
-  welcome_fr: string | null;
-  welcome_en: string | null;
-  contact_phone: string | null;
-  contact_email: string | null;
-  status: Database["public"]["Enums"]["property_status"];
-  published_at: string | null;
-} & Timestamps;
-
-type GuideSectionRow = {
-  id: string;
-  property_id: string;
-  type: Database["public"]["Enums"]["section_type"];
-  title_fr: string | null;
-  title_en: string | null;
-  body_fr: string | null;
-  body_en: string | null;
-  data: Json;
-  media: Json;
-  position: number;
-  is_active: boolean;
-} & Timestamps;
-
-type PlaceRow = {
-  id: string;
-  name: string;
-  category: Database["public"]["Enums"]["place_category"];
-  description_fr: string | null;
-  description_en: string | null;
-  address: string | null;
-  postal_code: string | null;
-  city: string | null;
-  lat: number;
-  lng: number;
-  phone: string | null;
-  website: string | null;
-  booking_url: string | null;
-  photo_path: string | null;
-  photo_alt_fr: string | null;
-  photo_alt_en: string | null;
-  opening_mode: Database["public"]["Enums"]["opening_mode"];
-  hours_verified_at: string | null;
-  archived_at: string | null;
-} & Timestamps;
-
-type OpeningHoursRow = { id: string; place_id: string; weekday: number; opens_at: string; closes_at: string };
-
-type ClosureRow = {
-  id: string;
-  place_id: string;
-  starts_on: string;
-  ends_on: string;
-  reason_fr: string | null;
-  reason_en: string | null;
-};
-
-type PropertyPlaceRow = {
-  property_id: string;
-  place_id: string;
-  is_favorite: boolean;
-  comment_fr: string | null;
-  comment_en: string | null;
-  position: number;
-  created_at: string;
-};
-
-type ModuleRow = { key: string; name: string; description: string | null };
-
-type PropertyModuleRow = {
-  property_id: string;
-  module_key: string;
-  is_active: boolean;
-  starts_on: string | null;
-  ends_on: string | null;
-};
-
-// Insert : les colonnes avec valeur par défaut ou nullables deviennent facultatives.
-type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-type NullableKeys<T> = { [K in keyof T]: null extends T[K] ? K : never }[keyof T];
-type InsertOf<T, Defaults extends keyof T> = Optional<T, Defaults | NullableKeys<T>>;
-
-type Relationship = {
-  foreignKeyName: string;
-  columns: string[];
-  isOneToOne: boolean;
-  referencedRelation: string;
-  referencedColumns: string[];
-};
-
-// Clé étrangère `column` → `table`.id (ou `table`.key pour modules)
-type FK<Name extends string, Column extends string, Table extends string, Ref extends string = "id"> = {
-  foreignKeyName: Name;
-  columns: [Column];
-  isOneToOne: false;
-  referencedRelation: Table;
-  referencedColumns: [Ref];
-};
-
-type Table<Row, Defaults extends keyof Row, Rels extends Relationship[] = []> = {
-  Row: Row;
-  Insert: InsertOf<Row, Defaults>;
-  Update: Partial<Row>;
-  Relationships: Rels;
-};
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.18"
+  }
   public: {
     Tables: {
-      admins: Table<{ user_id: string; created_at: string }, "created_at">;
-      hosts: Table<HostRow, "id" | "created_at" | "updated_at">;
-      properties: Table<
-        PropertyRow,
-        "id" | "status" | "created_at" | "updated_at",
-        [FK<"properties_host_id_fkey", "host_id", "hosts">]
-      >;
-      guide_sections: Table<
-        GuideSectionRow,
-        "id" | "data" | "media" | "position" | "is_active" | "created_at" | "updated_at",
-        [FK<"guide_sections_property_id_fkey", "property_id", "properties">]
-      >;
-      places: Table<PlaceRow, "id" | "opening_mode" | "created_at" | "updated_at">;
-      place_opening_hours: Table<
-        OpeningHoursRow,
-        "id",
-        [FK<"place_opening_hours_place_id_fkey", "place_id", "places">]
-      >;
-      place_closures: Table<ClosureRow, "id", [FK<"place_closures_place_id_fkey", "place_id", "places">]>;
-      property_places: Table<
-        PropertyPlaceRow,
-        "is_favorite" | "position" | "created_at",
-        [
-          FK<"property_places_property_id_fkey", "property_id", "properties">,
-          FK<"property_places_place_id_fkey", "place_id", "places">,
+      admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      guide_sections: {
+        Row: {
+          body_en: string | null
+          body_fr: string | null
+          created_at: string
+          data: Json
+          id: string
+          is_active: boolean
+          media: Json
+          position: number
+          property_id: string
+          title_en: string | null
+          title_fr: string | null
+          type: Database["public"]["Enums"]["section_type"]
+          updated_at: string
+        }
+        Insert: {
+          body_en?: string | null
+          body_fr?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          is_active?: boolean
+          media?: Json
+          position?: number
+          property_id: string
+          title_en?: string | null
+          title_fr?: string | null
+          type: Database["public"]["Enums"]["section_type"]
+          updated_at?: string
+        }
+        Update: {
+          body_en?: string | null
+          body_fr?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          is_active?: boolean
+          media?: Json
+          position?: number
+          property_id?: string
+          title_en?: string | null
+          title_fr?: string | null
+          type?: Database["public"]["Enums"]["section_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_sections_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
         ]
-      >;
-      modules: Table<ModuleRow, never>;
-      property_modules: Table<
-        PropertyModuleRow,
-        "is_active",
-        [
-          FK<"property_modules_property_id_fkey", "property_id", "properties">,
-          FK<"property_modules_module_key_fkey", "module_key", "modules", "key">,
+      }
+      hosts: {
+        Row: {
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          description: string | null
+          key: string
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          name: string
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      place_closures: {
+        Row: {
+          ends_on: string
+          id: string
+          place_id: string
+          reason_en: string | null
+          reason_fr: string | null
+          starts_on: string
+        }
+        Insert: {
+          ends_on: string
+          id?: string
+          place_id: string
+          reason_en?: string | null
+          reason_fr?: string | null
+          starts_on: string
+        }
+        Update: {
+          ends_on?: string
+          id?: string
+          place_id?: string
+          reason_en?: string | null
+          reason_fr?: string | null
+          starts_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_closures_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_closures_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places_needing_review"
+            referencedColumns: ["id"]
+          },
         ]
-      >;
-    };
+      }
+      place_opening_hours: {
+        Row: {
+          closes_at: string
+          id: string
+          opens_at: string
+          place_id: string
+          weekday: number
+        }
+        Insert: {
+          closes_at: string
+          id?: string
+          opens_at: string
+          place_id: string
+          weekday: number
+        }
+        Update: {
+          closes_at?: string
+          id?: string
+          opens_at?: string
+          place_id?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_opening_hours_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_opening_hours_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places_needing_review"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      places: {
+        Row: {
+          address: string | null
+          archived_at: string | null
+          booking_url: string | null
+          category: Database["public"]["Enums"]["place_category"]
+          city: string | null
+          created_at: string
+          description_en: string | null
+          description_fr: string | null
+          hours_verified_at: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          opening_mode: Database["public"]["Enums"]["opening_mode"]
+          phone: string | null
+          photo_alt_en: string | null
+          photo_alt_fr: string | null
+          photo_path: string | null
+          postal_code: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          archived_at?: string | null
+          booking_url?: string | null
+          category: Database["public"]["Enums"]["place_category"]
+          city?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_fr?: string | null
+          hours_verified_at?: string | null
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          opening_mode?: Database["public"]["Enums"]["opening_mode"]
+          phone?: string | null
+          photo_alt_en?: string | null
+          photo_alt_fr?: string | null
+          photo_path?: string | null
+          postal_code?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          archived_at?: string | null
+          booking_url?: string | null
+          category?: Database["public"]["Enums"]["place_category"]
+          city?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_fr?: string | null
+          hours_verified_at?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          opening_mode?: Database["public"]["Enums"]["opening_mode"]
+          phone?: string | null
+          photo_alt_en?: string | null
+          photo_alt_fr?: string | null
+          photo_path?: string | null
+          postal_code?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      properties: {
+        Row: {
+          address: string | null
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          cover_photo_alt_en: string | null
+          cover_photo_alt_fr: string | null
+          cover_photo_path: string | null
+          created_at: string
+          host_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          postal_code: string | null
+          published_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["property_status"]
+          updated_at: string
+          welcome_en: string | null
+          welcome_fr: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_photo_alt_en?: string | null
+          cover_photo_alt_fr?: string | null
+          cover_photo_path?: string | null
+          created_at?: string
+          host_id: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          postal_code?: string | null
+          published_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["property_status"]
+          updated_at?: string
+          welcome_en?: string | null
+          welcome_fr?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_photo_alt_en?: string | null
+          cover_photo_alt_fr?: string | null
+          cover_photo_path?: string | null
+          created_at?: string
+          host_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          postal_code?: string | null
+          published_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["property_status"]
+          updated_at?: string
+          welcome_en?: string | null
+          welcome_fr?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "properties_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_modules: {
+        Row: {
+          ends_on: string | null
+          is_active: boolean
+          module_key: string
+          property_id: string
+          starts_on: string | null
+        }
+        Insert: {
+          ends_on?: string | null
+          is_active?: boolean
+          module_key: string
+          property_id: string
+          starts_on?: string | null
+        }
+        Update: {
+          ends_on?: string | null
+          is_active?: boolean
+          module_key?: string
+          property_id?: string
+          starts_on?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_modules_module_key_fkey"
+            columns: ["module_key"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "property_modules_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_places: {
+        Row: {
+          comment_en: string | null
+          comment_fr: string | null
+          created_at: string
+          is_favorite: boolean
+          place_id: string
+          position: number
+          property_id: string
+        }
+        Insert: {
+          comment_en?: string | null
+          comment_fr?: string | null
+          created_at?: string
+          is_favorite?: boolean
+          place_id: string
+          position?: number
+          property_id: string
+        }
+        Update: {
+          comment_en?: string | null
+          comment_fr?: string | null
+          created_at?: string
+          is_favorite?: boolean
+          place_id?: string
+          position?: number
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_places_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_places_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places_needing_review"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_places_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
     Views: {
-      places_needing_review: { Row: PlaceRow; Relationships: [] };
-    };
+      places_needing_review: {
+        Row: {
+          address: string | null
+          archived_at: string | null
+          booking_url: string | null
+          category: Database["public"]["Enums"]["place_category"] | null
+          city: string | null
+          created_at: string | null
+          description_en: string | null
+          description_fr: string | null
+          hours_verified_at: string | null
+          id: string | null
+          lat: number | null
+          lng: number | null
+          name: string | null
+          opening_mode: Database["public"]["Enums"]["opening_mode"] | null
+          phone: string | null
+          photo_alt_en: string | null
+          photo_alt_fr: string | null
+          photo_path: string | null
+          postal_code: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          archived_at?: string | null
+          booking_url?: string | null
+          category?: Database["public"]["Enums"]["place_category"] | null
+          city?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_fr?: string | null
+          hours_verified_at?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          opening_mode?: Database["public"]["Enums"]["opening_mode"] | null
+          phone?: string | null
+          photo_alt_en?: string | null
+          photo_alt_fr?: string | null
+          photo_path?: string | null
+          postal_code?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          archived_at?: string | null
+          booking_url?: string | null
+          category?: Database["public"]["Enums"]["place_category"] | null
+          city?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_fr?: string | null
+          hours_verified_at?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          opening_mode?: Database["public"]["Enums"]["opening_mode"] | null
+          phone?: string | null
+          photo_alt_en?: string | null
+          photo_alt_fr?: string | null
+          photo_path?: string | null
+          postal_code?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+    }
     Functions: {
-      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
-      get_guide: { Args: { p_slug: string }; Returns: Json };
-    };
+      get_guide: { Args: { p_slug: string }; Returns: Json }
+      is_admin: { Args: never; Returns: boolean }
+      module_is_active: {
+        Args: { p_key: string; p_property_id: string }
+        Returns: boolean
+      }
+    }
     Enums: {
-      property_status: "draft" | "published";
-      section_type: "arrival" | "wifi" | "house" | "equipment" | "departure" | "contacts" | "practical";
+      opening_mode: "schedule" | "always" | "appointment" | "unknown"
       place_category:
         | "restaurant"
         | "producer"
@@ -189,16 +550,164 @@ export type Database = {
         | "activity"
         | "heritage"
         | "family"
-        | "health";
-      opening_mode: "schedule" | "always" | "appointment" | "unknown";
-    };
-    CompositeTypes: Record<string, never>;
-  };
-};
+        | "health"
+      property_status: "draft" | "published"
+      section_type:
+        | "arrival"
+        | "wifi"
+        | "house"
+        | "equipment"
+        | "departure"
+        | "contacts"
+        | "practical"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
 
-export type Tables<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
-export type TablesInsert<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Insert"];
-export type TablesUpdate<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Update"];
-export type Enums<T extends keyof Database["public"]["Enums"]> = Database["public"]["Enums"][T];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      opening_mode: ["schedule", "always", "appointment", "unknown"],
+      place_category: [
+        "restaurant",
+        "producer",
+        "market",
+        "shop",
+        "activity",
+        "heritage",
+        "family",
+        "health",
+      ],
+      property_status: ["draft", "published"],
+      section_type: [
+        "arrival",
+        "wifi",
+        "house",
+        "equipment",
+        "departure",
+        "contacts",
+        "practical",
+      ],
+    },
+  },
+} as const
