@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/auth";
 import { deleteProperty, regenerateSlug, setModule, setPublished } from "../actions";
 import { PropertyForm } from "../property-form";
 import { missingForPublication } from "../publication";
+import { SectionsPanel } from "./sections-panel";
 
 export const metadata = { title: "Logement" };
 
@@ -19,14 +20,15 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
   const { error } = await searchParams;
   const { supabase } = await requireAdmin();
 
-  const [{ data: property }, { data: hosts }, { data: modules }] = await Promise.all([
+  const [{ data: property }, { data: hosts }, { data: modules }, { data: sections }] = await Promise.all([
     supabase.from("properties").select("*").eq("id", id).maybeSingle(),
     supabase.from("hosts").select("id, name").order("name"),
     supabase.from("property_modules").select("module_key, is_active").eq("property_id", id),
+    supabase.from("guide_sections").select("*").eq("property_id", id).order("position").order("created_at"),
   ]);
   if (!property) notFound();
 
-  const missing = missingForPublication(property);
+  const missing = missingForPublication(property, sections ?? []);
   const published = property.status === "published";
   const placesActive = modules?.some((m) => m.module_key === "places" && m.is_active) ?? false;
   const guidePath = `/g/${property.slug}`;
@@ -95,6 +97,8 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
           </Button>
         </form>
       </section>
+
+      <SectionsPanel propertyId={property.id} sections={sections ?? []} />
 
       <PropertyForm property={property} hosts={hosts ?? []} />
 

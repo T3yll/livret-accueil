@@ -86,6 +86,18 @@ export type SectionLike = {
   is_active: boolean;
 };
 
+// Un texte saisi en français sans son équivalent anglais (signalé dans l'admin).
+export function hasMissingTranslation(section: SectionLike): boolean {
+  const missing = (fr?: string | null, en?: string | null) => Boolean(fr?.trim()) && !en?.trim();
+  if (missing(section.body_fr, section.body_en) || missing(section.title_fr, section.title_en)) return true;
+  if (parseMedia(section.media).some((m) => missing(m.alt_fr, m.alt_en))) return true;
+  if (section.type === "arrival") {
+    const d = parseSectionData("arrival", section.data);
+    return missing(d.parking_fr, d.parking_en);
+  }
+  return false;
+}
+
 // Une section vide ne s'affiche jamais côté voyageur.
 // « Vide » = rien d'utile à montrer dans cette langue (le FR sert de repli pour l'EN).
 export function isSectionEmpty(section: SectionLike, locale: Locale): boolean {

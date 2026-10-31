@@ -83,12 +83,11 @@ export async function setPublished(id: string, published: boolean) {
   const { supabase } = await requireAdmin();
 
   if (published) {
-    const { data: property } = await supabase
-      .from("properties")
-      .select("lat, lng, welcome_fr, welcome_en, address")
-      .eq("id", id)
-      .single();
-    if (!property || missingForPublication(property).length > 0) {
+    const [{ data: property }, { data: sections }] = await Promise.all([
+      supabase.from("properties").select("lat, lng, welcome_fr, welcome_en, address").eq("id", id).single(),
+      supabase.from("guide_sections").select("type, data, is_active").eq("property_id", id),
+    ]);
+    if (!property || missingForPublication(property, sections ?? []).length > 0) {
       redirect(`/admin/logements/${id}?error=incomplete`);
     }
   }
