@@ -1,8 +1,10 @@
-import { Mail, Phone, PlayCircle } from "lucide-react";
+import { Mail, Navigation, Phone, PlayCircle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import type { Guide } from "@/lib/guide";
-import { formatTime, type GuideSection } from "@/lib/guide-view";
+import { formatDistance } from "@/lib/distance";
+import { directionsLinks, formatTime, type GuideSection } from "@/lib/guide-view";
+import type { PlaceWithDistance } from "@/lib/places-view";
 import { localizedWithLang } from "@/lib/localized";
 import { RichText } from "@/lib/rich-text";
 import { parseMedia, parseSectionData } from "@/lib/sections";
@@ -10,7 +12,12 @@ import { CopyButton } from "./copy-button";
 import { Directions } from "./directions";
 import { Photos } from "./photos";
 
-type Props = { section: GuideSection; property: Guide["property"]; locale: Locale };
+type Props = {
+  section: GuideSection;
+  property: Guide["property"];
+  locale: Locale;
+  nearby?: PlaceWithDistance[]; // adresses santé, pour la section Contacts
+};
 
 const card = "flex flex-col gap-1 rounded-2xl bg-surface p-4";
 const label = "text-sm text-muted";
@@ -20,7 +27,7 @@ function Body({ section, locale }: { section: GuideSection; locale: Locale }) {
   return body ? <RichText text={body.text} lang={body.lang} /> : null;
 }
 
-export async function SectionContent({ section, property, locale }: Props) {
+export async function SectionContent({ section, property, locale, nearby = [] }: Props) {
   const photos = <Photos items={parseMedia(section.media)} locale={locale} />;
 
   switch (section.type) {
@@ -31,7 +38,7 @@ export async function SectionContent({ section, property, locale }: Props) {
     case "departure":
       return <DepartureContent section={section} locale={locale} />;
     case "contacts":
-      return <ContactsContent section={section} property={property} locale={locale} />;
+      return <ContactsContent section={section} property={property} locale={locale} nearby={nearby} />;
     case "equipment": {
       const title = localizedWithLang(section, "title", locale);
       return (
@@ -172,12 +179,16 @@ const EMERGENCY_NUMBERS = [
   { number: "3237", key: "pharmacy", scheme: "tel" },
 ] as const;
 
+const pill =
+  "inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-sm font-semibold hover:bg-stone focus-visible:outline-2 focus-visible:outline-primary";
+
 const linkRow =
   "flex min-h-12 items-center gap-3 rounded-xl bg-surface px-4 py-2 hover:bg-stone focus-visible:outline-2 focus-visible:outline-primary";
 
-async function ContactsContent({ section, property, locale }: Props) {
-  const t = await getTranslations("Contacts");
+async function ContactsContent({ section, property, locale, nearby = [] }: Props) {
+  const [t, tPlaces] = await Promise.all([getTranslations("Contacts"), getTranslations("Places")]);
   const hasHost = property.contact_phone || property.contact_email;
+  const tGuideDirections = (await getTranslations("Guide"))("directions");
 
   return (
     <div className="flex flex-col gap-6">
@@ -208,6 +219,43 @@ async function ContactsContent({ section, property, locale }: Props) {
       )}
 
       <Body section={section} locale={locale} />
+
+      {nearby.length > 0 && (
+        <section aria-labelledby="nearby-title" className="flex flex-col gap-2">
+          <h2 id="nearby-title" className="text-2xl">
+            {tPlaces("emergencyPlaces")}
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {nearby.map((place) => (
+              <li key={place.id} className="flex flex-col gap-2 rounded-xl bg-surface p-4">
+                <span>
+                  <span className="block font-semibold">{place.name}</span>
+                  <span className="text-sm text-muted">
+                    {[place.city, place.km !== null && formatDistance(place.km, locale)].filter(Boolean).join(" · ")}
+                  </span>
+                </span>
+                <span className="flex flex-wrap gap-2">
+                  {place.phone && (
+                    <a href={`tel:${place.phone.replace(/\s/g, "")}`} className={`${pill} text-primary`}>
+                      <Phone size={16} aria-hidden />
+                      {place.phone}
+                    </a>
+                  )}
+                  <a
+                    href={directionsLinks(place.lat, place.lng, locale)[0].href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${pill} text-primary`}
+                  >
+                    <Navigation size={16} aria-hidden />
+                    {tGuideDirections}
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section aria-labelledby="emergency-title" className="flex flex-col gap-2">
         <h2 id="emergency-title" className="text-2xl">

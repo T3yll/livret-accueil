@@ -30,7 +30,7 @@ export default async function GuestLayout({ children, params }: LayoutProps<"/[l
     <html lang={locale} className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-full">
         {/* Seuls les textes des composants navigateur sont envoyés au client (pages légères). */}
-        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher }}>
+        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher, Places: messages.Places }}>
           {children}
         </NextIntlClientProvider>
       </body>

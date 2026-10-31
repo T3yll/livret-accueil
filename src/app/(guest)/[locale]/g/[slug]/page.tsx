@@ -1,4 +1,4 @@
-import { ChevronRight, Navigation, Phone, type LucideIcon } from "lucide-react";
+import { ChevronRight, MapPin, Navigation, Phone, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -12,6 +12,7 @@ import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
 import { mediaUrl, visibleSectionTypes } from "@/lib/guide-view";
 import { localized, localizedWithLang } from "@/lib/localized";
+import { guidePlaces } from "@/lib/places-view";
 import { RichText } from "@/lib/rich-text";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/g/[slug]">): Promise<Metadata> {
@@ -34,20 +35,27 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
   const guide = await getGuide(slug);
   if (!guide) notFound();
 
-  const [t, tSections] = await Promise.all([getTranslations("Guide"), getTranslations("Sections")]);
+  const [t, tSections, tPlaces] = await Promise.all([
+    getTranslations("Guide"),
+    getTranslations("Sections"),
+    getTranslations("Places"),
+  ]);
   const { property } = guide;
   const welcome = localizedWithLang(property, "welcome", locale);
   const coverAlt = localized(property, "cover_photo_alt", locale) ?? "";
   const sections = visibleSectionTypes(guide, locale);
   const base = `/g/${slug}`;
   const hasDirections = property.lat !== null && property.lng !== null;
+  const hasPlaces = guidePlaces(guide).length > 0;
 
   // Les 4 infos les plus demandées, en un geste. Une tuile sans contenu n'apparaît pas.
   const tiles: Tile[] = [
     sections.includes("arrival") && { href: `${base}/arrival`, label: tSections("arrival"), icon: SECTION_ICONS.arrival },
     sections.includes("wifi") && { href: `${base}/wifi`, label: tSections("wifi"), icon: SECTION_ICONS.wifi },
     sections.includes("contacts") && { href: `${base}/contacts`, label: t("contact"), icon: Phone },
-    hasDirections && { href: "#directions", label: t("directions"), icon: Navigation },
+    hasPlaces
+      ? { href: `${base}/places`, label: tPlaces("tile"), icon: MapPin }
+      : hasDirections && { href: "#directions", label: t("directions"), icon: Navigation },
   ].filter((tile): tile is Tile => Boolean(tile));
 
   return (
@@ -110,12 +118,24 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
           </nav>
         )}
 
-        {sections.length > 0 && (
+        {(sections.length > 0 || hasPlaces) && (
           <section aria-labelledby="guide-title" className="flex flex-col gap-3">
             <h2 id="guide-title" className="text-[28px]">
               {t("yourGuide")}
             </h2>
             <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+              {hasPlaces && (
+                <li>
+                  <Link
+                    href={`${base}/places`}
+                    className="flex min-h-14 items-center gap-3 px-4 py-2 hover:bg-stone focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <IconBadge icon={MapPin} />
+                    <span className="flex-1 font-semibold">{tPlaces("tile")}</span>
+                    <ChevronRight size={20} className="text-muted" aria-hidden />
+                  </Link>
+                </li>
+              )}
               {sections.map((type) => (
                 <li key={type}>
                   <Link

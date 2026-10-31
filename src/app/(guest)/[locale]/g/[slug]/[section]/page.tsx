@@ -7,6 +7,7 @@ import { IconBadge, SECTION_ICONS } from "@/components/guide/section-icon";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
 import { visibleSectionsOfType } from "@/lib/guide-view";
+import { healthPlaces } from "@/lib/places-view";
 import { isSectionType } from "@/lib/sections";
 
 type Props = PageProps<"/[locale]/g/[slug]/[section]">;
@@ -46,7 +47,13 @@ export default async function SectionPage({ params }: Props) {
       </div>
       <div className="flex flex-col gap-10">
         {sections.map((section) => (
-          <SectionContent key={section.id} section={section} property={guide.property} locale={locale} />
+          <SectionContent
+            key={section.id}
+            section={section}
+            property={guide.property}
+            locale={locale}
+            nearby={type === "contacts" ? healthPlaces(guide) : undefined}
+          />
         ))}
       </div>
     </main>
