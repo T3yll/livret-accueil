@@ -107,11 +107,28 @@ type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type NullableKeys<T> = { [K in keyof T]: null extends T[K] ? K : never }[keyof T];
 type InsertOf<T, Defaults extends keyof T> = Optional<T, Defaults | NullableKeys<T>>;
 
-type Table<Row, Defaults extends keyof Row> = {
+type Relationship = {
+  foreignKeyName: string;
+  columns: string[];
+  isOneToOne: boolean;
+  referencedRelation: string;
+  referencedColumns: string[];
+};
+
+// Clé étrangère `column` → `table`.id (ou `table`.key pour modules)
+type FK<Name extends string, Column extends string, Table extends string, Ref extends string = "id"> = {
+  foreignKeyName: Name;
+  columns: [Column];
+  isOneToOne: false;
+  referencedRelation: Table;
+  referencedColumns: [Ref];
+};
+
+type Table<Row, Defaults extends keyof Row, Rels extends Relationship[] = []> = {
   Row: Row;
   Insert: InsertOf<Row, Defaults>;
   Update: Partial<Row>;
-  Relationships: [];
+  Relationships: Rels;
 };
 
 export type Database = {
@@ -119,17 +136,40 @@ export type Database = {
     Tables: {
       admins: Table<{ user_id: string; created_at: string }, "created_at">;
       hosts: Table<HostRow, "id" | "created_at" | "updated_at">;
-      properties: Table<PropertyRow, "id" | "status" | "created_at" | "updated_at">;
+      properties: Table<
+        PropertyRow,
+        "id" | "status" | "created_at" | "updated_at",
+        [FK<"properties_host_id_fkey", "host_id", "hosts">]
+      >;
       guide_sections: Table<
         GuideSectionRow,
-        "id" | "data" | "media" | "position" | "is_active" | "created_at" | "updated_at"
+        "id" | "data" | "media" | "position" | "is_active" | "created_at" | "updated_at",
+        [FK<"guide_sections_property_id_fkey", "property_id", "properties">]
       >;
       places: Table<PlaceRow, "id" | "opening_mode" | "created_at" | "updated_at">;
-      place_opening_hours: Table<OpeningHoursRow, "id">;
-      place_closures: Table<ClosureRow, "id">;
-      property_places: Table<PropertyPlaceRow, "is_favorite" | "position" | "created_at">;
+      place_opening_hours: Table<
+        OpeningHoursRow,
+        "id",
+        [FK<"place_opening_hours_place_id_fkey", "place_id", "places">]
+      >;
+      place_closures: Table<ClosureRow, "id", [FK<"place_closures_place_id_fkey", "place_id", "places">]>;
+      property_places: Table<
+        PropertyPlaceRow,
+        "is_favorite" | "position" | "created_at",
+        [
+          FK<"property_places_property_id_fkey", "property_id", "properties">,
+          FK<"property_places_place_id_fkey", "place_id", "places">,
+        ]
+      >;
       modules: Table<ModuleRow, never>;
-      property_modules: Table<PropertyModuleRow, "is_active">;
+      property_modules: Table<
+        PropertyModuleRow,
+        "is_active",
+        [
+          FK<"property_modules_property_id_fkey", "property_id", "properties">,
+          FK<"property_modules_module_key_fkey", "module_key", "modules", "key">,
+        ]
+      >;
     };
     Views: {
       places_needing_review: { Row: PlaceRow; Relationships: [] };
