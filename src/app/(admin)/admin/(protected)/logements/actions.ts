@@ -9,6 +9,7 @@ import {
   optionalCoordinate,
   optionalText,
   requiredText,
+  formValues,
   type FormState,
 } from "@/lib/forms";
 import { generateSlug } from "@/lib/slug";
@@ -44,30 +45,32 @@ export async function saveProperty(
   formData: FormData,
 ): Promise<FormState> {
   const { supabase } = await requireAdmin();
+  const values = formValues(formData);
 
-  const parsed = propertySchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: null, fieldErrors: fieldErrorsFrom(parsed.error) };
-  const values = parsed.data;
+  const parsed = propertySchema.safeParse(values);
+  if (!parsed.success) return { values, error: null, fieldErrors: fieldErrorsFrom(parsed.error) };
+  const fields = parsed.data;
 
   if (id) {
-    const { error } = await supabase.from("properties").update(values).eq("id", id);
+    const { error } = await supabase.from("properties").update(fields).eq("id", id);
     if (error?.message.includes("published_requires_essentials")) {
       return {
+        values,
         error: "Un livret publié doit garder ses coordonnées GPS et son message d'accueil en français.",
         fieldErrors: {},
       };
     }
-    if (error) return { error: DB_ERROR, fieldErrors: {} };
+    if (error) return { values, error: DB_ERROR, fieldErrors: {} };
     refresh(id);
-    return { error: null, fieldErrors: {}, saved: true };
+    return { values, error: null, fieldErrors: {}, saved: true };
   }
 
   const { data, error } = await supabase
     .from("properties")
-    .insert({ ...values, slug: generateSlug(values.name) })
+    .insert({ ...fields, slug: generateSlug(fields.name) })
     .select("id")
     .single();
-  if (error) return { error: DB_ERROR, fieldErrors: {} };
+  if (error) return { values, error: DB_ERROR, fieldErrors: {} };
 
   // Le module « bonnes adresses » est actif par défaut sur un nouveau logement.
   await supabase.from("property_modules").insert({ property_id: data.id, module_key: "places" });

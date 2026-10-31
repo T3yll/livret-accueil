@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { brand } from "@/config/brand";
 import { routing } from "@/i18n/routing";
@@ -24,11 +24,15 @@ export default async function GuestLayout({ children, params }: LayoutProps<"/[l
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const messages = await getMessages();
 
   return (
     <html lang={locale} className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-full">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        {/* Seuls les textes des composants navigateur sont envoyés au client (pages légères). */}
+        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher }}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

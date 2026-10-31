@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Field } from "@/components/ui/field";
 import { createClient, publicMediaUrl } from "@/lib/supabase/client";
+import { initialValue, type FormState } from "@/lib/forms";
 import type { Tables } from "@/types/database";
 
 const ACCEPTED = "image/jpeg,image/png,image/webp,image/avif";
@@ -11,7 +12,7 @@ const ACCEPTED = "image/jpeg,image/png,image/webp,image/avif";
 // Envoie la photo directement du navigateur vers Supabase Storage (la règle
 // d'accès du bucket « media » n'autorise que l'admin), puis renseigne le chemin
 // dans un champ caché : il est enregistré avec le reste du formulaire.
-export function CoverPhotoInput({ property }: { property: Tables<"properties"> }) {
+export function CoverPhotoInput({ property, state }: { property: Tables<"properties">; state: FormState }) {
   const [path, setPath] = useState(property.cover_photo_path ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,14 +69,14 @@ export function CoverPhotoInput({ property }: { property: Tables<"properties"> }
           label="Description de la photo (FR)"
           name="cover_photo_alt_fr"
           lang="fr"
-          defaultValue={property.cover_photo_alt_fr ?? ""}
+          defaultValue={initialValue(state, "cover_photo_alt_fr", property.cover_photo_alt_fr)}
           hint="Lue par les lecteurs d'écran. Ex. « Maison en pierre avec piscine »."
         />
         <Field
           label="Photo description (EN)"
           name="cover_photo_alt_en"
           lang="en"
-          defaultValue={property.cover_photo_alt_en ?? ""}
+          defaultValue={initialValue(state, "cover_photo_alt_en", property.cover_photo_alt_en)}
         />
       </div>
     </div>

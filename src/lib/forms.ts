@@ -28,6 +28,9 @@ export const optionalCoordinate = (min: number, max: number) =>
 export type FormState = {
   error: string | null;
   fieldErrors: Record<string, string>;
+  // Saisie renvoyée au formulaire : React 19 le réinitialise après chaque action,
+  // sans ça une erreur de validation effacerait tout ce qui a été tapé.
+  values?: Record<string, string>;
   saved?: boolean;
 };
 
@@ -40,4 +43,17 @@ export function fieldErrorsFrom(error: z.ZodError): Record<string, string> {
     if (key && !result[key]) result[key] = issue.message;
   }
   return result;
+}
+
+export function formValues(formData: FormData): Record<string, string> {
+  const values: Record<string, string> = {};
+  for (const [key, value] of formData) {
+    if (typeof value === "string" && !key.startsWith("$")) values[key] = value;
+  }
+  return values;
+}
+
+// Valeur initiale d'un champ : la dernière saisie si le formulaire a été renvoyé, sinon la valeur en base.
+export function initialValue(state: FormState, name: string, stored: string | number | null | undefined) {
+  return state.values?.[name] ?? (stored === null || stored === undefined ? "" : String(stored));
 }
