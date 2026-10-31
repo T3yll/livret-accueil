@@ -7,6 +7,7 @@ const nav = [
   { href: "/admin", label: "Tableau de bord" },
   { href: "/admin/hebergeurs", label: "Hébergeurs" },
   { href: "/admin/logements", label: "Logements" },
+  { href: "/admin/adresses", label: "Adresses" },
 ] as const;
 
 export default async function ProtectedLayout({ children }: LayoutProps<"/admin">) {

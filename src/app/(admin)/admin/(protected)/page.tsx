@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     { label: "Hébergeurs", value: hosts.count, href: "/admin/hebergeurs" },
     { label: "Logements", value: properties.count, href: "/admin/logements" },
     { label: "Livrets publiés", value: published.count, href: "/admin/logements" },
-    { label: "Adresses à revérifier", value: toReview.count, href: null },
+    { label: "Adresses à revérifier", value: toReview.count, href: "/admin/adresses?filtre=a-verifier" },
   ];
 
   return (
