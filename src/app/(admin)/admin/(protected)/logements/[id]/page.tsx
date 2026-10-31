@@ -1,0 +1,112 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { StatusBadge } from "@/components/admin/status-badge";
+import { Button } from "@/components/ui/button";
+import { requireAdmin } from "@/lib/auth";
+import { deleteProperty, regenerateSlug, setModule, setPublished } from "../actions";
+import { PropertyForm } from "../property-form";
+import { missingForPublication } from "../publication";
+
+export const metadata = { title: "Logement" };
+
+const errors: Record<string, string> = {
+  incomplete: "Publication impossible : des informations essentielles manquent.",
+  save: "L'opération a échoué. Réessayez.",
+};
+
+export default async function PropertyPage({ params, searchParams }: PageProps<"/admin/logements/[id]">) {
+  const { id } = await params;
+  const { error } = await searchParams;
+  const { supabase } = await requireAdmin();
+
+  const [{ data: property }, { data: hosts }, { data: modules }] = await Promise.all([
+    supabase.from("properties").select("*").eq("id", id).maybeSingle(),
+    supabase.from("hosts").select("id, name").order("name"),
+    supabase.from("property_modules").select("module_key, is_active").eq("property_id", id),
+  ]);
+  if (!property) notFound();
+
+  const missing = missingForPublication(property);
+  const published = property.status === "published";
+  const placesActive = modules?.some((m) => m.module_key === "places" && m.is_active) ?? false;
+  const guidePath = `/g/${property.slug}`;
+  const errorMessage = typeof error === "string" ? errors[error] : undefined;
+
+  return (
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-3">
+        <p>
+          <Link href="/admin/logements" className="text-sm font-semibold text-primary underline">
+            ← Logements
+          </Link>
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-[28px]">{property.name}</h1>
+          <StatusBadge status={property.status} />
+        </div>
+        {errorMessage && (
+          <p role="alert" className="rounded-xl bg-favorite-bg px-4 py-3 text-sm text-favorite">
+            {errorMessage}
+          </p>
+        )}
+      </div>
+
+      <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4">
+        <h2 className="text-2xl">Livret</h2>
+        <p className="text-sm break-all">
+          Adresse publique : <code className="rounded bg-stone px-1.5 py-0.5">{guidePath}</code>
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={guidePath}
+            target="_blank"
+            className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-[15px] font-semibold hover:bg-stone"
+          >
+            Prévisualiser
+          </Link>
+          <form action={setPublished.bind(null, property.id, !published)}>
+            <Button type="submit" variant={published ? "secondary" : "primary"} disabled={!published && missing.length > 0}>
+              {published ? "Repasser en brouillon" : "Publier"}
+            </Button>
+          </form>
+          <form action={regenerateSlug.bind(null, property.id)}>
+            <Button type="submit" variant="secondary">
+              Changer l&apos;adresse du livret
+            </Button>
+          </form>
+        </div>
+        {!published && missing.length > 0 && (
+          <p className="text-sm text-info">Pour publier, il manque : {missing.join(", ")}.</p>
+        )}
+        <p className="text-sm text-muted">
+          Changer l&apos;adresse rend l&apos;ancien lien et l&apos;ancien QR code inutilisables : à faire seulement
+          si le lien a circulé.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">
+        <h2 className="text-2xl">Modules</h2>
+        <form action={setModule.bind(null, property.id, "places", !placesActive)} className="flex flex-wrap items-center gap-3">
+          <span>
+            Bonnes adresses : <strong>{placesActive ? "activé" : "désactivé"}</strong>
+          </span>
+          <Button type="submit" variant="secondary">
+            {placesActive ? "Désactiver" : "Activer"}
+          </Button>
+        </form>
+      </section>
+
+      <PropertyForm property={property} hosts={hosts ?? []} />
+
+      <section className="flex flex-col gap-3 border-t border-border pt-6">
+        <h2 className="text-2xl">Supprimer</h2>
+        <p className="text-sm text-muted">Supprime aussi les sections et la sélection d&apos;adresses du logement.</p>
+        <form action={deleteProperty.bind(null, property.id)}>
+          <Button type="submit" variant="danger">
+            Supprimer ce logement
+          </Button>
+        </form>
+      </section>
+    </div>
+  );
+}

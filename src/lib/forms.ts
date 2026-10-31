@@ -28,6 +28,7 @@ export const optionalCoordinate = (min: number, max: number) =>
 export type FormState = {
   error: string | null;
   fieldErrors: Record<string, string>;
+  saved?: boolean;
 };
 
 export const initialFormState: FormState = { error: null, fieldErrors: {} };
