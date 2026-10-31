@@ -4,8 +4,8 @@ import { useActionState } from "react";
 import { KEY_HANDOVER_LABELS, SECTION_BODY_HINTS } from "@/components/admin/section-labels";
 import { Button } from "@/components/ui/button";
 import { Field, Select, TextArea } from "@/components/ui/field";
-import { initialFormState, initialValue, type FormState } from "@/lib/forms";
-import { KEY_HANDOVER, parseMedia, parseSectionData } from "@/lib/sections";
+import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
+import { KEY_HANDOVER, parseMedia, parseMediaJson, parseSectionData } from "@/lib/sections";
 import type { Tables } from "@/types/database";
 import { saveSection } from "../actions";
 import { MediaListInput } from "./media-list-input";
@@ -32,7 +32,7 @@ export function SectionForm({ propertyId, section }: { propertyId: string; secti
   };
 
   return (
-    <form action={action} className="flex flex-col gap-8">
+    <form key={formKey(state)} action={action} className="flex flex-col gap-8">
       {section.type === "equipment" && (
         <fieldset className="grid gap-4 lg:grid-cols-2">
           <legend className="sr-only">Nom de l&apos;équipement</legend>
@@ -125,7 +125,7 @@ export function SectionForm({ propertyId, section }: { propertyId: string; secti
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Photos</legend>
         <MediaListInput
-          initial={parseMedia(section.media)}
+          initial={state.values?.media ? parseMediaJson(state.values.media) : parseMedia(section.media)}
           pathPrefix={`properties/${propertyId}/sections/${section.id}`}
         />
       </fieldset>

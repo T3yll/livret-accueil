@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, TextArea } from "@/components/ui/field";
-import { initialFormState, initialValue, type FormState } from "@/lib/forms";
+import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
 import type { Tables } from "@/types/database";
 import { saveHost } from "./actions";
 
@@ -15,7 +15,7 @@ export function HostForm({ host }: { host?: Tables<"hosts"> }) {
   const e = state.fieldErrors;
 
   return (
-    <form action={action} className="flex max-w-xl flex-col gap-4">
+    <form key={formKey(state)} action={action} className="flex max-w-xl flex-col gap-4">
       <Field label="Nom de l'établissement" name="name" defaultValue={initialValue(state, "name", host?.name)} error={e.name} required />
       <Field label="Personne à contacter" name="contact_name" defaultValue={initialValue(state, "contact_name", host?.contact_name)} />
       <div className="grid gap-4 sm:grid-cols-2">

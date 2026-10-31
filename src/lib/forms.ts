@@ -57,3 +57,13 @@ export function formValues(formData: FormData): Record<string, string> {
 export function initialValue(state: FormState, name: string, stored: string | number | null | undefined) {
   return state.values?.[name] ?? (stored === null || stored === undefined ? "" : String(stored));
 }
+
+// Clé du <form>, nouvelle à chaque réponse du serveur : le formulaire est reconstruit
+// avec les valeurs renvoyées. Sans ça, la réinitialisation automatique de React remet
+// les listes déroulantes à leur valeur de départ et la saisie se perd.
+const formKeys = new WeakMap<FormState, number>();
+let nextFormKey = 0;
+export function formKey(state: FormState): number {
+  if (!formKeys.has(state)) formKeys.set(state, ++nextFormKey);
+  return formKeys.get(state)!;
+}

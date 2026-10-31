@@ -13,7 +13,7 @@ const ACCEPTED = "image/jpeg,image/png,image/webp,image/avif";
 // d'accès du bucket « media » n'autorise que l'admin), puis renseigne le chemin
 // dans un champ caché : il est enregistré avec le reste du formulaire.
 export function CoverPhotoInput({ property, state }: { property: Tables<"properties">; state: FormState }) {
-  const [path, setPath] = useState(property.cover_photo_path ?? "");
+  const [path, setPath] = useState(initialValue(state, "cover_photo_path", property.cover_photo_path));
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

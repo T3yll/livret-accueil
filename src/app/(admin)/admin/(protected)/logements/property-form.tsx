@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, Select, TextArea } from "@/components/ui/field";
-import { initialFormState, initialValue, type FormState } from "@/lib/forms";
+import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
 import type { Tables } from "@/types/database";
 import { saveProperty } from "./actions";
 import { CoverPhotoInput } from "./cover-photo-input";
@@ -22,7 +22,7 @@ export function PropertyForm({ property, hosts, defaultHostId }: Props) {
   const e = state.fieldErrors;
 
   return (
-    <form action={action} className="flex flex-col gap-8">
+    <form key={formKey(state)} action={action} className="flex flex-col gap-8">
       <fieldset className="flex max-w-2xl flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Identité</legend>
         <Select

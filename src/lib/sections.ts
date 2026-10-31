@@ -75,6 +75,15 @@ export function parseMedia(media: Json): MediaItem[] {
   return result.success ? result.data : [];
 }
 
+// Liste de photos reçue d'un formulaire (champ caché JSON).
+export function parseMediaJson(value: string): MediaItem[] {
+  try {
+    return parseMedia(JSON.parse(value));
+  } catch {
+    return [];
+  }
+}
+
 export type SectionLike = {
   type: SectionType;
   title_fr: string | null;

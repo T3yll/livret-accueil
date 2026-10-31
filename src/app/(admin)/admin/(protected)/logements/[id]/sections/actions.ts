@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { formValues, type FormState } from "@/lib/forms";
-import { parseMedia, sectionDataSchemas, type SectionType } from "@/lib/sections";
+import { parseMediaJson, sectionDataSchemas, type SectionType } from "@/lib/sections";
 import type { Json } from "@/types/database";
 
 const propertyPath = (propertyId: string) => `/admin/logements/${propertyId}`;
@@ -107,12 +107,7 @@ export async function saveSection(
   }
   if (Object.keys(fieldErrors).length > 0) return { values, error: null, fieldErrors };
 
-  let media: Json = [];
-  try {
-    media = parseMedia(JSON.parse(values.media || "[]"));
-  } catch {
-    media = [];
-  }
+  const media = parseMediaJson(values.media || "[]");
 
   const data = Object.fromEntries(Object.entries(parsed).filter(([, v]) => v !== undefined && v !== false)) as Json;
 
