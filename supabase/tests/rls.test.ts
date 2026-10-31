@@ -132,6 +132,37 @@ describe("admin", () => {
   });
 });
 
+describe("sections par défaut", () => {
+  const sectionTypes = async (propertyFilter: string) =>
+    (
+      await db.query<{ type: string }>(
+        `select s.type from public.guide_sections s join public.properties p on p.id = s.property_id
+         where ${propertyFilter} order by s.position`,
+      )
+    ).rows.map((r) => r.type);
+
+  const expected = ["arrival", "wifi", "house", "departure", "contacts", "practical"];
+
+  it("sont créées pour un nouveau logement", async () => {
+    await db.exec(`insert into public.properties (host_id, name, slug)
+                   values ('00000000-0000-4000-8000-000000000001', 'Nouveau', 'zzzzzzzz-nouveau')`);
+    expect(await sectionTypes("p.slug = 'zzzzzzzz-nouveau'")).toEqual(expected);
+  });
+
+  it("ne s'affichent pas au voyageur tant qu'elles sont vides : get_guide les renvoie, l'app les filtre", async () => {
+    expect(await sectionTypes(`p.slug = '${DEMO_SLUG}'`)).toEqual(expected);
+  });
+
+  it("une seule section par type, sauf les équipements", async () => {
+    const insert = (type: string) =>
+      db.exec(`insert into public.guide_sections (property_id, type)
+               select id, '${type}' from public.properties where slug = 'zzzzzzzz-nouveau'`);
+    await expect(insert("wifi")).rejects.toThrow(/guide_sections_one_per_type/);
+    await insert("equipment");
+    await insert("equipment");
+  });
+});
+
 describe("contraintes", () => {
   it("refuse un slug devinable", async () => {
     await expect(
