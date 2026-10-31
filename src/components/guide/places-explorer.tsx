@@ -58,8 +58,10 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
       (!query.trim() || normalize(p.name).includes(normalize(query.trim()))),
   );
 
-  // Marchés classés par jour de la semaine (seulement ceux qui ont des horaires).
-  const markets = withStatus.filter((p) => p.category === "market" && p.opening_mode === "schedule");
+  // Marchés classés par jour de la semaine : seulement les horaires vérifiés, jamais une supposition.
+  const markets = withStatus.filter(
+    (p) => p.category === "market" && p.opening_mode === "schedule" && p.hours_verified_at,
+  );
   const marketDays = [1, 2, 3, 4, 5, 6, 7]
     .map((day) => ({ day, items: markets.flatMap((m) => rangesOn(m, day).map((r) => ({ market: m, ...r }))) }))
     .filter((d) => d.items.length > 0);
