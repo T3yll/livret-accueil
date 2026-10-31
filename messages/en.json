@@ -1,0 +1,18 @@
+{
+  "Metadata": {
+    "description": "Your welcome guide: arrival, Wi-Fi and good places nearby."
+  },
+  "Home": {
+    "title": "Welcome",
+    "scanPrompt": "Scan the QR code in your accommodation to open your welcome guide."
+  },
+  "Guide": {
+    "welcome": "Welcome",
+    "draftNotice": "Preview: this guide is not published yet."
+  },
+  "LanguageSwitcher": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  }
+}

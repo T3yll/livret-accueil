@@ -1,0 +1,18 @@
+{
+  "Metadata": {
+    "description": "Votre livret d'accueil : arrivée, Wi-Fi, bonnes adresses autour de vous."
+  },
+  "Home": {
+    "title": "Bienvenue",
+    "scanPrompt": "Scannez le QR code de votre logement pour ouvrir votre livret d'accueil."
+  },
+  "Guide": {
+    "welcome": "Bienvenue",
+    "draftNotice": "Aperçu : ce livret n'est pas encore publié."
+  },
+  "LanguageSwitcher": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  }
+}

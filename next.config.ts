@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
   // Modèle de rendu classique (dynamique par défaut) : plus simple pour l'admin,
   // qui lit la session à chaque requête. On pourra activer cacheComponents plus tard.
   cacheComponents: false,
+  experimental: {
+    // 404 commune : l'appli a deux layouts racine (voyageur et admin).
+    globalNotFound: true,
+  },
   turbopack: {
     rules: {
       "*.css": {
