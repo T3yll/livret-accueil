@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
+/* Direction artistique : docs/DIRECTION_ARTISTIQUE.md (contrastes vérifiés sur l'ivoire).
+   Ces variables sont émises telles quelles sur :root et donnent les classes
+   Tailwind correspondantes : bg-background, text-muted, bg-primary, font-heading…
+   L'or (accent) est décoratif : jamais pour du texte. */
+@theme static {
+  --color-background: #f7f5ef;
+  --color-surface: #ffffff;
+  --color-stone: #eae6dc;
+  --color-text: #292b27;
+  --color-muted: #646a66;
+  --color-primary: #465b48;
+  --color-accent: #a48652;
+  --color-open: #286344;
+  --color-closed: #646a66;
+  --color-favorite: #a34f3d;
+  --color-favorite-bg: #f4ece4;
+  --color-info: #42677a;
+  --color-border: #ded9cd;
+
+  --font-heading: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+}
+
+/* Personnalisation par hébergeur (plus tard) : retombe sur la marque. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --host-primary: var(--color-primary);
+  --host-accent: var(--color-accent);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-host-primary: var(--host-primary);
+  --color-host-accent: var(--host-accent);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 500;
 }
