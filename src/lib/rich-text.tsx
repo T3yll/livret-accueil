@@ -28,9 +28,9 @@ export function parseRichText(source: string): Block[] {
   return blocks.filter((b) => (b.kind === "list" ? b.items.length > 0 : b.lines.length > 0));
 }
 
-export function RichText({ text, className = "" }: { text: string; className?: string }) {
+export function RichText({ text, lang, className = "" }: { text: string; lang?: string; className?: string }) {
   return (
-    <div className={`flex flex-col gap-3 ${className}`}>
+    <div lang={lang} className={`flex flex-col gap-3 ${className}`}>
       {parseRichText(text).map((block, i) =>
         block.kind === "list" ? (
           <ul key={i} className="list-disc space-y-1 pl-5">

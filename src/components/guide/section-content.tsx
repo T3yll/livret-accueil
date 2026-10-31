@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import type { Guide } from "@/lib/guide";
 import { formatTime, type GuideSection } from "@/lib/guide-view";
-import { localized } from "@/lib/localized";
+import { localizedWithLang } from "@/lib/localized";
 import { RichText } from "@/lib/rich-text";
 import { parseMedia, parseSectionData } from "@/lib/sections";
 import { CopyButton } from "./copy-button";
@@ -16,8 +16,8 @@ const card = "flex flex-col gap-1 rounded-2xl bg-surface p-4";
 const label = "text-sm text-muted";
 
 function Body({ section, locale }: { section: GuideSection; locale: Locale }) {
-  const body = localized(section, "body", locale);
-  return body ? <RichText text={body} /> : null;
+  const body = localizedWithLang(section, "body", locale);
+  return body ? <RichText text={body.text} lang={body.lang} /> : null;
 }
 
 export async function SectionContent({ section, property, locale }: Props) {
@@ -33,10 +33,14 @@ export async function SectionContent({ section, property, locale }: Props) {
     case "contacts":
       return <ContactsContent section={section} property={property} locale={locale} />;
     case "equipment": {
-      const title = localized(section, "title", locale);
+      const title = localizedWithLang(section, "title", locale);
       return (
         <article className="flex flex-col gap-3">
-          {title && <h2 className="text-2xl font-semibold">{title}</h2>}
+          {title && (
+            <h2 lang={title.lang} className="text-2xl font-semibold">
+              {title.text}
+            </h2>
+          )}
           <Body section={section} locale={locale} />
           {photos}
         </article>
@@ -55,7 +59,7 @@ export async function SectionContent({ section, property, locale }: Props) {
 async function ArrivalContent({ section, property, locale }: Props) {
   const t = await getTranslations("Arrival");
   const d = parseSectionData("arrival", section.data);
-  const parking = localized(d, "parking", locale);
+  const parking = localizedWithLang(d, "parking", locale);
 
   return (
     <div className="flex flex-col gap-4">
@@ -85,7 +89,7 @@ async function ArrivalContent({ section, property, locale }: Props) {
         {parking && (
           <div className={card}>
             <dt className={label}>{t("parking")}</dt>
-            <dd>{parking}</dd>
+            <dd lang={parking.lang}>{parking.text}</dd>
           </div>
         )}
       </dl>

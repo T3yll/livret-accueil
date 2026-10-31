@@ -11,7 +11,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
 import { mediaUrl, visibleSectionTypes } from "@/lib/guide-view";
-import { localized } from "@/lib/localized";
+import { localized, localizedWithLang } from "@/lib/localized";
 import { RichText } from "@/lib/rich-text";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/g/[slug]">): Promise<Metadata> {
@@ -36,7 +36,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
 
   const [t, tSections] = await Promise.all([getTranslations("Guide"), getTranslations("Sections")]);
   const { property } = guide;
-  const welcome = localized(property, "welcome", locale);
+  const welcome = localizedWithLang(property, "welcome", locale);
   const coverAlt = localized(property, "cover_photo_alt", locale) ?? "";
   const sections = visibleSectionTypes(guide, locale);
   const base = `/g/${slug}`;
@@ -76,7 +76,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
           <div aria-hidden className="h-px w-12 bg-accent" />
           <p className="text-sm text-muted">{t("welcome")}</p>
           <h1 className="text-[32px] leading-tight">{property.name}</h1>
-          {welcome && <RichText text={welcome} />}
+          {welcome && <RichText text={welcome.text} lang={welcome.lang} />}
         </header>
 
         {tiles.length > 0 && (

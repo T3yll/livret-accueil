@@ -29,7 +29,7 @@
   "Arrival": {
     "checkinFrom": "À partir de {time}",
     "checkinBetween": "Entre {from} et {until}",
-    "checkin": "Arrivée",
+    "checkin": "Horaires d'arrivée",
     "keys": "Clés",
     "accessCode": "Code d'accès",
     "parking": "Parking",

@@ -5,19 +5,39 @@ import { useState } from "react";
 
 type Labels = { copy: string; copied: string; failed: string };
 
+// API moderne d'abord ; sinon l'ancienne méthode (champ temporaire + execCommand),
+// encore utile sur certains navigateurs mobiles et vues intégrées.
+async function writeToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+    try {
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      field.remove();
+    }
+  }
+}
+
 // Copie en un geste, avec un retour lu par les lecteurs d'écran.
 // Les libellés arrivent en props : pas besoin d'envoyer les traductions au navigateur.
 export function CopyButton({ value, labels }: { value: string; labels: Labels }) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   async function copy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setStatus("copied");
-      setTimeout(() => setStatus("idle"), 3000);
-    } catch {
-      setStatus("failed");
-    }
+    const ok = await writeToClipboard(value);
+    setStatus(ok ? "copied" : "failed");
+    if (ok) setTimeout(() => setStatus("idle"), 3000);
   }
 
   return (

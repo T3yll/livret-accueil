@@ -14,3 +14,16 @@ export function localized<K extends string>(
   if (locale === "fr") return fr;
   return pick(record[`${key}_en` as keyof Bilingual<K>]) ?? fr;
 }
+
+// Comme localized, avec la langue réelle du texte : un texte en repli FR sur une page
+// anglaise doit porter lang="fr" pour être bien prononcé par les lecteurs d'écran.
+export function localizedWithLang<K extends string>(
+  record: Bilingual<K>,
+  key: K,
+  locale: Locale,
+): { text: string; lang: Locale } | null {
+  const text = localized(record, key, locale);
+  if (!text) return null;
+  const en = record[`${key}_en` as keyof Bilingual<K>];
+  return { text, lang: locale === "en" && !(en && en.trim()) ? "fr" : locale };
+}
