@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   // Modèle de rendu classique (dynamique par défaut) : plus simple pour l'admin,
   // qui lit la session à chaque requête. On pourra activer cacheComponents plus tard.
   cacheComponents: false,
+  // Mode dev uniquement : ouvrir le serveur local depuis un téléphone sur le même Wi-Fi
+  // (adresses privées du réseau domestique, et nom Bonjour du Mac en .local).
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.local"],
   experimental: {
     // 404 commune : l'appli a deux layouts racine (voyageur et admin).
     globalNotFound: true,
