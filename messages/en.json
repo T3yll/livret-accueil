@@ -8,7 +8,60 @@
   },
   "Guide": {
     "welcome": "Welcome",
-    "draftNotice": "Preview: this guide is not published yet."
+    "draftNotice": "Preview: this guide is not published yet.",
+    "back": "Back",
+    "quickAccess": "Quick access",
+    "yourGuide": "Your guide",
+    "address": "Address",
+    "directions": "Directions",
+    "contact": "Contact",
+    "openIn": "Open directions in {app}"
+  },
+  "Sections": {
+    "arrival": "Arrival",
+    "wifi": "Wi-Fi",
+    "house": "The house",
+    "equipment": "Equipment",
+    "departure": "Departure",
+    "contacts": "Useful contacts",
+    "practical": "Practical information"
+  },
+  "Arrival": {
+    "checkinFrom": "From {time}",
+    "checkinBetween": "Between {from} and {until}",
+    "checkin": "Check-in",
+    "keys": "Keys",
+    "accessCode": "Access code",
+    "parking": "Parking",
+    "video": "Watch the access video",
+    "keyHandover": {
+      "key_box": "Key box",
+      "in_person": "Handed over in person",
+      "smart_lock": "Keypad lock",
+      "other": "See the instructions below"
+    }
+  },
+  "Wifi": {
+    "network": "Network",
+    "password": "Password",
+    "copy": "Copy password",
+    "copied": "Password copied",
+    "copyFailed": "Could not copy: please select the password",
+    "noWifi": "There is no Wi-Fi in this accommodation."
+  },
+  "Departure": {
+    "checkoutBefore": "Check-out before {time}"
+  },
+  "Contacts": {
+    "host": "Your host",
+    "call": "Call",
+    "email": "Send an email",
+    "emergencies": "Emergencies",
+    "samu": "Ambulance (medical emergency)",
+    "firefighters": "Fire brigade",
+    "european": "European emergency number",
+    "deaf": "Emergency for deaf or hard-of-hearing people (text)",
+    "pharmacy": "Out-of-hours pharmacy"
   },
   "LanguageSwitcher": {
     "label": "Language",

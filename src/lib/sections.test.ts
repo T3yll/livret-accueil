@@ -16,9 +16,14 @@ const section = (overrides: Partial<SectionLike>): SectionLike => ({
 
 describe("isSectionEmpty", () => {
   it("une section créée par défaut est vide", () => {
-    for (const type of ["arrival", "wifi", "house", "departure", "contacts", "practical"] as const) {
+    for (const type of ["arrival", "wifi", "house", "departure", "practical"] as const) {
       expect(isSectionEmpty(section({ type }), "fr")).toBe(true);
     }
+  });
+
+  it("Contacts n'est jamais vide (numéros d'urgence), sauf désactivée", () => {
+    expect(isSectionEmpty(section({ type: "contacts" }), "fr")).toBe(false);
+    expect(isSectionEmpty(section({ type: "contacts", is_active: false }), "fr")).toBe(true);
   });
 
   it("un texte suffit à la rendre visible, et le FR sert de repli en anglais", () => {

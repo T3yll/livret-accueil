@@ -117,6 +117,9 @@ export function isSectionEmpty(section: SectionLike, locale: Locale): boolean {
     }
     case "departure":
       return !parseSectionData("departure", section.data).checkout_time;
+    case "contacts":
+      // Jamais vide : les numéros d'urgence s'affichent toujours.
+      return false;
     default:
       return true;
   }

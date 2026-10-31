@@ -8,7 +8,60 @@
   },
   "Guide": {
     "welcome": "Bienvenue",
-    "draftNotice": "Aperçu : ce livret n'est pas encore publié."
+    "draftNotice": "Aperçu : ce livret n'est pas encore publié.",
+    "back": "Retour",
+    "quickAccess": "Accès rapides",
+    "yourGuide": "Votre livret",
+    "address": "Adresse",
+    "directions": "Itinéraire",
+    "contact": "Contact",
+    "openIn": "Ouvrir l'itinéraire dans {app}"
+  },
+  "Sections": {
+    "arrival": "Arrivée",
+    "wifi": "Wi-Fi",
+    "house": "Le logement",
+    "equipment": "Équipements",
+    "departure": "Départ",
+    "contacts": "Contacts utiles",
+    "practical": "Infos pratiques"
+  },
+  "Arrival": {
+    "checkinFrom": "À partir de {time}",
+    "checkinBetween": "Entre {from} et {until}",
+    "checkin": "Arrivée",
+    "keys": "Clés",
+    "accessCode": "Code d'accès",
+    "parking": "Parking",
+    "video": "Voir la vidéo d'accès",
+    "keyHandover": {
+      "key_box": "Boîte à clés",
+      "in_person": "Remise en main propre",
+      "smart_lock": "Serrure à code",
+      "other": "Voir les consignes ci-dessous"
+    }
+  },
+  "Wifi": {
+    "network": "Réseau",
+    "password": "Mot de passe",
+    "copy": "Copier le mot de passe",
+    "copied": "Mot de passe copié",
+    "copyFailed": "Copie impossible : sélectionnez le mot de passe",
+    "noWifi": "Ce logement n'a pas de Wi-Fi."
+  },
+  "Departure": {
+    "checkoutBefore": "Départ avant {time}"
+  },
+  "Contacts": {
+    "host": "Votre hôte",
+    "call": "Appeler",
+    "email": "Écrire un email",
+    "emergencies": "Urgences",
+    "samu": "SAMU (urgence médicale)",
+    "firefighters": "Pompiers",
+    "european": "Numéro d'urgence européen",
+    "deaf": "Urgences pour personnes sourdes ou malentendantes (SMS)",
+    "pharmacy": "Pharmacie de garde"
   },
   "LanguageSwitcher": {
     "label": "Langue",
