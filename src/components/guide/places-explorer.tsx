@@ -14,6 +14,7 @@ import { localized, localizedWithLang } from "@/lib/localized";
 import { isOpenToday, rangesOn, todayStatus } from "@/lib/opening-hours";
 import { GUIDE_CATEGORIES, weekdayName, type PlaceCategory, type PlaceWithDistance } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
+import { floatingButton } from "./map-ui";
 import { OpenBadge } from "./open-badge";
 import { CATEGORY_ICONS } from "./place-icons";
 
@@ -136,52 +137,63 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
   if (view === "map") {
     return (
       <div ref={rootRef}>
-        <section aria-label={t("map")} className="flex h-[100lvh] flex-col bg-background">
-          <div className="flex flex-col gap-2 border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
-            <div className="flex items-center justify-between gap-3">
-              <Link
-                href={`/g/${slug}`}
-                className="-ml-2 inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-[15px] font-semibold text-primary focus-visible:outline-2 focus-visible:outline-primary"
-              >
-                <ChevronLeft size={20} aria-hidden />
-                {t("backToGuide")}
-              </Link>
-              <p aria-live="polite" className="text-sm text-muted">
-                {t("count", { count: filtered.length })}
-              </p>
-              <button
-                type="button"
-                onClick={() => setView("list")}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-stone px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-primary"
-              >
-                <List size={16} aria-hidden />
-                {t("list")}
-              </button>
-            </div>
-            <div role="group" aria-label={t("filters")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        {/* Contrôles flottants sur la carte, comme les cartes mobiles courantes (Google Maps, Airbnb) :
+            retour et filtres en haut, liste en bas au centre (à portée de pouce), position en bas à droite. */}
+        <section aria-label={t("map")} className="relative h-[100lvh] overflow-hidden bg-background">
+          <PlacesMap
+            origin={origin}
+            places={filtered.map((p) => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, category: p.category, is_favorite: p.is_favorite }))}
+            selectedId={selected?.id ?? null}
+            onSelect={setSelectedId}
+            originLabel={originLabel}
+            controlsHidden={Boolean(selected)}
+            labels={{
+              yourStay: t("yourStay"),
+              favorite: t("favorite"),
+              locateMe: t("locateMe"),
+              showStay: t("showStay"),
+              youAreHere: t("youAreHere"),
+              locationDenied: t("locationDenied"),
+              locationUnavailable: t("locationUnavailable"),
+            }}
+          />
+
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] flex items-center gap-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
+            <Link
+              href={`/g/${slug}`}
+              aria-label={t("backToGuide")}
+              className={`pointer-events-auto ml-3 shrink-0 ${floatingButton}`}
+            >
+              <ChevronLeft size={22} aria-hidden />
+            </Link>
+            <div
+              role="group"
+              aria-label={t("filters")}
+              className="pointer-events-auto flex min-w-0 flex-1 gap-2 overflow-x-auto py-1.5 pr-3 [scrollbar-width:none] [&>button]:border-transparent [&>button]:shadow-[0_1px_4px_rgb(0_0_0/0.25)]"
+            >
               {categoryChips}
               {favoritesChip}
             </div>
           </div>
-          <div className="relative flex-1">
-            <PlacesMap
-              origin={origin}
-              places={filtered.map((p) => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, category: p.category, is_favorite: p.is_favorite }))}
-              selectedId={selected?.id ?? null}
-              onSelect={setSelectedId}
-              originLabel={originLabel}
-              labels={{
-                yourStay: t("yourStay"),
-                favorite: t("favorite"),
-                locateMe: t("locateMe"),
-                showStay: t("showStay"),
-                youAreHere: t("youAreHere"),
-                locationDenied: t("locationDenied"),
-                locationUnavailable: t("locationUnavailable"),
-              }}
-            />
-            {selected && <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />}
-          </div>
+
+          <p aria-live="polite" className="sr-only">
+            {t("count", { count: filtered.length })}
+          </p>
+
+          {selected ? (
+            <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />
+          ) : (
+            <div className="map-above-toolbar pointer-events-none absolute inset-x-0 bottom-0 z-[1000] flex justify-center pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-text px-5 text-[15px] font-semibold text-white shadow-[0_2px_12px_rgb(0_0_0/0.3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <List size={18} aria-hidden />
+                {t("list")} · {filtered.length}
+              </button>
+            </div>
+          )}
         </section>
       </div>
     );
@@ -339,11 +351,11 @@ function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: Pla
               width={640}
               height={360}
               sizes="(max-width: 640px) 100vw, 640px"
-              className="h-40 w-full object-cover"
+              className="h-32 w-full object-cover"
             />
           </Link>
         )}
-        <div className={`flex flex-col gap-1.5 p-4 ${place.photo_path ? "" : "pr-14"}`}>
+        <div className={`flex flex-col gap-1 p-4 pt-3 ${place.photo_path ? "" : "pr-14"}`}>
           {place.is_favorite && (
             <span className="inline-flex items-center gap-1 text-sm font-semibold text-favorite">
               <Heart size={14} fill="currentColor" aria-hidden />
@@ -359,10 +371,10 @@ function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: Pla
             {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
           </p>
           <OpenBadge status={place.status} label={t(`status.${place.status.state}`)} />
-          {description && <p className="line-clamp-3 text-[15px]">{description}</p>}
+          {description && <p className="line-clamp-2 text-[15px]">{description}</p>}
           {comment && (
-            <blockquote lang={comment.lang} className="mt-1 rounded-xl bg-favorite-bg px-3 py-2 font-heading text-lg italic">
-              « {comment.text} »
+            <blockquote lang={comment.lang} className="mt-1 rounded-xl bg-favorite-bg px-3 py-2 font-heading text-lg leading-snug italic">
+              <span className="line-clamp-2">« {comment.text} »</span>
             </blockquote>
           )}
           <Link

@@ -8,6 +8,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import { brandColors } from "@/config/brand";
 import type { PlaceCategory } from "@/lib/places-view";
+import { floatingButton } from "./map-ui";
 import { CATEGORY_ICONS } from "./place-icons";
 
 type MapPlace = { id: string; name: string; lat: number; lng: number; category: PlaceCategory; is_favorite: boolean };
@@ -19,6 +20,7 @@ type Props = {
   // Le détail du lieu choisi s'affiche hors de la carte (fiche résumée en bas de l'écran).
   onSelect: (id: string | null) => void;
   originLabel: string;
+  controlsHidden: boolean; // boutons masqués quand la fiche résumée d'un lieu est ouverte
   labels: {
     yourStay: string;
     favorite: string;
@@ -84,25 +86,33 @@ function ClearSelectionOnMapClick({ onClear }: { onClear: () => void }) {
 
 // Cadre la carte sur le logement et les adresses affichées une fois le conteneur à sa taille finale
 // (en plein écran, il n'a pas encore sa hauteur quand Leaflet s'initialise).
-function FitToPlaces({ bounds }: { bounds: L.LatLngBounds | undefined }) {
+// Une seule fois par carte : la carte est recréée quand les filtres changent (clé), et les rendus
+// suivants (position GPS, lieu choisi…) ne doivent pas la recadrer.
+function FitToPlaces({ bounds: initialBounds }: { bounds: L.LatLngBounds | undefined }) {
   const map = useMap();
+  const [bounds] = useState(initialBounds);
   useEffect(() => {
+    // Crédits réduits à « © OpenStreetMap » (sans le lien Leaflet), obligatoires pour les tuiles OSM.
+    map.attributionControl?.setPrefix(false);
     map.invalidateSize();
-    // Marge pour qu'aucun marqueur ne passe sous les boutons de zoom ou au bord.
-    if (bounds) map.fitBounds(bounds, { padding: [24, 24] });
+    // Marges : les filtres flottent en haut, le bouton « Liste » en bas.
+    if (bounds) map.fitBounds(bounds, { paddingTopLeft: [24, 80], paddingBottomRight: [24, 88] });
   }, [map, bounds]);
   return null;
 }
 
 // Amène le lieu choisi au centre, pour qu'il ne reste pas caché sous la fiche résumée.
+// Seulement quand on choisit un autre lieu (coordonnées en dépendances, pas l'objet recréé à chaque rendu).
 function PanToSelected({ place }: { place: MapPlace | undefined }) {
   const map = useMap();
+  const lat = place?.lat;
+  const lng = place?.lng;
   useEffect(() => {
-    if (!place) return;
-    // Centre un peu au-dessus du milieu : la fiche occupe le bas de l'écran.
-    const point = map.project([place.lat, place.lng]).add([0, map.getSize().y * 0.2]);
+    if (lat === undefined || lng === undefined) return;
+    // Centre au-dessus du milieu : la fiche résumée occupe le bas de l'écran.
+    const point = map.project([lat, lng]).add([0, map.getSize().y * 0.25]);
     map.panTo(map.unproject(point), { animate: true });
-  }, [map, place]);
+  }, [map, lat, lng]);
   return null;
 }
 
@@ -160,11 +170,7 @@ function useLivePosition() {
   return { position, error, start };
 }
 
-const mapButton =
-  "inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface text-primary shadow-[0_1px_4px_rgb(0_0_0/0.2)] " +
-  "focus-visible:outline-2 focus-visible:outline-primary";
-
-export default function PlacesMap({ origin, places, selectedId, onSelect, originLabel, labels }: Props) {
+export default function PlacesMap({ origin, places, selectedId, onSelect, originLabel, controlsHidden, labels }: Props) {
   const [map, setMap] = useState<L.Map | null>(null);
   const live = useLivePosition();
   const center = origin ?? (places[0] ? { lat: places[0].lat, lng: places[0].lng } : { lat: 44.8, lng: 1.4 });
@@ -190,6 +196,8 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
         key={places.map((p) => p.id).join(",")}
         center={[center.lat, center.lng]}
         zoom={13}
+        // Pas de boutons +/− : on zoome à deux doigts (ou à la molette), comme sur les cartes mobiles.
+        zoomControl={false}
         className="places-map size-full"
       >
         <TileLayer
@@ -230,25 +238,30 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
           />
         ))}
       </MapContainer>
-      {/* Boutons de recentrage, sous les filtres, à droite (le zoom est à gauche). */}
-      <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
-        <button type="button" onClick={locate} aria-label={labels.locateMe} title={labels.locateMe} className={mapButton}>
-          <LocateFixed size={20} aria-hidden />
-        </button>
-        {origin && (
-          <button
-            type="button"
-            onClick={() => map?.setView([origin.lat, origin.lng], Math.max(map.getZoom(), 14))}
-            aria-label={labels.showStay}
-            title={labels.showStay}
-            className={mapButton}
-          >
-            <House size={20} aria-hidden />
+      {/* Position et logement en bas à droite, au-dessus des crédits et du bouton « Liste » (Google Maps). */}
+      {!controlsHidden && (
+        <div className="map-above-toolbar absolute right-3 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4rem)] z-[1000] flex flex-col gap-2">
+          {origin && (
+            <button
+              type="button"
+              onClick={() => map?.setView([origin.lat, origin.lng], Math.max(map.getZoom(), 14))}
+              aria-label={labels.showStay}
+              title={labels.showStay}
+              className={floatingButton}
+            >
+              <House size={20} aria-hidden />
+            </button>
+          )}
+          <button type="button" onClick={locate} aria-label={labels.locateMe} title={labels.locateMe} className={`${floatingButton} text-info`}>
+            <LocateFixed size={20} aria-hidden />
           </button>
-        )}
-      </div>
+        </div>
+      )}
       {live.error && (
-        <p role="status" className="absolute top-3 right-16 left-16 z-[1000] rounded-xl bg-surface px-3 py-2 text-sm shadow-[0_1px_4px_rgb(0_0_0/0.2)]">
+        <p
+          role="status"
+          className="absolute inset-x-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+3.75rem)] z-[1000] rounded-xl bg-surface px-3 py-2 text-sm shadow-[0_1px_6px_rgb(0_0_0/0.25)]"
+        >
           {live.error === "denied" ? labels.locationDenied : labels.locationUnavailable}
         </p>
       )}
