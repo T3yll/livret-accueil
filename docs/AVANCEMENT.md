@@ -1,6 +1,6 @@
 # Avancement du projet
 
-État au 2 novembre 2026. À lire en reprenant le projet (nouveau PC, nouvelle session).
+État au 2 novembre 2026 (semaine 4 commencée). À lire en reprenant le projet (nouveau PC, nouvelle session).
 Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers de `docs/`.
 
 ## Où on en est dans le planning
@@ -10,7 +10,7 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 | 1 · 2 → 8 nov. | Projet initialisé, base de données, admin hébergeurs et logements | ✅ Fait et testé |
 | 2 · 9 → 15 nov. | Sections du livret, affichage voyageur FR/EN | ✅ Fait et testé |
 | 3 · 16 → 22 nov. | Base d'adresses, carte, « ouvert aujourd'hui », coups de cœur | ✅ Fait et testé |
-| 4 · 23 → 29 nov. | PWA hors connexion, QR codes, mise en ligne Vercel, DA appliquée | ⏳ À faire |
+| 4 · 23 → 29 nov. | PWA hors connexion, QR codes, mise en ligne Vercel, DA appliquée | 🔶 PWA, QR codes et DA faits ; reste la mise en ligne Vercel |
 | 5 · 30 nov. → 13 déc. | Saisie des 30 adresses, livret de démo, rendez-vous avec 3 hébergeurs | ⏳ À faire |
 
 ## Ce qui existe
@@ -22,6 +22,15 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 - **Livret voyageur** (`/g/<slug>` → `/fr/...` ou `/en/...`) : accueil, 7 sections, Wi-Fi copiable,
   contacts et urgences, itinéraire (Google Maps, Plans, Waze), bonnes adresses (liste, filtres,
   recherche, carte Leaflet, marchés par jour, fiche).
+- **Hors connexion (PWA)** : `public/sw.js` (écrit à la main). À la première visite, toutes les pages du livret
+  dans la langue courante et leurs fichiers JS/CSS sont enregistrées en arrière-plan ; ensuite, pages en
+  « réseau d'abord » avec repli sur le cache au bout de 4 s. Photos et tuiles de carte : seulement celles déjà vues.
+  Manifest par logement (`/<langue>/g/<slug>/manifest.webmanifest`), icônes générées depuis l'emblème
+  (`/icons/…`), page `/offline.html`, bandeau « Hors connexion », invitation à l'installation (Android : bouton ;
+  iPhone : marche à suivre). **Actif seulement en production** (`npm run build && npm start`).
+- **QR codes** (fiche d'un logement dans l'admin) : aperçu, PNG 1024 px, SVG, carte A6 recto verso imprimable
+  (`/admin/logements/<id>/carte-qr`). Le QR encode `NEXT_PUBLIC_SITE_URL/g/<slug>` (sans langue).
+- **Emblème** : dessin unique dans `src/config/emblem.ts` (composant `Emblem`, icônes, carte QR).
 - **Base Supabase** (projet cloud `oeheumqsfmcqaiwisgxr`, région Europe) : 3 migrations dans
   `supabase/migrations/`, toutes appliquées. Aucun accès anonyme aux tables : le voyageur passe
   uniquement par la fonction `get_guide(slug)`.
@@ -54,7 +63,13 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 - Avertissement « N archivée(s) » sur la fiche d'un logement.
 - Un blocage unique (2,5 min) au premier enregistrement d'une section, jamais reproduit :
   probablement la première compilation en mode dev.
-- Node 20 est en fin de support pour `supabase-js` : passer en Node 22.
+- Ce PC est en Node 22.
+- **Service worker testé** dans Edge headless (serveur coupé : sections et fiches jamais ouvertes, filtres de la liste,
+  repli sur l'accueil, page « Pas de connexion »). Le navigateur intégré de Claude bloque les service workers :
+  à vérifier sur un vrai téléphone (mode avion), iPhone compris.
+- Pages admin des QR codes et carte A6 : non vérifiées à l'écran (connexion admin nécessaire). Les PNG et SVG
+  générés ont été décodés avec succès par un lecteur de QR indépendant.
+- Une adresse vue hors connexion affiche « ouvert aujourd'hui » recalculé à l'heure du téléphone.
 
 ## Reprendre sur un autre PC
 
@@ -69,8 +84,15 @@ npm run dev
 Pour créer ou appliquer des migrations : `npx supabase login`, puis
 `npx supabase link --project-ref oeheumqsfmcqaiwisgxr`.
 
-## Prochaine étape : semaine 4
+## Prochaine étape : fin de la semaine 4, mise en ligne sur Vercel
 
-Proposer le plan avant de coder (règle de `CLAUDE.md`) : PWA et hors connexion (manifest, service worker,
-cache du livret et des adresses), QR codes PNG/SVG et carte A6 imprimable, mise en ligne sur Vercel
-(variables d'environnement, domaine, URL de redirection Supabase Auth), passe de DA (emblème, détails visuels).
+À faire avec Rémi (compte Vercel, DNS) :
+1. Importer le dépôt GitHub dans Vercel (framework Next.js détecté).
+2. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   `NEXT_PUBLIC_SITE_URL` (adresse définitive, sans / final : elle est imprimée dans les QR codes).
+3. Domaine (`conciergerie-des-deux-vallees.fr` ou un sous-domaine) dans Vercel, puis DNS chez le registrar.
+4. Supabase → Authentication → URL Configuration : Site URL = l'adresse définitive, et ajouter
+   `<adresse>/auth/callback` aux Redirect URLs.
+5. Tests réels : QR imprimé sur iPhone et Android, mode avion après une visite, installation sur l'écran d'accueil.
+
+Ensuite, semaine 5 : saisie des 30 adresses et préparation de la démo.
