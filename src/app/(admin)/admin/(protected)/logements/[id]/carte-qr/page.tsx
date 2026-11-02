@@ -33,7 +33,7 @@ export default async function QrCardPage({ params }: PageProps<"/admin/logements
 
   const card =
     "relative flex h-[148mm] w-[105mm] shrink-0 flex-col items-center overflow-hidden bg-background text-center " +
-    "shadow-[0_1px_4px_rgb(0_0_0/0.15)] print:break-after-page print:shadow-none [print-color-adjust:exact]";
+    "shadow-[0_1px_4px_rgb(0_0_0/0.15)] print:shadow-none [print-color-adjust:exact]";
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,10 +53,18 @@ export default async function QrCardPage({ params }: PageProps<"/admin/logements
             NEXT_PUBLIC_SITE_URL avec l&apos;adresse du site en ligne avant d&apos;imprimer.
           </p>
         )}
-        <p className="text-sm text-muted">
-          Impression recto verso, papier crème mat 300–350 g, à l&apos;échelle 100 %. Testez le QR code sur un iPhone et un
-          Android avant de lancer le tirage.
-        </p>
+        <div className="flex flex-col gap-1 text-sm text-muted">
+          <p>
+            Pour un fichier à envoyer à l&apos;imprimeur, choisissez la destination{" "}
+            <strong className="text-text">Enregistrer au format PDF</strong> : le format A6, les marges et les couleurs
+            sont alors appliqués automatiquement (2 pages : recto puis verso).
+          </p>
+          <p>
+            Sur une imprimante de bureau, le navigateur impose ses réglages : choisissez A6, marges « Aucune », échelle
+            100 % et cochez « Graphiques d&apos;arrière-plan ».
+          </p>
+          <p>Papier crème mat 300–350 g. Testez le QR code sur un iPhone et un Android avant de lancer le tirage.</p>
+        </div>
         <div>
           <PrintButton>Imprimer</PrintButton>
         </div>
@@ -64,7 +72,8 @@ export default async function QrCardPage({ params }: PageProps<"/admin/logements
 
       <div className="flex flex-wrap gap-6 print:block">
         {/* Recto */}
-        <section aria-label="Recto" className={`${card} justify-between px-[10mm] py-[9mm]`}>
+        {/* Saut de page après le recto seulement : après le verso, il ajouterait une page blanche. */}
+        <section aria-label="Recto" className={`${card} justify-between px-[10mm] py-[9mm] print:break-after-page`}>
           <div className="flex flex-col items-center gap-[2mm]">
             <Emblem size={64} />
             <p className="text-[9pt] tracking-[0.25em] text-muted uppercase">{brand.name}</p>
