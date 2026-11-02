@@ -236,6 +236,7 @@ export type Database = {
           phone: string | null
           photo_alt_en: string | null
           photo_alt_fr: string | null
+          photo_credit: string | null
           photo_path: string | null
           postal_code: string | null
           updated_at: string
@@ -259,6 +260,7 @@ export type Database = {
           phone?: string | null
           photo_alt_en?: string | null
           photo_alt_fr?: string | null
+          photo_credit?: string | null
           photo_path?: string | null
           postal_code?: string | null
           updated_at?: string
@@ -282,6 +284,7 @@ export type Database = {
           phone?: string | null
           photo_alt_en?: string | null
           photo_alt_fr?: string | null
+          photo_credit?: string | null
           photo_path?: string | null
           postal_code?: string | null
           updated_at?: string

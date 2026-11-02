@@ -19,6 +19,7 @@ const place = (overrides: Partial<Guide["places"][number]>): Guide["places"][num
   photo_path: null,
   photo_alt_fr: null,
   photo_alt_en: null,
+  photo_credit: null,
   opening_mode: "unknown",
   hours_verified_at: null,
   is_favorite: false,

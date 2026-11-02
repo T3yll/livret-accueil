@@ -54,15 +54,21 @@ export default async function PlacePage({ params }: Props) {
     <main className="mx-auto flex min-h-dvh max-w-[640px] flex-col gap-6 pb-12">
       <div className="relative">
         {place.photo_path && (
-          <Image
-            src={mediaUrl(place.photo_path)}
-            alt={photoAlt?.text ?? ""}
-            width={1280}
-            height={853}
-            priority
-            sizes="(max-width: 640px) 100vw, 640px"
-            className="aspect-[4/3] w-full object-cover sm:rounded-b-3xl"
-          />
+          <figure>
+            <Image
+              src={mediaUrl(place.photo_path)}
+              alt={photoAlt?.text ?? ""}
+              width={1280}
+              height={853}
+              priority
+              sizes="(max-width: 640px) 100vw, 640px"
+              className="aspect-[4/3] w-full object-cover sm:rounded-b-3xl"
+            />
+            {/* Crédit exigé par les licences libres (Wikimedia Commons) : discret, sous la photo. */}
+            {place.photo_credit && (
+              <figcaption className="px-4 pt-1 text-right text-xs text-muted">{place.photo_credit}</figcaption>
+            )}
+          </figure>
         )}
         <div
           className={`flex items-center justify-between gap-4 px-4 pt-2 ${place.photo_path ? "absolute inset-x-0 top-0" : ""}`}

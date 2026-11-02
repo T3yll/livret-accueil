@@ -55,6 +55,7 @@ export type Guide = {
     photo_path: string | null;
     photo_alt_fr: string | null;
     photo_alt_en: string | null;
+    photo_credit: string | null;
     opening_mode: Enums<"opening_mode">;
     hours_verified_at: string | null;
     is_favorite: boolean;

@@ -162,13 +162,21 @@ function PlaceFields({
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Photo</legend>
         {place ? (
-          <SinglePhotoInput
-            name="photo_path"
-            altNames={{ fr: "photo_alt_fr", en: "photo_alt_en" }}
-            initialPath={v("photo_path")}
-            initialAlt={{ fr: v("photo_alt_fr"), en: v("photo_alt_en") }}
-            pathPrefix={`places/${place.id}/photo`}
-          />
+          <>
+            <SinglePhotoInput
+              name="photo_path"
+              altNames={{ fr: "photo_alt_fr", en: "photo_alt_en" }}
+              initialPath={v("photo_path")}
+              initialAlt={{ fr: v("photo_alt_fr"), en: v("photo_alt_en") }}
+              pathPrefix={`places/${place.id}/photo`}
+            />
+            <Field
+              label="Crédit photo"
+              name="photo_credit"
+              defaultValue={v("photo_credit")}
+              hint="Obligatoire pour une photo sous licence libre. Ex. : Photo : Jean Dupont, CC BY-SA 4.0, Wikimedia Commons"
+            />
+          </>
         ) : (
           <p className="text-sm text-muted">La photo s&apos;ajoute après la création de l&apos;adresse.</p>
         )}

@@ -41,6 +41,7 @@ const placeSchema = z.object({
   photo_path: optionalText,
   photo_alt_fr: optionalText,
   photo_alt_en: optionalText,
+  photo_credit: optionalText,
   opening_mode: z.enum(["schedule", "always", "appointment", "unknown"]),
   hours_verified_at: optionalText.pipe(z.iso.date("Date invalide.").nullable()),
 });
