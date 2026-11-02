@@ -132,11 +132,12 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
 
   // En mode carte, la carte EST le contenu de la page (pas un calque fixe) : sur iPhone, Safari
   // ne laisse passer sous sa barre flottante que le contenu normal, il découpe les éléments fixes.
+  // Hauteur : tout l'écran (100lvh) plus la zone de la barre d'accueil de l'iPhone (safe-area).
   // La page masque alors son en-tête (data-view sur <main>, voir globals.css).
   if (view === "map") {
     return (
       <div ref={rootRef}>
-        <section aria-label={t("map")} className="flex h-[100lvh] flex-col bg-background">
+        <section aria-label={t("map")} className="flex h-[calc(100lvh+env(safe-area-inset-bottom))] flex-col bg-background">
           <div className="flex flex-col gap-2 border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
             <div className="flex items-center justify-between gap-3">
               <Link
