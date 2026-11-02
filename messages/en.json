@@ -123,5 +123,13 @@
     "label": "Language",
     "fr": "Français",
     "en": "English"
+  },
+  "Offline": {
+    "notice": "Offline: showing the last saved version of the guide.",
+    "installTitle": "Keep your guide close at hand",
+    "installText": "Add it to your home screen: it stays available even without signal.",
+    "install": "Add to home screen",
+    "iosHint": "Tap <share>Share</share>, then “Add to Home Screen”.",
+    "dismiss": "Dismiss"
   }
 }

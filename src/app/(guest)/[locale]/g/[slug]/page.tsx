@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { DraftNotice } from "@/components/guide/guide-header";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { Directions } from "@/components/guide/directions";
+import { Emblem } from "@/components/guide/emblem";
+import { InstallPrompt } from "@/components/guide/install-prompt";
 import { IconBadge, SECTION_ICONS } from "@/components/guide/section-icon";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -81,7 +83,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
         {property.status === "draft" && <DraftNotice label={t("draftNotice")} />}
 
         <header className="flex flex-col gap-3">
-          <div aria-hidden className="h-px w-12 bg-accent" />
+          <Emblem size={48} className="-ml-1" />
           <p className="text-sm text-muted">{t("welcome")}</p>
           <h1 className="text-[32px] leading-tight">{property.name}</h1>
           {welcome && <RichText text={welcome.text} lang={welcome.lang} />}
@@ -153,6 +155,8 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
         )}
 
         <Directions property={property} locale={locale} />
+
+        <InstallPrompt />
       </div>
     </main>
   );

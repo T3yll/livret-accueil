@@ -123,5 +123,13 @@
     "label": "Langue",
     "fr": "Français",
     "en": "English"
+  },
+  "Offline": {
+    "notice": "Hors connexion : dernière version enregistrée du livret.",
+    "installTitle": "Gardez le livret à portée de main",
+    "installText": "Ajoutez-le à votre écran d'accueil : il reste consultable même sans réseau.",
+    "install": "Ajouter à l'écran d'accueil",
+    "iosHint": "Touchez <share>Partager</share> puis « Sur l'écran d'accueil ».",
+    "dismiss": "Masquer"
   }
 }

@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { brand } from "@/config/brand";
+import { brand, brandColors } from "@/config/brand";
 import { routing } from "@/i18n/routing";
 import { fontVariables } from "../../fonts";
 import "../../globals.css";
@@ -10,6 +10,9 @@ import "../../globals.css";
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+// Couleur de la barre du navigateur et de l'appli installée : le fond ivoire du livret.
+export const viewport: Viewport = { themeColor: brandColors.background };
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -30,7 +33,7 @@ export default async function GuestLayout({ children, params }: LayoutProps<"/[l
     <html lang={locale} className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-full">
         {/* Seuls les textes des composants navigateur sont envoyés au client (pages légères). */}
-        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher, Places: messages.Places }}>
+        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher, Places: messages.Places, Offline: messages.Offline }}>
           {children}
         </NextIntlClientProvider>
       </body>
