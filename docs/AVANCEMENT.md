@@ -67,8 +67,9 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 - **Service worker testé** dans Edge headless (serveur coupé : sections et fiches jamais ouvertes, filtres de la liste,
   repli sur l'accueil, page « Pas de connexion »). Le navigateur intégré de Claude bloque les service workers :
   à vérifier sur un vrai téléphone (mode avion), iPhone compris.
-- Pages admin des QR codes et carte A6 : non vérifiées à l'écran (connexion admin nécessaire). Les PNG et SVG
-  générés ont été décodés avec succès par un lecteur de QR indépendant.
+- QR codes vérifiés dans l'admin : aperçu, PNG 1024 px et SVG (décodés par un lecteur indépendant), carte A6
+  exactement à 105 × 148 mm sans débordement, routes refusées sans connexion. **Pas encore testé** : l'aperçu
+  d'impression réel (Ctrl+P, recto verso) et un tirage papier.
 - Une adresse vue hors connexion affiche « ouvert aujourd'hui » recalculé à l'heure du téléphone.
 
 ## Reprendre sur un autre PC
