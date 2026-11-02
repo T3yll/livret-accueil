@@ -1,5 +1,6 @@
 import { Mail, Phone } from "lucide-react";
 import Link from "next/link";
+import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PrintButton } from "@/components/admin/print-button";
@@ -115,7 +116,19 @@ export default async function QrCardPage({ params }: PageProps<"/admin/logements
               <p className="text-[8pt] tracking-[0.15em] text-muted uppercase">
                 {fr("guideAddress")} · <span lang="en">{en("guideAddress")}</span>
               </p>
-              <p className="text-[10pt] font-semibold break-all">{displayUrl}</p>
+              {/* Retour à la ligne après un « / » plutôt qu'au milieu d'un mot. */}
+              <p className="text-[10pt] font-semibold [overflow-wrap:anywhere]">
+                {displayUrl.split("/").map((part, i) => (
+                  <Fragment key={i}>
+                    {i > 0 && (
+                      <>
+                        /<wbr />
+                      </>
+                    )}
+                    {part}
+                  </Fragment>
+                ))}
+              </p>
               <p className="text-[8pt] text-muted">
                 {fr("noApp")} · <span lang="en">{en("noApp")}</span>
               </p>
