@@ -4,6 +4,7 @@ import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { DraftNotice } from "@/components/guide/guide-header";
+import { brand } from "@/config/brand";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { Directions } from "@/components/guide/directions";
 import { Emblem } from "@/components/guide/emblem";
@@ -157,6 +158,14 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
         <Directions property={property} locale={locale} />
 
         <InstallPrompt />
+
+        {/* Signature de la marque : discrète, le logement reste au premier plan. */}
+        <footer className="flex flex-col items-center gap-2 pt-4 text-center">
+          <Emblem size={28} />
+          <p className="text-xs tracking-[0.25em] text-muted uppercase">
+            {brand.name} · {brand.territory}
+          </p>
+        </footer>
       </div>
     </main>
   );
