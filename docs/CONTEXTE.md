@@ -40,6 +40,27 @@ l'hébergement touristique**, et l'offre phare **le livret d'accueil numérique*
   de base reste gratuite et les coups de cœur ne se vendent pas.
 - Nom définitif à choisir après les premiers retours ; « Deux Vallées » est provisoire.
 
+## Idées pour la V2
+
+### Recommandations personnalisées (idée de Christelle, notée le 2 novembre 2026)
+
+Le livret s'adapte au voyageur (couple, famille, amis…) pour lui recommander les bonnes adresses.
+Contrainte de Rémi : **ne pas surcharger le livret**. Principe retenu : personnaliser ce qui existe, ne rien ajouter
+de visible.
+
+- **Une seule question, une seule fois**, à la première ouverture : portrait de Rémi, « Vous êtes… » en couple ·
+  en famille · entre amis · seul, et « Passer ». Jamais bloquante (Wi-Fi et arrivée restent accessibles).
+- **Le carrousel des coups de cœur devient « Ma sélection pour vous »** : même place, même look ; les adresses
+  adaptées passent devant, avec la raison sur la carte (« Idéal en famille »). Sous le titre : « Pour une famille ·
+  modifier », pour affiner (âge des enfants, envies) sans l'imposer.
+- **Sur la carte, la pastille « Coups de cœur » devient « Pour vous »**.
+- Pas de question si le logement ne reçoit qu'un type de public (ex. gîte pour 2) : réglage « logement pour… » dans l'admin.
+- **Fonctionnement** : étiquettes sur chaque adresse dans l'admin (pour qui, thèmes, PMR, temps de pluie) et score
+  calculé dans le navigateur. Pas d'IA : hors connexion, gratuit, aucune recommandation inventée.
+- **RGPD** : les réponses restent sur le téléphone, rien n'est envoyé.
+- **Modèle** : module payant « Conseiller personnalisé », activable par logement.
+- **Avant de développer** : demander aux 3 hébergeurs de la démo si ça les intéresse.
+
 ## Concurrence observée
 
 - notre.guide (outil utilisé par le domaine visité) : menu latéral de 12 rubriques, liens vers
