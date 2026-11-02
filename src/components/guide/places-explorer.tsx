@@ -160,28 +160,18 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
             }}
           />
 
-          {/* Bandeau en dégradé ivoire sous l'heure et les filtres : la carte ne s'arrête pas net en haut. */}
+          {/* Bandeau en dégradé ivoire sous l'heure : la carte ne s'arrête pas net en haut. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 z-[999] h-[calc(max(0.75rem,env(safe-area-inset-top))+5.5rem)] bg-linear-to-b from-background from-35% via-background/70 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 z-[999] h-[calc(max(0.75rem,env(safe-area-inset-top))+4rem)] bg-linear-to-b from-background from-30% via-background/60 to-transparent"
           />
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] flex items-center gap-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
-            <Link
-              href={`/g/${slug}`}
-              aria-label={t("backToGuide")}
-              className={`pointer-events-auto ml-3 shrink-0 ${floatingButton}`}
-            >
-              <ChevronLeft size={22} aria-hidden />
-            </Link>
-            <div
-              role="group"
-              aria-label={t("filters")}
-              className="pointer-events-auto flex min-w-0 flex-1 gap-2 overflow-x-auto py-1.5 pr-3 [scrollbar-width:none] [&>button]:border-transparent [&>button]:shadow-[0_1px_4px_rgb(0_0_0/0.25)]"
-            >
-              {favoritesChip}
-              {categoryChips}
-            </div>
-          </div>
+          <Link
+            href={`/g/${slug}`}
+            aria-label={t("backToGuide")}
+            className={`absolute top-[max(0.75rem,env(safe-area-inset-top))] left-3 z-[1000] ${floatingButton}`}
+          >
+            <ChevronLeft size={22} aria-hidden />
+          </Link>
 
           <p aria-live="polite" className="sr-only">
             {t("count", { count: filtered.length })}
@@ -190,16 +180,22 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
           {selected ? (
             <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />
           ) : (
-            // En bas à gauche, en face des boutons de position : le centre de la carte reste dégagé.
-            <div className="map-above-toolbar pointer-events-none absolute bottom-[calc(max(1rem,env(safe-area-inset-bottom))+1.25rem)] left-3 z-[1000]">
+            // Tout ce qu'on touche souvent est en bas, à portée de pouce : la liste puis les filtres.
+            <div
+              role="group"
+              aria-label={t("filters")}
+              className="map-above-toolbar absolute inset-x-0 bottom-0 z-[1000] flex gap-2 overflow-x-auto px-3 pt-1.5 pb-[max(1rem,env(safe-area-inset-bottom))] [scrollbar-width:none] [&>button]:border-transparent [&>button]:shadow-[0_1px_4px_rgb(0_0_0/0.25)]"
+            >
               <button
                 type="button"
                 onClick={() => setView("list")}
-                className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-text px-5 text-[15px] font-semibold text-white shadow-[0_2px_12px_rgb(0_0_0/0.3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-text px-4 text-[15px] font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <List size={18} aria-hidden />
                 {t("list")} · {filtered.length}
               </button>
+              {favoritesChip}
+              {categoryChips}
             </div>
           )}
         </section>
