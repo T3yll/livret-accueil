@@ -8,6 +8,7 @@ import { brand } from "@/config/brand";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { Directions } from "@/components/guide/directions";
 import { Emblem } from "@/components/guide/emblem";
+import { FavoritesCarousel } from "@/components/guide/favorites-carousel";
 import { InstallPrompt } from "@/components/guide/install-prompt";
 import { IconBadge, SECTION_ICONS } from "@/components/guide/section-icon";
 import { Link } from "@/i18n/navigation";
@@ -49,7 +50,8 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
   const sections = visibleSectionTypes(guide, locale);
   const base = `/g/${slug}`;
   const hasDirections = property.lat !== null && property.lng !== null;
-  const hasPlaces = guidePlaces(guide).length > 0;
+  const places = guidePlaces(guide);
+  const hasPlaces = places.length > 0;
 
   // Les 4 infos les plus demandées, en un geste. Une tuile sans contenu n'apparaît pas.
   const tiles: Tile[] = [
@@ -120,6 +122,9 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
             </ul>
           </nav>
         )}
+
+        {/* Juste après les accès rapides (arrivée, Wi-Fi…) : les coups de cœur, visibles sans chercher. */}
+        <FavoritesCarousel slug={slug} places={places.filter((p) => p.is_favorite)} locale={locale} />
 
         {(sections.length > 0 || hasPlaces) && (
           <section aria-labelledby="guide-title" className="flex flex-col gap-3">

@@ -2,7 +2,7 @@
 
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { House, LocateFixed } from "lucide-react";
+import { Heart, House, LocateFixed } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
@@ -37,45 +37,48 @@ type Position = { lat: number; lng: number; accuracy: number };
 // Marqueurs de la DA : ronds ivoire, contour vert foncé, icône au centre ;
 // pastille terre cuite pour les coups de cœur ; le logement et le lieu choisi en vert plein.
 function markerIcon(category: PlaceCategory | "home", favorite: boolean, selected = false) {
-  const Icon = category === "home" ? House : CATEGORY_ICONS[category];
   const home = category === "home";
-  const filled = home || selected;
-  const size = home ? 42 : selected ? 42 : 34;
+  // Coup de cœur : rond terre cuite avec un cœur blanc, plus gros que les autres lieux.
+  const highlighted = favorite && !selected;
+  const Icon = home ? House : highlighted ? Heart : CATEGORY_ICONS[category];
+  const size = home || selected || highlighted ? 42 : 34;
+  const background = home || selected ? "var(--color-primary)" : highlighted ? "var(--color-favorite)" : "var(--color-background)";
   const html = renderToStaticMarkup(
     <span
       style={{
-        position: "relative",
         display: "flex",
         width: size,
         height: size,
         alignItems: "center",
         justifyContent: "center",
         borderRadius: "9999px",
-        // Le logement se distingue des lieux choisis par un contour doré (décor, DA).
-        border: home ? "3px solid var(--color-accent)" : "2px solid var(--color-primary)",
-        background: filled ? "var(--color-primary)" : "var(--color-background)",
-        color: filled ? "#fff" : "var(--color-primary)",
-        boxShadow: "0 1px 3px rgb(0 0 0 / 0.25)",
+        // Le logement : contour doré (décor, DA) ; coup de cœur : contour blanc ; les autres : vert.
+        border: home ? "3px solid var(--color-accent)" : highlighted ? "3px solid #fff" : "2px solid var(--color-primary)",
+        background,
+        color: background === "var(--color-background)" ? "var(--color-primary)" : "#fff",
+        boxShadow: highlighted ? "0 2px 6px rgb(0 0 0 / 0.35)" : "0 1px 3px rgb(0 0 0 / 0.25)",
       }}
     >
-      <Icon size={size > 34 ? 22 : 18} strokeWidth={2} aria-hidden />
-      {favorite && (
-        <span
-          style={{
-            position: "absolute",
-            top: -3,
-            right: -3,
-            width: 12,
-            height: 12,
-            borderRadius: "9999px",
-            background: "var(--color-favorite)",
-            border: "2px solid #fff",
-          }}
-        />
-      )}
+      <Icon size={size > 34 ? 22 : 18} strokeWidth={2} fill={highlighted ? "currentColor" : "none"} aria-hidden />
     </span>,
   );
   return L.divIcon({ html, className: "", iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
+}
+
+// Noms des coups de cœur affichés à partir de ce zoom (en dessous, ils se chevauchent).
+const FAVORITE_LABELS_ZOOM = 11;
+
+function FavoriteLabelsByZoom() {
+  const map = useMap();
+  useEffect(() => {
+    const update = () => map.getContainer().classList.toggle("show-favorite-labels", map.getZoom() >= FAVORITE_LABELS_ZOOM);
+    update();
+    map.on("zoomend", update);
+    return () => {
+      map.off("zoomend", update);
+    };
+  }, [map]);
+  return null;
 }
 
 // Toucher le fond de carte referme la fiche résumée.
@@ -205,6 +208,7 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitToPlaces bounds={bounds} />
+        <FavoriteLabelsByZoom />
         <ClearSelectionOnMapClick onClear={() => onSelect(null)} />
         <PanToSelected place={selected} />
         {origin && (
@@ -233,9 +237,16 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
             icon={markerIcon(place.category, place.is_favorite, place.id === selectedId)}
             title={place.is_favorite ? `${place.name} · ${labels.favorite}` : place.name}
             // Le lieu choisi passe au premier plan des marqueurs voisins.
-            zIndexOffset={place.id === selectedId ? 1000 : 0}
+            zIndexOffset={place.id === selectedId ? 1000 : place.is_favorite ? 400 : 0}
             eventHandlers={{ click: () => onSelect(place.id) }}
-          />
+          >
+            {/* Le nom des coups de cœur reste affiché : on les repère sans toucher la carte. */}
+            {place.is_favorite && (
+              <Tooltip permanent direction="top" offset={[0, -22]} className="favorite-label">
+                {place.name}
+              </Tooltip>
+            )}
+          </Marker>
         ))}
       </MapContainer>
       {/* Position et logement en bas à droite, juste au-dessus des crédits (Google Maps). */}

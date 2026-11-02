@@ -89,7 +89,7 @@
     },
     "filters": "Filters",
     "openToday": "Open today",
-    "favorites": "Host's picks",
+    "favorites": "Favourites",
     "search": "Search by name",
     "list": "List",
     "map": "Map",
@@ -103,8 +103,8 @@
       "appointment": "By appointment",
       "unknown": "Opening hours to be checked"
     },
-    "favorite": "Host's pick",
-    "hostWord": "A word from your host",
+    "favorite": "{name}'s pick",
+    "hostWord": "A word from {name}",
     "hours": "Opening hours",
     "closedDay": "Closed",
     "today": "today",
@@ -146,5 +146,10 @@
     "noApp": "No app to install",
     "guideAddress": "Your guide online",
     "contact": "Your host"
+  },
+  "Favorites": {
+    "title": "{name}'s favourites",
+    "intro": "{name} lives in {home}, in the Lot. Favourite places, tried and tested for you.",
+    "seeOnMap": "See on the map"
   }
 }

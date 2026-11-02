@@ -31,6 +31,12 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 - **QR codes** (fiche d'un logement dans l'admin) : aperçu, PNG 1024 px, SVG, carte A6 recto verso imprimable
   (`/admin/logements/<id>/carte-qr`). Le QR encode `NEXT_PUBLIC_SITE_URL/g/<slug>` (sans langue).
 - **Emblème** : dessin unique dans `src/config/emblem.ts` (composant `Emblem`, icônes, carte QR).
+- **Coups de cœur signés « Rémi »** : prénom, commune et photo dans `curator` (`src/config/brand.ts`) ;
+  sans photo, un rond avec l'initiale (ajouter la photo dans `public/` puis renseigner `photo`).
+  Carrousel « Les coups de cœur de Rémi » sur l'accueil du livret, cœurs terre cuite sur la carte (noms affichés
+  en zoomant), mot signé sur la fiche résumée et la fiche.
+- **Carte des bonnes adresses** : affichage par défaut, plein écran, contrôles flottants (retour et filtres en haut,
+  « Liste » en bas à gauche, logement et position en bas à droite), position du voyageur en temps réel.
 - **Base Supabase** (projet cloud `oeheumqsfmcqaiwisgxr`, région Europe) : 4 migrations dans
   `supabase/migrations/`, toutes appliquées (la 4e ajoute `places.photo_credit`). Aucun accès anonyme aux tables : le voyageur passe
   uniquement par la fonction `get_guide(slug)`.

@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { curator } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { formatDistance } from "@/lib/distance";
@@ -14,6 +15,7 @@ import { localized, localizedWithLang } from "@/lib/localized";
 import { isOpenToday, rangesOn, todayStatus } from "@/lib/opening-hours";
 import { GUIDE_CATEGORIES, weekdayName, type PlaceCategory, type PlaceWithDistance } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
+import { CuratorAvatar } from "./curator-avatar";
 import { floatingButton } from "./map-ui";
 import { OpenBadge } from "./open-badge";
 import { CATEGORY_ICONS } from "./place-icons";
@@ -149,7 +151,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
             controlsHidden={Boolean(selected)}
             labels={{
               yourStay: t("yourStay"),
-              favorite: t("favorite"),
+              favorite: t("favorite", { name: curator.name }),
               locateMe: t("locateMe"),
               showStay: t("showStay"),
               youAreHere: t("youAreHere"),
@@ -176,8 +178,8 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
               aria-label={t("filters")}
               className="pointer-events-auto flex min-w-0 flex-1 gap-2 overflow-x-auto py-1.5 pr-3 [scrollbar-width:none] [&>button]:border-transparent [&>button]:shadow-[0_1px_4px_rgb(0_0_0/0.25)]"
             >
-              {categoryChips}
               {favoritesChip}
+              {categoryChips}
             </div>
           </div>
 
@@ -284,7 +286,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
                     {place.is_favorite && (
                       <span className="inline-flex items-center gap-1 text-sm font-semibold text-favorite">
                         <Heart size={14} fill="currentColor" aria-hidden />
-                        {t("favorite")}
+                        {t("favorite", { name: curator.name })}
                       </span>
                     )}
                     <span className="font-heading text-xl leading-tight font-semibold">{place.name}</span>
@@ -365,7 +367,7 @@ function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: Pla
           {place.is_favorite && (
             <span className="inline-flex items-center gap-1 text-sm font-semibold text-favorite">
               <Heart size={14} fill="currentColor" aria-hidden />
-              {t("favorite")}
+              {t("favorite", { name: curator.name })}
             </span>
           )}
           <h2 id="sheet-title" className="text-2xl leading-tight font-semibold">
@@ -379,9 +381,15 @@ function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: Pla
           <OpenBadge status={place.status} label={t(`status.${place.status.state}`)} />
           {description && <p className="line-clamp-2 text-[15px]">{description}</p>}
           {comment && (
-            <blockquote lang={comment.lang} className="mt-1 rounded-xl bg-favorite-bg px-3 py-2 font-heading text-lg leading-snug italic">
-              <span className="line-clamp-2">« {comment.text} »</span>
-            </blockquote>
+            <figure className="mt-1 flex flex-col gap-2 rounded-xl bg-favorite-bg px-3 py-2">
+              <blockquote lang={comment.lang} className="font-heading text-lg leading-snug italic">
+                <span className="line-clamp-2">« {comment.text} »</span>
+              </blockquote>
+              <figcaption className="flex items-center gap-2 text-sm font-semibold">
+                <CuratorAvatar size={24} />
+                {curator.name}
+              </figcaption>
+            </figure>
           )}
           <Link
             href={href}

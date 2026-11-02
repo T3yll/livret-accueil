@@ -1,12 +1,14 @@
-import { ChevronLeft, ExternalLink, Globe, Heart, Phone } from "lucide-react";
+import { ChevronLeft, ExternalLink, Globe, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { CuratorAvatar } from "@/components/guide/curator-avatar";
 import { DraftNotice } from "@/components/guide/guide-header";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { CATEGORY_ICONS } from "@/components/guide/place-icons";
 import { PlaceTodayStatus, PlaceWeek } from "@/components/guide/place-schedule";
+import { curator } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { formatDistance } from "@/lib/distance";
@@ -99,9 +101,9 @@ export default async function PlacePage({ params }: Props) {
 
         {place.is_favorite && (
           <section aria-labelledby="host-word" className="flex flex-col gap-2 rounded-2xl bg-favorite-bg p-4">
-            <h2 id="host-word" className="flex items-center gap-2 font-sans text-base font-semibold text-favorite">
-              <Heart size={18} fill="currentColor" aria-hidden />
-              {comment ? t("hostWord") : t("favorite")}
+            <h2 id="host-word" className="flex items-center gap-3 font-sans text-base font-semibold text-favorite">
+              <CuratorAvatar size={36} />
+              {comment ? t("hostWord", { name: curator.name }) : t("favorite", { name: curator.name })}
             </h2>
             {comment && (
               <blockquote lang={comment.lang} className="font-heading text-xl italic">

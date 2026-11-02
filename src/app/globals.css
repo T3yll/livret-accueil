@@ -62,3 +62,20 @@ h3 {
 .places-page[data-view="map"] .hide-when-map {
   display: none;
 }
+
+/* Nom des coups de cœur sur la carte : étiquette discrète terre cuite. */
+.leaflet-tooltip.favorite-label {
+  padding: 2px 8px;
+  border: none;
+  border-radius: 9999px;
+  color: var(--color-favorite);
+  font: 600 13px var(--font-sans);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+}
+.leaflet-tooltip.favorite-label::before {
+  display: none;
+}
+/* Vue d'ensemble : les cœurs suffisent ; les noms apparaissent en se rapprochant (sinon ils se chevauchent). */
+.places-map:not(.show-favorite-labels) .favorite-label {
+  display: none;
+}

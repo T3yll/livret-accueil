@@ -7,6 +7,14 @@ export const brand = {
   contactEmail: "contact@conciergerie-des-deux-vallees.fr",
 } as const;
 
+// La personne qui signe les coups de cœur du livret : « quelqu'un du coin ».
+// photo : chemin dans public/ (ex. "/curator.jpg") ; sans photo, un rond avec l'initiale.
+export const curator = {
+  name: "Rémi",
+  home: "Fajoles",
+  photo: null as string | null,
+};
+
 // Couleurs de la DA là où les variables CSS ne s'appliquent pas (manifest, icônes, carte QR).
 // Les mêmes valeurs sont dans globals.css.
 export const brandColors = {

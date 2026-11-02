@@ -103,8 +103,8 @@
       "appointment": "Sur rendez-vous",
       "unknown": "Horaires à vérifier"
     },
-    "favorite": "Coup de cœur",
-    "hostWord": "Le mot de l'hôte",
+    "favorite": "Coup de cœur de {name}",
+    "hostWord": "Le mot de {name}",
     "hours": "Horaires",
     "closedDay": "Fermé",
     "today": "aujourd'hui",
@@ -146,5 +146,10 @@
     "noApp": "Sans application à installer",
     "guideAddress": "Votre livret en ligne",
     "contact": "Votre hôte"
+  },
+  "Favorites": {
+    "title": "Les coups de cœur de {name}",
+    "intro": "{name} vit à {home}, dans le Lot. Ses adresses préférées, testées pour vous.",
+    "seeOnMap": "Voir sur la carte"
   }
 }
