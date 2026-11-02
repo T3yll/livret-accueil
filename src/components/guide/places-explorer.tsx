@@ -163,9 +163,9 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
           {/* Bandeau en dégradé ivoire sous l'heure et les filtres : la carte ne s'arrête pas net en haut. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 z-[999] h-[calc(max(0.75rem,env(safe-area-inset-top))+5.5rem)] bg-linear-to-b from-background from-35% via-background/70 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 z-[999] h-[calc(max(0.75rem,env(safe-area-inset-top))+6.75rem)] bg-linear-to-b from-background from-35% via-background/70 to-transparent"
           />
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] flex items-center gap-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] flex items-center gap-2 pt-[calc(max(0.75rem,env(safe-area-inset-top))+1.25rem)]">
             <Link
               href={`/g/${slug}`}
               aria-label={t("backToGuide")}
