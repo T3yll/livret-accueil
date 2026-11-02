@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth";
+import { guideUrl, isLocalUrl, qrSvg } from "@/lib/qr";
 import { deleteProperty, regenerateSlug, setModule, setPublished } from "../actions";
 import { PropertyForm } from "../property-form";
 import { missingForPublication } from "../publication";
@@ -41,6 +42,8 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
     archived: selectedPlaces?.filter((p) => p.places?.archived_at).length ?? 0,
   };
   const errorMessage = typeof error === "string" ? errors[error] : undefined;
+  const qrUrl = guideUrl(property.slug);
+  const qr = await qrSvg(qrUrl);
 
   return (
     <div className="flex flex-col gap-10">
@@ -92,6 +95,47 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
           Changer l&apos;adresse rend l&apos;ancien lien et l&apos;ancien QR code inutilisables : à faire seulement
           si le lien a circulé.
         </p>
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4">
+        <h2 className="text-2xl">QR code</h2>
+        <div className="flex flex-wrap items-start gap-6">
+          <div
+            role="img"
+            aria-label={`QR code du livret : ${qrUrl}`}
+            className="size-40 shrink-0 rounded-xl border border-border [&>svg]:size-full"
+            dangerouslySetInnerHTML={{ __html: qr }}
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-3">
+            <p className="text-sm break-all">
+              Ouvre : <code className="rounded bg-stone px-1.5 py-0.5">{qrUrl}</code>
+            </p>
+            {isLocalUrl(qrUrl) && (
+              <p className="text-sm text-favorite">
+                Adresse locale : ce QR code ne fonctionnera pas sur un téléphone. Renseignez NEXT_PUBLIC_SITE_URL
+                avec l&apos;adresse du site en ligne.
+              </p>
+            )}
+            {!published && <p className="text-sm text-info">Livret en brouillon : le QR code n&apos;ouvrira rien tant qu&apos;il n&apos;est pas publié.</p>}
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink href={`/admin/logements/${property.id}/carte-qr`}>Carte A6 à imprimer</ButtonLink>
+              <a
+                href={`/admin/logements/${property.id}/qr?format=png`}
+                download
+                className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-[15px] font-semibold hover:bg-stone"
+              >
+                Télécharger en PNG
+              </a>
+              <a
+                href={`/admin/logements/${property.id}/qr?format=svg`}
+                download
+                className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-[15px] font-semibold hover:bg-stone"
+              >
+                Télécharger en SVG
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">

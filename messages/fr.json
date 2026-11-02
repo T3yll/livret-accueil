@@ -131,5 +131,13 @@
     "install": "Ajouter à l'écran d'accueil",
     "iosHint": "Touchez <share>Partager</share> puis « Sur l'écran d'accueil ».",
     "dismiss": "Masquer"
+  },
+  "QrCard": {
+    "title": "Livret d'accueil",
+    "welcome": "Bienvenue chez vous",
+    "scan": "Scannez pour découvrir votre livret",
+    "noApp": "Sans application à installer",
+    "guideAddress": "Votre livret en ligne",
+    "contact": "Votre hôte"
   }
 }

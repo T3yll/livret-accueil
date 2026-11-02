@@ -15,7 +15,7 @@ export default async function ProtectedLayout({ children }: LayoutProps<"/admin"
 
   return (
     <div className="min-h-dvh">
-      <header className="border-b border-border bg-surface">
+      <header className="border-b border-border bg-surface print:hidden">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <p className="font-heading text-xl">{brand.name} · Admin</p>
           <nav aria-label="Administration" className="flex flex-wrap gap-1">
@@ -40,7 +40,7 @@ export default async function ProtectedLayout({ children }: LayoutProps<"/admin"
           </form>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 py-8 print:max-w-none print:p-0">{children}</main>
     </div>
   );
 }

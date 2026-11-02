@@ -131,5 +131,13 @@
     "install": "Add to home screen",
     "iosHint": "Tap <share>Share</share>, then “Add to Home Screen”.",
     "dismiss": "Dismiss"
+  },
+  "QrCard": {
+    "title": "Welcome guide",
+    "welcome": "Make yourself at home",
+    "scan": "Scan to open your welcome guide",
+    "noApp": "No app to install",
+    "guideAddress": "Your guide online",
+    "contact": "Your host"
   }
 }
