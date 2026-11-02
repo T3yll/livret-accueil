@@ -11,7 +11,7 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 | 2 · 9 → 15 nov. | Sections du livret, affichage voyageur FR/EN | ✅ Fait et testé |
 | 3 · 16 → 22 nov. | Base d'adresses, carte, « ouvert aujourd'hui », coups de cœur | ✅ Fait et testé |
 | 4 · 23 → 29 nov. | PWA hors connexion, QR codes, mise en ligne Vercel, DA appliquée | ✅ Fait, en ligne sur https://livret-accueil.vercel.app (domaine définitif à brancher) |
-| 5 · 30 nov. → 13 déc. | Saisie des 30 adresses, livret de démo, rendez-vous avec 3 hébergeurs | ⏳ À faire |
+| 5 · 30 nov. → 13 déc. | Saisie des 30 adresses, livret de démo, rendez-vous avec 3 hébergeurs | 🔶 30 adresses, photos et coups de cœur saisis ; reste la vérification des horaires et les rendez-vous |
 
 ## Ce qui existe
 
@@ -31,8 +31,8 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 - **QR codes** (fiche d'un logement dans l'admin) : aperçu, PNG 1024 px, SVG, carte A6 recto verso imprimable
   (`/admin/logements/<id>/carte-qr`). Le QR encode `NEXT_PUBLIC_SITE_URL/g/<slug>` (sans langue).
 - **Emblème** : dessin unique dans `src/config/emblem.ts` (composant `Emblem`, icônes, carte QR).
-- **Base Supabase** (projet cloud `oeheumqsfmcqaiwisgxr`, région Europe) : 3 migrations dans
-  `supabase/migrations/`, toutes appliquées. Aucun accès anonyme aux tables : le voyageur passe
+- **Base Supabase** (projet cloud `oeheumqsfmcqaiwisgxr`, région Europe) : 4 migrations dans
+  `supabase/migrations/`, toutes appliquées (la 4e ajoute `places.photo_credit`). Aucun accès anonyme aux tables : le voyageur passe
   uniquement par la fonction `get_guide(slug)`.
 - **Tests** : `npm test` (69 tests : calcul « ouvert aujourd'hui », règles d'accès RLS sur un
   Postgres embarqué, sections, distances…).
@@ -50,10 +50,18 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 
 - **Gîte de démonstration** (fictif), publié : `/g/demo4x7q-gite-de-demonstration`. Son slug est dans
   `supabase/seed.sql` : le régénérer depuis l'admin si le dépôt devient public.
-- **10 adresses réelles** saisies depuis des sources publiques (Cougnac, Padirac, Marqueyssac, Castelnaud,
-  marchés de Sarlat et Gourdon, Forêt des Singes, Maison Louis Roque, Rocamadour, La Roque-Gageac),
-  ajoutées au gîte de démo. **Horaires non vérifiés** : à confirmer par téléphone puis
-  « Horaires vérifiés aujourd'hui ». Aucune photo, aucun coup de cœur.
+- **30 adresses réelles** (sources : fiches des offices de tourisme, nov. 2026), toutes ajoutées au gîte de démo :
+  6 restaurants, 4 producteurs, 7 marchés, 2 activités, 2 sorties en famille, 9 sites. Le détail et les sources
+  des 20 ajoutées en semaine 5 sont dans `supabase/data/` (fichiers SQL rejouables, déjà appliqués).
+- **Horaires : aucun n'est vérifié.** 9 fiches ont les horaires relevés sur les fiches touristiques (souvent
+  contradictoires), les autres sont en « horaires inconnus ». Tout s'affiche « Horaires à vérifier » jusqu'à
+  l'appel et au bouton « Horaires vérifiés aujourd'hui ». Points douteux : Musée de Préhistoire (fermé le mardi
+  selon son site, pas selon la fiche), Aquarium (week-ends seulement en hiver ?), coordonnées approchées
+  du marché couvert et de la cité médiévale de Sarlat.
+- **Photos** : 16 adresses ont une photo libre de Wikimedia Commons (crédit affiché sous la photo). Sans photo :
+  restaurants, producteurs, Lascaux IV (seule photo libre = Lascaux II), marchés couvert et de Sarlat.
+- **Gîte de démo** : message d'accueil et 6 coups de cœur avec le mot de l'hôte (FR/EN), validés par Rémi.
+  Contact encore fictif (`05 65 00 00 00`, `contact@example.com`) ; aucune adresse santé (Urgences à proximité vide).
 - 4 adresses « TEST … à supprimer » archivées. Suppression définitive (éditeur SQL Supabase) :
   `delete from public.places where name like 'TEST % à supprimer';`
 
@@ -105,4 +113,7 @@ Pour créer ou appliquer des migrations : `npx supabase login`, puis
 1. Domaine définitif dans Vercel (`conciergerie-des-deux-vallees.fr` ou sous-domaine), DNS, puis
    `NEXT_PUBLIC_SITE_URL` mis à jour et redéploiement **avant d'imprimer les cartes QR**.
 2. Tirage papier d'une carte QR avec l'adresse définitive, scannée avec un iPhone et un Android.
-3. Semaine 5 : saisie des 30 adresses, horaires vérifiés, photos, coups de cœur, livret de démo, rendez-vous.
+3. Vérifier les horaires des 30 adresses par téléphone (dont 15 ouvertes hors saison : critère de la V1).
+4. Tester « ouvert aujourd'hui » à la main sur 10 adresses (critère de la V1).
+5. Mentions légales et page de confidentialité accessibles depuis le livret (critère RGPD du cahier des charges).
+6. Rendez-vous avec 3 hébergeurs, puis noter leurs retours.
