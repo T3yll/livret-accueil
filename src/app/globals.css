@@ -45,3 +45,10 @@ h3 {
   font-family: var(--font-heading);
   font-weight: 500;
 }
+
+/* Carte plein écran : elle descend sous la barre du navigateur (100lvh), mais ce qu'on doit
+   pouvoir lire ou toucher reste au-dessus (100dvh = partie réellement visible). */
+.map-above-toolbar,
+.places-map .leaflet-bottom {
+  margin-bottom: calc(100lvh - 100dvh);
+}

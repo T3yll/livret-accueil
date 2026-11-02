@@ -190,7 +190,7 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
         key={places.map((p) => p.id).join(",")}
         center={[center.lat, center.lng]}
         zoom={13}
-        className="size-full"
+        className="places-map size-full"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

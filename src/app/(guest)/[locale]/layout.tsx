@@ -12,7 +12,8 @@ export function generateStaticParams() {
 }
 
 // Couleur de la barre du navigateur et de l'appli installée : le fond ivoire du livret.
-export const viewport: Viewport = { themeColor: brandColors.background };
+// viewportFit « cover » : la page peut s'étendre sous les barres du téléphone (carte plein écran).
+export const viewport: Viewport = { themeColor: brandColors.background, viewportFit: "cover" };
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;

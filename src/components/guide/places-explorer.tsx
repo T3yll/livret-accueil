@@ -174,7 +174,8 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
       </div>
 
       {view === "map" && (
-        <section aria-label={t("map")} className="fixed inset-0 z-[1100] flex flex-col bg-background">
+        // 100lvh : jusqu'en bas de l'écran, sous la barre flottante de Safari (iOS 26), plus immersif.
+        <section aria-label={t("map")} className="fixed inset-x-0 top-0 z-[1100] flex h-[100lvh] flex-col bg-background">
           <div className="flex flex-col gap-2 border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
             <div className="flex items-center justify-between gap-3">
               <Link
@@ -305,7 +306,7 @@ function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: Pla
   const href = `/g/${slug}/places/${place.id}`;
 
   return (
-    <div className="absolute inset-x-0 bottom-0 z-[1001] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="map-above-toolbar absolute inset-x-0 bottom-0 z-[1001] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <article
         aria-labelledby="sheet-title"
         className="relative mx-auto flex max-h-[60dvh] max-w-[640px] flex-col overflow-y-auto rounded-2xl bg-surface shadow-[0_4px_24px_rgb(0_0_0/0.25)]"
