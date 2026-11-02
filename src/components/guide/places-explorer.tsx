@@ -1,15 +1,16 @@
 "use client";
 
-import { Heart, List, Map as MapIcon, Search } from "lucide-react";
+import { ChevronLeft, Heart, List, Map as MapIcon, Search, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { formatDistance } from "@/lib/distance";
 import { mediaUrl } from "@/lib/guide-view";
-import { localized } from "@/lib/localized";
+import { localized, localizedWithLang } from "@/lib/localized";
 import { isOpenToday, rangesOn, todayStatus } from "@/lib/opening-hours";
 import { GUIDE_CATEGORIES, weekdayName, type PlaceCategory, type PlaceWithDistance } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
@@ -39,7 +40,36 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
   const [openToday, setOpenToday] = useState(false);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [query, setQuery] = useState("");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // La carte s'ouvre en plein écran et ajoute une étape dans l'historique (?vue=carte) :
+  // le bouton retour du téléphone ramène à la liste au lieu de quitter la page.
+  const searchParams = useSearchParams();
+  const view: "list" | "map" = searchParams.get("vue") === "carte" ? "map" : "list";
+  const pushedMap = useRef(false);
+  const setView = (next: "list" | "map") => {
+    if (next === view) return;
+    if (next === "map") {
+      window.history.pushState(null, "", "?vue=carte");
+      pushedMap.current = true;
+    } else if (pushedMap.current) {
+      pushedMap.current = false;
+      window.history.back();
+    } else {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  };
+
+  // Plein écran : la page derrière ne défile plus ; Échap ferme la fiche, puis la carte.
+  useEffect(() => {
+    if (view !== "map") return;
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = previous;
+    };
+  }, [view]);
 
   const withStatus = useMemo(() => places.map((p) => ({ ...p, status: todayStatus(p, now) })), [places, now]);
   const categories = GUIDE_CATEGORIES.filter((c) => places.some((p) => p.category === c));
@@ -52,6 +82,39 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
       (!openToday || isOpenToday(p.status)) &&
       (!favoritesOnly || p.is_favorite) &&
       (!query.trim() || normalize(p.name).includes(normalize(query.trim()))),
+  );
+
+  // Un lieu masqué par un filtre ne reste pas sélectionné.
+  const selected = view === "map" ? filtered.find((p) => p.id === selectedId) : undefined;
+
+  useEffect(() => {
+    if (view !== "map") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (selectedId) setSelectedId(null);
+      else setView("list");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  const categoryChips = (
+    <>
+      <button type="button" className={chip} aria-pressed={category === "all"} onClick={() => setCategory("all")}>
+        {t("all")}
+      </button>
+      {categories.map((c) => (
+        <button key={c} type="button" className={chip} aria-pressed={category === c} onClick={() => setCategory(c)}>
+          {t(`categories.${c}`)}
+        </button>
+      ))}
+    </>
+  );
+  const favoritesChip = hasFavorites && (
+    <button type="button" className={chip} aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly((v) => !v)}>
+      <Heart size={16} aria-hidden />
+      {t("favorites")}
+    </button>
   );
 
   // Marchés classés par jour de la semaine : seulement les horaires vérifiés, jamais une supposition.
@@ -77,14 +140,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
       </div>
 
       <div role="group" aria-label={t("filters")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        <button type="button" className={chip} aria-pressed={category === "all"} onClick={() => setCategory("all")}>
-          {t("all")}
-        </button>
-        {categories.map((c) => (
-          <button key={c} type="button" className={chip} aria-pressed={category === c} onClick={() => setCategory(c)}>
-            {t(`categories.${c}`)}
-          </button>
-        ))}
+        {categoryChips}
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -92,12 +148,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
           <span aria-hidden className="size-2 rounded-full bg-current" />
           {t("openToday")}
         </button>
-        {hasFavorites && (
-          <button type="button" className={chip} aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly((v) => !v)}>
-            <Heart size={16} aria-hidden />
-            {t("favorites")}
-          </button>
-        )}
+        {favoritesChip}
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -123,14 +174,41 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
         </div>
       </div>
 
-      {view === "map" ? (
-        <PlacesMap
-          slug={slug}
-          origin={origin}
-          places={filtered.map((p) => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, category: p.category, is_favorite: p.is_favorite }))}
-          labels={{ yourStay: t("yourStay"), seeDetails: t("seeDetails"), favorite: t("favorite") }}
-        />
-      ) : filtered.length === 0 ? (
+      {view === "map" && (
+        <div role="dialog" aria-modal="true" aria-label={t("map")} className="fixed inset-0 z-[1100] flex flex-col bg-background">
+          <div className="flex flex-col gap-2 border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                className="-ml-2 inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-[15px] font-semibold text-primary focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                <ChevronLeft size={20} aria-hidden />
+                {t("backToList")}
+              </button>
+              <p aria-live="polite" className="text-sm text-muted">
+                {t("count", { count: filtered.length })}
+              </p>
+            </div>
+            <div role="group" aria-label={t("filters")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+              {categoryChips}
+              {favoritesChip}
+            </div>
+          </div>
+          <div className="relative flex-1">
+            <PlacesMap
+              origin={origin}
+              places={filtered.map((p) => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, category: p.category, is_favorite: p.is_favorite }))}
+              selectedId={selected?.id ?? null}
+              onSelect={setSelectedId}
+              labels={{ yourStay: t("yourStay"), favorite: t("favorite") }}
+            />
+            {selected && <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />}
+          </div>
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
         <p className="rounded-2xl bg-surface p-4 text-muted">{t("empty")}</p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -197,6 +275,76 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
           </ul>
         </section>
       )}
+    </div>
+  );
+}
+
+type PlaceWithStatus = PlaceWithDistance & { status: ReturnType<typeof todayStatus> };
+
+// Fiche résumée d'un lieu touché sur la carte : photo, état du jour, description, mot de l'hôte.
+function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: PlaceWithStatus; locale: Locale; onClose: () => void }) {
+  const t = useTranslations("Places");
+  const Icon = CATEGORY_ICONS[place.category];
+  const description = localized(place, "description", locale);
+  const comment = place.is_favorite ? localizedWithLang(place, "comment", locale) : null;
+  const href = `/g/${slug}/places/${place.id}`;
+
+  return (
+    <div className="absolute inset-x-0 bottom-0 z-[1001] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <article
+        aria-labelledby="sheet-title"
+        className="relative mx-auto flex max-h-[60dvh] max-w-[640px] flex-col overflow-y-auto rounded-2xl bg-surface shadow-[0_4px_24px_rgb(0_0_0/0.25)]"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t("close")}
+          className="absolute top-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-full bg-background/90 text-text focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <X size={20} aria-hidden />
+        </button>
+        {place.photo_path && (
+          <Link href={href} tabIndex={-1} aria-hidden>
+            <Image
+              src={mediaUrl(place.photo_path)}
+              alt=""
+              width={640}
+              height={360}
+              sizes="(max-width: 640px) 100vw, 640px"
+              className="h-40 w-full object-cover"
+            />
+          </Link>
+        )}
+        <div className={`flex flex-col gap-1.5 p-4 ${place.photo_path ? "" : "pr-14"}`}>
+          {place.is_favorite && (
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-favorite">
+              <Heart size={14} fill="currentColor" aria-hidden />
+              {t("favorite")}
+            </span>
+          )}
+          <h2 id="sheet-title" className="text-2xl leading-tight font-semibold">
+            {place.name}
+          </h2>
+          <p className="flex items-center gap-1.5 text-sm text-muted">
+            <Icon size={16} strokeWidth={1.75} className="text-primary" aria-hidden />
+            {t(`category.${place.category}`)}
+            {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
+          </p>
+          <OpenBadge status={place.status} label={t(`status.${place.status.state}`)} />
+          {description && <p className="line-clamp-3 text-[15px]">{description}</p>}
+          {comment && (
+            <blockquote lang={comment.lang} className="mt-1 rounded-xl bg-favorite-bg px-3 py-2 font-heading text-lg italic">
+              « {comment.text} »
+            </blockquote>
+          )}
+          <Link
+            href={href}
+            className="mt-2 inline-flex min-h-12 items-center justify-center rounded-xl bg-primary px-4 text-[15px] font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {t("seeDetails")}
+          </Link>
+        </div>
+      </article>
     </div>
   );
 }

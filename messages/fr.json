@@ -117,7 +117,9 @@
     "yourStay": "Votre logement",
     "seeDetails": "Voir la fiche",
     "back": "Bonnes adresses",
-    "emergencyPlaces": "À proximité"
+    "emergencyPlaces": "À proximité",
+    "backToList": "Retour à la liste",
+    "close": "Fermer"
   },
   "LanguageSwitcher": {
     "label": "Langue",

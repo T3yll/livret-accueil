@@ -117,7 +117,9 @@
     "yourStay": "Your accommodation",
     "seeDetails": "See details",
     "back": "Good places",
-    "emergencyPlaces": "Nearby"
+    "emergencyPlaces": "Nearby",
+    "backToList": "Back to the list",
+    "close": "Close"
   },
   "LanguageSwitcher": {
     "label": "Language",
