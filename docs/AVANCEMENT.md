@@ -10,7 +10,7 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 | 1 · 2 → 8 nov. | Projet initialisé, base de données, admin hébergeurs et logements | ✅ Fait et testé |
 | 2 · 9 → 15 nov. | Sections du livret, affichage voyageur FR/EN | ✅ Fait et testé |
 | 3 · 16 → 22 nov. | Base d'adresses, carte, « ouvert aujourd'hui », coups de cœur | ✅ Fait et testé |
-| 4 · 23 → 29 nov. | PWA hors connexion, QR codes, mise en ligne Vercel, DA appliquée | 🔶 PWA, QR codes et DA faits ; reste la mise en ligne Vercel |
+| 4 · 23 → 29 nov. | PWA hors connexion, QR codes, mise en ligne Vercel, DA appliquée | ✅ Fait, en ligne sur https://livret-accueil.vercel.app (domaine définitif à brancher) |
 | 5 · 30 nov. → 13 déc. | Saisie des 30 adresses, livret de démo, rendez-vous avec 3 hébergeurs | ⏳ À faire |
 
 ## Ce qui existe
@@ -85,15 +85,24 @@ npm run dev
 Pour créer ou appliquer des migrations : `npx supabase login`, puis
 `npx supabase link --project-ref oeheumqsfmcqaiwisgxr`.
 
-## Prochaine étape : fin de la semaine 4, mise en ligne sur Vercel
+## Mise en ligne (Vercel)
 
-À faire avec Rémi (compte Vercel, DNS) :
-1. Importer le dépôt GitHub dans Vercel (framework Next.js détecté).
-2. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
-   `NEXT_PUBLIC_SITE_URL` (adresse définitive, sans / final : elle est imprimée dans les QR codes).
-3. Domaine (`conciergerie-des-deux-vallees.fr` ou un sous-domaine) dans Vercel, puis DNS chez le registrar.
-4. Supabase → Authentication → URL Configuration : Site URL = l'adresse définitive, et ajouter
-   `<adresse>/auth/callback` aux Redirect URLs.
-5. Tests réels : QR imprimé sur iPhone et Android, mode avion après une visite, installation sur l'écran d'accueil.
+- Projet Vercel `livret-accueil`, relié au dépôt GitHub : chaque push sur `master` redéploie.
+  Adresse : https://livret-accueil.vercel.app
+- Variables (Vercel → Settings → Environment Variables) : `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL`. Ce sont des variables `NEXT_PUBLIC_` :
+  intégrées au build, **toute modification demande un redéploiement**.
+- Ne pas ajouter l'intégration Supabase de Vercel (elle créerait d'autres variables, voire une autre base).
+- Vérifié en ligne : livret, adresses, photos (AVIF), manifest, icônes, service worker non mis en cache,
+  hors connexion (20 pages enregistrées à la première visite).
+- La connexion admin se fait par mot de passe : aucune URL de redirection Supabase n'est nécessaire.
+  Quand le domaine sera choisi, mettre quand même Supabase → Authentication → URL Configuration → Site URL
+  sur l'adresse définitive (utilisée dans les emails, par exemple mot de passe oublié).
 
-Ensuite, semaine 5 : saisie des 30 adresses et préparation de la démo.
+## Prochaine étape
+
+1. Domaine définitif dans Vercel (`conciergerie-des-deux-vallees.fr` ou sous-domaine), DNS, puis
+   `NEXT_PUBLIC_SITE_URL` mis à jour et redéploiement **avant d'imprimer les cartes QR**.
+2. Tests sur vrais téléphones : QR imprimé (iPhone, Android), mode avion après une visite,
+   installation sur l'écran d'accueil, bouton « Copier » du Wi-Fi.
+3. Semaine 5 : saisie des 30 adresses, horaires vérifiés, photos, coups de cœur, livret de démo, rendez-vous.
