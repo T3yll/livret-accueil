@@ -59,17 +59,18 @@ Le contexte métier et les règles sont dans `CLAUDE.md` et les autres fichiers 
 
 ## Points non vérifiés ou à surveiller
 
-- Bouton « Copier » du Wi-Fi sur un vrai téléphone (testé seulement dans le navigateur intégré).
 - Avertissement « N archivée(s) » sur la fiche d'un logement.
 - Un blocage unique (2,5 min) au premier enregistrement d'une section, jamais reproduit :
   probablement la première compilation en mode dev.
 - Ce PC est en Node 22.
 - **Service worker testé** dans Edge headless (serveur coupé : sections et fiches jamais ouvertes, filtres de la liste,
-  repli sur l'accueil, page « Pas de connexion »). Le navigateur intégré de Claude bloque les service workers :
-  à vérifier sur un vrai téléphone (mode avion), iPhone compris.
+  repli sur l'accueil, page « Pas de connexion »). Le navigateur intégré de Claude bloque les service workers.
 - QR codes vérifiés dans l'admin : aperçu, PNG 1024 px et SVG (décodés par un lecteur indépendant), carte A6
-  exactement à 105 × 148 mm sans débordement, routes refusées sans connexion. **Pas encore testé** : l'aperçu
-  d'impression réel (Ctrl+P, recto verso) et un tirage papier.
+  exactement à 105 × 148 mm sans débordement, routes refusées sans connexion. En « Enregistrer au format PDF » :
+  2 pages A6, fond crème compris. Sur imprimante de bureau, Chrome impose ses réglages (A6, marges, échelle,
+  arrière-plan à régler à la main). **Pas encore fait** : un tirage papier.
+- **Testé par Rémi sur téléphone le 2 novembre 2026**, sur le site en ligne : connexion admin, QR code scanné,
+  livret en mode avion après une visite, ajout à l'écran d'accueil, bouton « Copier » du Wi-Fi. Tout fonctionne.
 - Une adresse vue hors connexion affiche « ouvert aujourd'hui » recalculé à l'heure du téléphone.
 
 ## Reprendre sur un autre PC
@@ -103,6 +104,5 @@ Pour créer ou appliquer des migrations : `npx supabase login`, puis
 
 1. Domaine définitif dans Vercel (`conciergerie-des-deux-vallees.fr` ou sous-domaine), DNS, puis
    `NEXT_PUBLIC_SITE_URL` mis à jour et redéploiement **avant d'imprimer les cartes QR**.
-2. Tests sur vrais téléphones : QR imprimé (iPhone, Android), mode avion après une visite,
-   installation sur l'écran d'accueil, bouton « Copier » du Wi-Fi.
+2. Tirage papier d'une carte QR avec l'adresse définitive, scannée avec un iPhone et un Android.
 3. Semaine 5 : saisie des 30 adresses, horaires vérifiés, photos, coups de cœur, livret de démo, rendez-vous.
