@@ -158,6 +158,11 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
             }}
           />
 
+          {/* Bandeau en dégradé ivoire sous l'heure et les filtres : la carte ne s'arrête pas net en haut. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 z-[999] h-[calc(max(0.75rem,env(safe-area-inset-top))+5.5rem)] bg-linear-to-b from-background from-35% via-background/70 to-transparent"
+          />
           <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] flex items-center gap-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
             <Link
               href={`/g/${slug}`}
@@ -183,7 +188,8 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
           {selected ? (
             <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />
           ) : (
-            <div className="map-above-toolbar pointer-events-none absolute inset-x-0 bottom-0 z-[1000] flex justify-center pb-[max(1rem,env(safe-area-inset-bottom))]">
+            // En bas à gauche, en face des boutons de position : le centre de la carte reste dégagé.
+            <div className="map-above-toolbar pointer-events-none absolute bottom-[calc(max(1rem,env(safe-area-inset-bottom))+1.25rem)] left-3 z-[1000]">
               <button
                 type="button"
                 onClick={() => setView("list")}

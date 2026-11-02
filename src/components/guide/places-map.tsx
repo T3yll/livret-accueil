@@ -238,9 +238,9 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
           />
         ))}
       </MapContainer>
-      {/* Position et logement en bas à droite, au-dessus des crédits et du bouton « Liste » (Google Maps). */}
+      {/* Position et logement en bas à droite, juste au-dessus des crédits (Google Maps). */}
       {!controlsHidden && (
-        <div className="map-above-toolbar absolute right-3 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4rem)] z-[1000] flex flex-col gap-2">
+        <div className="map-above-toolbar absolute right-3 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+1.25rem)] z-[1000] flex flex-col gap-2">
           {origin && (
             <button
               type="button"
