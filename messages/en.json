@@ -118,8 +118,13 @@
     "seeDetails": "See details",
     "back": "Good places",
     "emergencyPlaces": "Nearby",
-    "backToList": "Back to the list",
-    "close": "Close"
+    "close": "Close",
+    "backToGuide": "Guide",
+    "locateMe": "Show my location",
+    "showStay": "Show the accommodation",
+    "youAreHere": "You are here",
+    "locationDenied": "Location access denied: allow it in your browser settings.",
+    "locationUnavailable": "Your position can't be found right now."
   },
   "LanguageSwitcher": {
     "label": "Language",

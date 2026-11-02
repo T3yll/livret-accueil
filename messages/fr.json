@@ -118,8 +118,13 @@
     "seeDetails": "Voir la fiche",
     "back": "Bonnes adresses",
     "emergencyPlaces": "À proximité",
-    "backToList": "Retour à la liste",
-    "close": "Fermer"
+    "close": "Fermer",
+    "backToGuide": "Livret",
+    "locateMe": "Me localiser",
+    "showStay": "Voir le logement",
+    "youAreHere": "Vous êtes ici",
+    "locationDenied": "Localisation refusée : autorisez-la dans les réglages du navigateur.",
+    "locationUnavailable": "Position introuvable pour le moment."
   },
   "LanguageSwitcher": {
     "label": "Langue",

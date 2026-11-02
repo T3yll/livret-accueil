@@ -14,6 +14,7 @@ export const brandColors = {
   text: "#292B27",
   muted: "#646A66",
   primary: "#465B48",
+  info: "#42677A",
   accent: "#A48652",
   border: "#DED9CD",
 } as const;

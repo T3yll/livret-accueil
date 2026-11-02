@@ -25,13 +25,14 @@ type Props = {
   places: PlaceWithDistance[];
   origin: { lat: number; lng: number } | null;
   nowIso: string; // heure du serveur au rendu : même résultat au premier affichage côté navigateur
+  originLabel: string; // nom du logement, affiché en permanence sous son marqueur
 };
 
 const chip =
   "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-4 text-[15px] font-semibold " +
   "focus-visible:outline-2 focus-visible:outline-primary aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-white";
 
-export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
+export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Props) {
   const t = useTranslations("Places");
   const locale = useLocale() as Locale;
   // L'état « ouvert aujourd'hui » suit l'heure réelle (minuit passé, page venue du cache…).
@@ -42,25 +43,26 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // La carte s'ouvre en plein écran et ajoute une étape dans l'historique (?vue=carte) :
-  // le bouton retour du téléphone ramène à la liste au lieu de quitter la page.
+  // La carte en plein écran est l'affichage par défaut. La liste ajoute une étape dans
+  // l'historique (?vue=liste) : le bouton retour du téléphone ramène à la carte.
   const searchParams = useSearchParams();
-  const view: "list" | "map" = searchParams.get("vue") === "carte" ? "map" : "list";
-  const pushedMap = useRef(false);
+  const view: "list" | "map" = searchParams.get("vue") === "liste" ? "list" : "map";
+  const pushedList = useRef(false);
   const setView = (next: "list" | "map") => {
     if (next === view) return;
-    if (next === "map") {
-      window.history.pushState(null, "", "?vue=carte");
-      pushedMap.current = true;
-    } else if (pushedMap.current) {
-      pushedMap.current = false;
+    if (next === "list") {
+      window.history.pushState(null, "", "?vue=liste");
+      pushedList.current = true;
+      window.scrollTo(0, 0);
+    } else if (pushedList.current) {
+      pushedList.current = false;
       window.history.back();
     } else {
       window.history.replaceState(null, "", window.location.pathname);
     }
   };
 
-  // Plein écran : la page derrière ne défile plus ; Échap ferme la fiche, puis la carte.
+  // Plein écran : la page derrière ne défile plus.
   useEffect(() => {
     if (view !== "map") return;
     const root = document.documentElement;
@@ -87,16 +89,13 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
   // Un lieu masqué par un filtre ne reste pas sélectionné.
   const selected = view === "map" ? filtered.find((p) => p.id === selectedId) : undefined;
 
+  // Échap referme la fiche résumée.
   useEffect(() => {
-    if (view !== "map") return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      if (selectedId) setSelectedId(null);
-      else setView("list");
-    };
+    if (view !== "map" || !selectedId) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSelectedId(null);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  });
+  }, [view, selectedId]);
 
   const categoryChips = (
     <>
@@ -175,20 +174,27 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
       </div>
 
       {view === "map" && (
-        <div role="dialog" aria-modal="true" aria-label={t("map")} className="fixed inset-0 z-[1100] flex flex-col bg-background">
+        <section aria-label={t("map")} className="fixed inset-0 z-[1100] flex flex-col bg-background">
           <div className="flex flex-col gap-2 border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
             <div className="flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => setView("list")}
+              <Link
+                href={`/g/${slug}`}
                 className="-ml-2 inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-[15px] font-semibold text-primary focus-visible:outline-2 focus-visible:outline-primary"
               >
                 <ChevronLeft size={20} aria-hidden />
-                {t("backToList")}
-              </button>
+                {t("backToGuide")}
+              </Link>
               <p aria-live="polite" className="text-sm text-muted">
                 {t("count", { count: filtered.length })}
               </p>
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-stone px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                <List size={16} aria-hidden />
+                {t("list")}
+              </button>
             </div>
             <div role="group" aria-label={t("filters")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
               {categoryChips}
@@ -201,11 +207,20 @@ export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
               places={filtered.map((p) => ({ id: p.id, name: p.name, lat: p.lat, lng: p.lng, category: p.category, is_favorite: p.is_favorite }))}
               selectedId={selected?.id ?? null}
               onSelect={setSelectedId}
-              labels={{ yourStay: t("yourStay"), favorite: t("favorite") }}
+              originLabel={originLabel}
+              labels={{
+                yourStay: t("yourStay"),
+                favorite: t("favorite"),
+                locateMe: t("locateMe"),
+                showStay: t("showStay"),
+                youAreHere: t("youAreHere"),
+                locationDenied: t("locationDenied"),
+                locationUnavailable: t("locationUnavailable"),
+              }}
             />
             {selected && <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />}
           </div>
-        </div>
+        </section>
       )}
 
       {filtered.length === 0 ? (

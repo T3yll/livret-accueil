@@ -41,6 +41,7 @@ export default async function PlacesPage({ params }: Props) {
         places={places}
         origin={lat !== null && lng !== null ? { lat, lng } : null}
         nowIso={new Date().toISOString()}
+        originLabel={guide.property.name}
       />
     </main>
   );
