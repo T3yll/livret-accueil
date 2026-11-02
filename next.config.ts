@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Le service worker ne doit jamais rester en cache : sinon une nouvelle version du livret
+  // (nouveau VERSION dans sw.js) mettrait des heures à arriver sur les téléphones.
+  async headers() {
+    return [{ source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] }];
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: supabaseHost
