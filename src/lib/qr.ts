@@ -4,7 +4,8 @@ import { brandColors } from "@/config/brand";
 
 // Adresse encodée dans le QR code : sans langue, pour que le livret s'ouvre dans celle du téléphone.
 export function guideUrl(slug: string): string {
-  const site = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+  // Une variable présente mais vide (oubli dans Vercel) compte comme absente.
+  const site = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
   return `${site}/g/${slug}`;
 }
 
