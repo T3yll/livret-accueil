@@ -79,8 +79,3 @@ h3 {
 .places-map:not(.show-favorite-labels) .favorite-label {
   display: none;
 }
-
-/* Crédits de la carte en haut à droite, sous l'heure du téléphone. */
-.places-map .leaflet-top {
-  margin-top: max(0.75rem, env(safe-area-inset-top));
-}

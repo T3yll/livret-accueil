@@ -96,11 +96,10 @@ function FitToPlaces({ bounds: initialBounds }: { bounds: L.LatLngBounds | undef
   const [bounds] = useState(initialBounds);
   useEffect(() => {
     // Crédits réduits à « © OpenStreetMap » (sans le lien Leaflet), obligatoires pour les tuiles OSM.
-    // En haut à droite : le bas de l'écran est occupé par la rangée de filtres.
-    map.attributionControl?.setPrefix(false).setPosition("topright");
+    map.attributionControl?.setPrefix(false);
     map.invalidateSize();
-    // Marges : le bouton retour en haut, la rangée de filtres en bas.
-    if (bounds) map.fitBounds(bounds, { paddingTopLeft: [24, 72], paddingBottomRight: [24, 96] });
+    // Marges : les filtres flottent en haut, le bouton « Liste » en bas.
+    if (bounds) map.fitBounds(bounds, { paddingTopLeft: [24, 80], paddingBottomRight: [24, 88] });
   }, [map, bounds]);
   return null;
 }
@@ -250,9 +249,9 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
           </Marker>
         ))}
       </MapContainer>
-      {/* Position et logement en bas à droite, juste au-dessus de la rangée de filtres (Google Maps). */}
+      {/* Position et logement en bas à droite, juste au-dessus des crédits (Google Maps). */}
       {!controlsHidden && (
-        <div className="map-above-toolbar absolute right-3 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+3.75rem)] z-[1000] flex flex-col gap-2">
+        <div className="map-above-toolbar absolute right-3 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+1.25rem)] z-[1000] flex flex-col gap-2">
           {origin && (
             <button
               type="button"
