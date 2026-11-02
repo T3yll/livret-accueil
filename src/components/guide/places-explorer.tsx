@@ -62,9 +62,15 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
     }
   };
 
-  // Plein écran : la page derrière ne défile plus.
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    rootRef.current?.closest("main")?.setAttribute("data-view", view);
+  }, [view]);
+
+  // Plein écran : la page ne défile plus.
   useEffect(() => {
     if (view !== "map") return;
+    window.scrollTo(0, 0);
     const root = document.documentElement;
     const previous = root.style.overflow;
     root.style.overflow = "hidden";
@@ -124,58 +130,13 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
     .map((day) => ({ day, items: markets.flatMap((m) => rangesOn(m, day).map((r) => ({ market: m, ...r }))) }))
     .filter((d) => d.items.length > 0);
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="relative">
-        <Search size={18} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" aria-hidden />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("search")}
-          aria-label={t("search")}
-          className="min-h-12 w-full rounded-xl border border-border bg-surface pr-3 pl-10 text-base focus-visible:outline-2 focus-visible:outline-primary"
-        />
-      </div>
-
-      <div role="group" aria-label={t("filters")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        {categoryChips}
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <button type="button" className={chip} aria-pressed={openToday} onClick={() => setOpenToday((v) => !v)}>
-          <span aria-hidden className="size-2 rounded-full bg-current" />
-          {t("openToday")}
-        </button>
-        {favoritesChip}
-      </div>
-
-      <div className="flex items-center justify-between gap-3">
-        <p aria-live="polite" className="text-sm text-muted">
-          {t("count", { count: filtered.length })}
-        </p>
-        <div role="group" aria-label={t("view")} className="flex gap-1 rounded-full bg-stone p-1">
-          {(["list", "map"] as const).map((v) => {
-            const Icon = v === "list" ? List : MapIcon;
-            return (
-              <button
-                key={v}
-                type="button"
-                aria-pressed={view === v}
-                onClick={() => setView(v)}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold aria-pressed:bg-primary aria-pressed:text-white"
-              >
-                <Icon size={16} aria-hidden />
-                {t(v)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {view === "map" && (
-        // 100lvh : jusqu'en bas de l'écran, sous la barre flottante de Safari (iOS 26), plus immersif.
-        <section aria-label={t("map")} className="fixed inset-x-0 top-0 z-[1100] flex h-[100lvh] flex-col bg-background">
+  // En mode carte, la carte EST le contenu de la page (pas un calque fixe) : sur iPhone, Safari
+  // ne laisse passer sous sa barre flottante que le contenu normal, il découpe les éléments fixes.
+  // La page masque alors son en-tête (data-view sur <main>, voir globals.css).
+  if (view === "map") {
+    return (
+      <div ref={rootRef}>
+        <section aria-label={t("map")} className="flex h-[100lvh] flex-col bg-background">
           <div className="flex flex-col gap-2 border-b border-border px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
             <div className="flex items-center justify-between gap-3">
               <Link
@@ -222,7 +183,58 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
             {selected && <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />}
           </div>
         </section>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={rootRef} className="flex flex-col gap-4">
+      <div className="relative">
+        <Search size={18} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" aria-hidden />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("search")}
+          aria-label={t("search")}
+          className="min-h-12 w-full rounded-xl border border-border bg-surface pr-3 pl-10 text-base focus-visible:outline-2 focus-visible:outline-primary"
+        />
+      </div>
+
+      <div role="group" aria-label={t("filters")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        {categoryChips}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button type="button" className={chip} aria-pressed={openToday} onClick={() => setOpenToday((v) => !v)}>
+          <span aria-hidden className="size-2 rounded-full bg-current" />
+          {t("openToday")}
+        </button>
+        {favoritesChip}
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <p aria-live="polite" className="text-sm text-muted">
+          {t("count", { count: filtered.length })}
+        </p>
+        <div role="group" aria-label={t("view")} className="flex gap-1 rounded-full bg-stone p-1">
+          {(["list", "map"] as const).map((v) => {
+            const Icon = v === "list" ? List : MapIcon;
+            return (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={view === v}
+                onClick={() => setView(v)}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold aria-pressed:bg-primary aria-pressed:text-white"
+              >
+                <Icon size={16} aria-hidden />
+                {t(v)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {filtered.length === 0 ? (
         <p className="rounded-2xl bg-surface p-4 text-muted">{t("empty")}</p>

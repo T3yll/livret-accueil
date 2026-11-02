@@ -15,8 +15,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: guide ? `${t("tile")} · ${guide.property.name}` : undefined, robots: { index: false, follow: false } };
 }
 
-export default async function PlacesPage({ params }: Props) {
+export default async function PlacesPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
+  // La carte est l'affichage par défaut ; ?vue=liste affiche la liste (la vue change ensuite côté navigateur).
+  const { vue } = await searchParams;
   setRequestLocale(locale);
 
   const guide = await getGuide(slug);
@@ -29,12 +31,17 @@ export default async function PlacesPage({ params }: Props) {
   const { lat, lng } = guide.property;
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[640px] flex-col gap-6 px-4 pt-2 pb-12">
-      <GuideHeader slug={slug} />
-      {guide.property.status === "draft" && <DraftNotice label={tGuide("draftNotice")} />}
-      <div className="flex flex-col gap-2">
-        <div aria-hidden className="h-px w-12 bg-accent" />
-        <h1 className="text-[28px] leading-tight">{t("title")}</h1>
+    <main
+      data-view={vue === "liste" ? "list" : "map"}
+      className="places-page mx-auto flex min-h-dvh max-w-[640px] flex-col gap-6 px-4 pt-2 pb-12"
+    >
+      <div className="hide-when-map flex flex-col gap-6">
+        <GuideHeader slug={slug} />
+        {guide.property.status === "draft" && <DraftNotice label={tGuide("draftNotice")} />}
+        <div className="flex flex-col gap-2">
+          <div aria-hidden className="h-px w-12 bg-accent" />
+          <h1 className="text-[28px] leading-tight">{t("title")}</h1>
+        </div>
       </div>
       <PlacesExplorer
         slug={slug}

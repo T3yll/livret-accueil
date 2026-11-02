@@ -52,3 +52,13 @@ h3 {
 .places-map .leaflet-bottom {
   margin-bottom: calc(100lvh - 100dvh);
 }
+
+/* Bonnes adresses en mode carte : la carte occupe toute la page, sans en-tête ni marges. */
+.places-page[data-view="map"] {
+  max-width: none;
+  padding: 0;
+  gap: 0;
+}
+.places-page[data-view="map"] .hide-when-map {
+  display: none;
+}
