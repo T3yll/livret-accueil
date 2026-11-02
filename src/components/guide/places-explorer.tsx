@@ -4,7 +4,7 @@ import { Heart, List, Map as MapIcon, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { formatDistance } from "@/lib/distance";
@@ -12,6 +12,7 @@ import { mediaUrl } from "@/lib/guide-view";
 import { localized } from "@/lib/localized";
 import { isOpenToday, rangesOn, todayStatus } from "@/lib/opening-hours";
 import { GUIDE_CATEGORIES, weekdayName, type PlaceCategory, type PlaceWithDistance } from "@/lib/places-view";
+import { useNow } from "@/lib/use-now";
 import { OpenBadge } from "./open-badge";
 import { CATEGORY_ICONS } from "./place-icons";
 
@@ -32,18 +33,13 @@ const chip =
 export function PlacesExplorer({ slug, places, origin, nowIso }: Props) {
   const t = useTranslations("Places");
   const locale = useLocale() as Locale;
-  const [now, setNow] = useState(() => new Date(nowIso));
+  // L'état « ouvert aujourd'hui » suit l'heure réelle (minuit passé, page venue du cache…).
+  const now = useNow(nowIso);
   const [category, setCategory] = useState<PlaceCategory | "all">("all");
   const [openToday, setOpenToday] = useState(false);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"list" | "map">("list");
-
-  // L'état « ouvert aujourd'hui » suit l'heure réelle (minuit passé, page restée ouverte…).
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 60_000);
-    return () => clearInterval(timer);
-  }, []);
 
   const withStatus = useMemo(() => places.map((p) => ({ ...p, status: todayStatus(p, now) })), [places, now]);
   const categories = GUIDE_CATEGORIES.filter((c) => places.some((p) => p.category === c));
