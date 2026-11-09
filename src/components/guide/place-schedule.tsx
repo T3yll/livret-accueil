@@ -4,9 +4,10 @@ import { CalendarX } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import { localizedWithLang } from "@/lib/localized";
-import { parisDay, rangesOn, todayStatus } from "@/lib/opening-hours";
-import { formatDate, weekdayName, type GuidePlace } from "@/lib/places-view";
+import { parisDay, rangesOn, stayStatus, todayStatus } from "@/lib/opening-hours";
+import { formatDate, formatStayDays, formatStayRange, weekdayName, type GuidePlace } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
+import { useStay } from "@/lib/use-stay";
 import { OpenBadge } from "./open-badge";
 
 // Tout ce qui dépend de l'heure sur la fiche d'une adresse est recalculé dans le navigateur :
@@ -33,6 +34,29 @@ export function PlaceTodayStatus({ place, nowIso }: Props) {
         </p>
       )}
     </>
+  );
+}
+
+// Sur la fiche : les jours d'ouverture pendant le séjour, si les dates sont connues.
+// Rien quand les horaires sont à vérifier : on ne suppose jamais.
+export function PlaceStayDays({ place, slug }: { place: GuidePlace; slug: string }) {
+  const t = useTranslations("Stay");
+  const locale = useLocale() as Locale;
+  const { stay } = useStay(slug);
+  if (!stay) return null;
+
+  const status = stayStatus(place, stay);
+  if (status.state !== "open" && status.state !== "closed") return null;
+  const label =
+    status.state === "closed"
+      ? t("closed")
+      : status.allDays
+        ? t("openAll")
+        : t("openDays", { days: formatStayDays(status.days, locale) });
+  return (
+    <p className="text-sm">
+      <OpenBadge status={status} label={label} /> <span className="text-muted">({formatStayRange(stay, locale)})</span>
+    </p>
   );
 }
 

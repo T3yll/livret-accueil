@@ -163,7 +163,7 @@
     "link": "Legal notice and privacy",
     "title": "Legal notice and privacy",
     "publisherTitle": "Publisher",
-    "publisher": "{product} is published by Rémi Leroi, sole trader (entrepreneur individuel), Fajoles (46300), France.\nSIREN: 948 211 727.\nPublication director: Rémi Leroi.\nContact: {email}",
+    "publisher": "{product} is published by Rémi Leroi, sole trader (entrepreneur individuel), 509 Route du Vallon, 46300 Fajoles, France.\nSIREN: 948 211 727.\nPublication director: Rémi Leroi.\nContact: {email}",
     "hostingTitle": "Hosting",
     "hosting": "Website: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.\nGuide data and photos: Supabase, servers located in Europe.",
     "privacyTitle": "Your data",
@@ -176,5 +176,28 @@
     "rights": "For any question about this information or your data: {email}. You can also contact the French data protection authority, the CNIL (cnil.fr).",
     "creditsTitle": "Photos",
     "credits": "Openly licensed photos are credited on each place's page. The base map is © OpenStreetMap contributors."
+  },
+  "Stay": {
+    "title": "Your stay dates",
+    "from": "Arrival",
+    "to": "Departure",
+    "save": "Save",
+    "clear": "Remove the dates",
+    "close": "Close",
+    "show": "Show",
+    "hint": "They stay on your phone. Nothing is sent.",
+    "invalid": "Please check the dates: departure follows arrival, 60 days at most, and the stay isn't over.",
+    "banner": "Your stay: {range}",
+    "modify": "change",
+    "ask": "Add my stay dates",
+    "chip": "Your dates",
+    "openAll": "Open every day of your stay",
+    "openDays": "Open {days} during your stay",
+    "closed": "Closed during your stay",
+    "filter": {
+      "stay": "Open during my stay",
+      "today": "Open today",
+      "all": "All places"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OfflineSupport } from "@/components/guide/offline-support";
+import { StayFromLink } from "@/components/guide/stay-from-link";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
 import { visibleSectionTypes } from "@/lib/guide-view";
@@ -40,6 +41,7 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
     <>
       {children}
       <OfflineSupport urls={urls} />
+      <StayFromLink slug={slug} />
     </>
   );
 }

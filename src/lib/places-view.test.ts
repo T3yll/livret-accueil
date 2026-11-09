@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Guide } from "./guide";
-import { formatDate, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, weekdayName } from "./places-view";
+import { formatDate, formatStayDays, formatStayRange, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, weekdayName } from "./places-view";
 
 const place = (overrides: Partial<Guide["places"][number]>): Guide["places"][number] => ({
   id: "x",
@@ -73,6 +73,20 @@ describe("filtres regroupés", () => {
     expect(healthPlaces(guide([p])).map((x) => x.id)).toEqual(["ph"]);
     expect(guidePlaces(guide([p], []))).toEqual([]);
     expect(healthPlaces(guide([p], [])).map((x) => x.id)).toEqual(["ph"]);
+  });
+});
+
+describe("affichage du séjour", () => {
+  it("dates du séjour, sur un ou deux mois", () => {
+    expect(formatStayRange({ from: "2026-12-12", to: "2026-12-15" }, "fr")).toBe("12 → 15 déc.");
+    expect(formatStayRange({ from: "2026-12-28", to: "2027-01-02" }, "fr")).toBe("28 déc. → 2 janv.");
+    expect(formatStayRange({ from: "2026-12-12", to: "2026-12-15" }, "en")).toBe("12 → 15 Dec");
+  });
+
+  it("jours d'ouverture, sans répéter un jour de la semaine", () => {
+    expect(formatStayDays(["2026-12-12", "2026-12-15"], "fr")).toBe("sam. et mar.");
+    expect(formatStayDays(["2026-12-12", "2026-12-19"], "fr")).toBe("sam.");
+    expect(formatStayDays(["2026-12-12", "2026-12-15"], "en")).toBe("Sat and Tue");
   });
 });
 

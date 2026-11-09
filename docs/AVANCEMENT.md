@@ -123,10 +123,17 @@ Fait au 9 novembre (plan validé par Rémi) :
   Enfants, Pratique (un filtre sans adresse est caché ; plus de « Tout »). Lascaux IV et le Musée passent en « site ».
 - Admin : prénoms des hôtes, livraison, drive, réservation et précision ; pictogrammes sur la fiche.
 - Mentions légales et confidentialité : `/g/<slug>/informations`, lien en bas de l'accueil du livret.
-  **Texte à faire relire ; manque l'adresse complète de l'éditeur** (seuls « Fajoles (46300) » et le SIREN y figurent).
+  **Texte à faire relire** (dont l'adresse de Vercel, écrite de mémoire).
+- Dates de séjour : `stayStatus` (`opening-hours.ts`), `parseStay` (`stay.ts`), stockage local par livret (`use-stay.ts`),
+  lien `?du=&au=` lu puis retiré de l'adresse, bandeau sur l'accueil, pastille en tête des filtres (Séjour, Aujourd'hui, Tout),
+  jours d'ouverture sur les cartes, la fiche résumée et la fiche.
+- Gîte de démo : prénoms des hôtes « Pascal et Brigitte ».
 
-Reste, dans l'ordre : dates de séjour (16 → 22 nov.), accueil de Rémi et audio (23 → 29 nov.), Préparer mon séjour
-et QR par page (30 nov. → 5 déc.). Décidé : Itinéraire retiré de l'accueil au profit de « Préparer mon séjour » ;
+Reste, dans l'ordre : accueil de Rémi et audio, Préparer mon séjour, QR par page.
+
+**Décision de Rémi (9 nov.) : horaires et fermetures remplis en dernier, juste avant la démo.** D'ici là, toutes les
+adresses restent « à vérifier » : le filtre séjour ne masque que les lieux ayant une fermeture saisie.
+À prévoir avant le critère « les sites fermés l'hiver n'apparaissent pas ». Décidé : Itinéraire retiré de l'accueil au profit de « Préparer mon séjour » ;
 pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout) ; `is_experience` reporté en P2.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la

@@ -7,7 +7,7 @@ import { CuratorAvatar } from "@/components/guide/curator-avatar";
 import { DraftNotice } from "@/components/guide/guide-header";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { CATEGORY_ICONS } from "@/components/guide/place-icons";
-import { PlaceTodayStatus, PlaceWeek } from "@/components/guide/place-schedule";
+import { PlaceStayDays, PlaceTodayStatus, PlaceWeek } from "@/components/guide/place-schedule";
 import { curator } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -103,6 +103,7 @@ export default async function PlacePage({ params }: Props) {
           </p>
           <h1 className="text-[28px] leading-tight font-semibold">{place.name}</h1>
           <PlaceTodayStatus place={place} nowIso={nowIso} />
+          <PlaceStayDays place={place} slug={slug} />
         </header>
 
         {place.is_favorite && (

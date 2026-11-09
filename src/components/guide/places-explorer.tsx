@@ -1,24 +1,26 @@
 "use client";
 
-import { ChevronLeft, Heart, List, Map as MapIcon, Search, X } from "lucide-react";
+import { CalendarDays, ChevronLeft, Heart, List, Map as MapIcon, Search, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { curator } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { formatDistance } from "@/lib/distance";
 import { mediaUrl } from "@/lib/guide-view";
 import { localized, localizedWithLang } from "@/lib/localized";
-import { isOpenToday, rangesOn, todayStatus } from "@/lib/opening-hours";
-import { isInGroup, PLACE_GROUP_KEYS, weekdayName, type PlaceGroup, type PlaceWithDistance } from "@/lib/places-view";
+import { isOpenToday, rangesOn, stayStatus, todayStatus } from "@/lib/opening-hours";
+import { formatStayDays, formatStayRange, isInGroup, PLACE_GROUP_KEYS, weekdayName, type PlaceGroup, type PlaceWithDistance } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
+import { useStay } from "@/lib/use-stay";
 import { CuratorAvatar } from "./curator-avatar";
 import { floatingButton } from "./map-ui";
 import { OpenBadge } from "./open-badge";
 import { CATEGORY_ICONS } from "./place-icons";
+import { StaySheet, type OpenFilter } from "./stay-sheet";
 
 // La carte (Leaflet) n'est chargée que si le voyageur l'ouvre : pages légères sur réseau faible.
 const PlacesMap = dynamic(() => import("./places-map"), { ssr: false });
@@ -42,7 +44,12 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
   const now = useNow(nowIso);
   // Aucun filtre actif : tout afficher. Toucher le filtre actif le retire.
   const [group, setGroup] = useState<PlaceGroup | null>(null);
-  const [openToday, setOpenToday] = useState(false);
+  const { stay, save: saveStay } = useStay(slug);
+  // Choix du voyageur ; sans choix, un séjour connu filtre d'office sur ses dates.
+  const [openChoice, setOpenChoice] = useState<OpenFilter | null>(null);
+  const openFilter: OpenFilter = openChoice === "stay" && !stay ? "all" : (openChoice ?? (stay ? "stay" : "all"));
+  const [staySheetOpen, setStaySheetOpen] = useState(false);
+  const tStay = useTranslations("Stay");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -83,7 +90,10 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
     };
   }, [view]);
 
-  const withStatus = useMemo(() => places.map((p) => ({ ...p, status: todayStatus(p, now) })), [places, now]);
+  const withStatus = useMemo(
+    () => places.map((p) => ({ ...p, status: todayStatus(p, now), stay: stay ? stayStatus(p, stay) : null })),
+    [places, now, stay],
+  );
   const groups = PLACE_GROUP_KEYS.filter((g) => places.some((p) => isInGroup(p.category, g)));
   const hasFavorites = places.some((p) => p.is_favorite);
 
@@ -91,7 +101,8 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
   const filtered = withStatus.filter(
     (p) =>
       (!group || isInGroup(p.category, group)) &&
-      (!openToday || isOpenToday(p.status)) &&
+      (openFilter !== "today" || isOpenToday(p.status)) &&
+      (openFilter !== "stay" || p.stay?.state !== "closed") &&
       (!favoritesOnly || p.is_favorite) &&
       (!query.trim() || normalize(p.name).includes(normalize(query.trim()))),
   );
@@ -106,6 +117,32 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [view, selectedId]);
+
+  // Pendant un séjour, le badge dit ce qui compte : les jours d'ouverture sur ces dates.
+  const badgeFor = (place: PlaceWithStatus) => {
+    const s = openFilter === "stay" ? place.stay : null;
+    if (!s) return { status: place.status, label: t(`status.${place.status.state}`) };
+    if (s.state === "open") {
+      return { status: s, label: s.allDays ? tStay("openAll") : tStay("openDays", { days: formatStayDays(s.days, locale) }) };
+    }
+    return { status: s, label: s.state === "closed" ? tStay("closed") : t(`status.${s.state}`) };
+  };
+
+  // Pastille unique : les dates du séjour et le filtre d'ouverture.
+  const stayChip = (
+    <button type="button" className={chip} aria-pressed={openFilter !== "all"} onClick={() => setStaySheetOpen(true)}>
+      <CalendarDays size={16} aria-hidden />
+      {openFilter === "today" ? t("openToday") : stay ? formatStayRange(stay, locale) : tStay("chip")}
+    </button>
+  );
+  const staySheet = staySheetOpen && (
+    <StaySheet
+      stay={stay}
+      onSave={saveStay}
+      onClose={() => setStaySheetOpen(false)}
+      filter={{ value: openFilter, onChange: setOpenChoice }}
+    />
+  );
 
   const categoryChips = (
     <>
@@ -176,6 +213,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
               aria-label={t("filters")}
               className="pointer-events-auto flex min-w-0 flex-1 gap-2 overflow-x-auto py-1.5 pr-3 [scrollbar-width:none] [&>button]:border-transparent [&>button]:shadow-[0_1px_4px_rgb(0_0_0/0.25)]"
             >
+              {stayChip}
               {favoritesChip}
               {categoryChips}
             </div>
@@ -186,7 +224,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
           </p>
 
           {selected ? (
-            <PlaceSheet slug={slug} place={selected} locale={locale} onClose={() => setSelectedId(null)} />
+            <PlaceSheet slug={slug} place={selected} badge={badgeFor(selected)} locale={locale} onClose={() => setSelectedId(null)} />
           ) : (
             // En bas à gauche, en face des boutons de position : le centre de la carte reste dégagé.
             <div className="map-above-toolbar pointer-events-none absolute bottom-[calc(max(1rem,env(safe-area-inset-bottom))+1.25rem)] left-3 z-[1000]">
@@ -201,6 +239,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
             </div>
           )}
         </section>
+        {staySheet}
       </div>
     );
   }
@@ -224,10 +263,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button type="button" className={chip} aria-pressed={openToday} onClick={() => setOpenToday((v) => !v)}>
-          <span aria-hidden className="size-2 rounded-full bg-current" />
-          {t("openToday")}
-        </button>
+        {stayChip}
         {favoritesChip}
       </div>
 
@@ -292,7 +328,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
                       {t(`category.${place.category}`)}
                       {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
                     </span>
-                    <OpenBadge status={place.status} label={t(`status.${place.status.state}`)} />
+                    <OpenBadge {...badgeFor(place)} />
                     {description && <span className="line-clamp-2 text-sm">{description}</span>}
                   </span>
                 </Link>
@@ -321,14 +357,27 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
           </ul>
         </section>
       )}
+      {staySheet}
     </div>
   );
 }
 
-type PlaceWithStatus = PlaceWithDistance & { status: ReturnType<typeof todayStatus> };
+type PlaceWithStatus = PlaceWithDistance & { status: ReturnType<typeof todayStatus>; stay: ReturnType<typeof stayStatus> | null };
 
 // Fiche résumée d'un lieu touché sur la carte : photo, état du jour, description, mot de l'hôte.
-function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: PlaceWithStatus; locale: Locale; onClose: () => void }) {
+function PlaceSheet({
+  slug,
+  place,
+  badge,
+  locale,
+  onClose,
+}: {
+  slug: string;
+  place: PlaceWithStatus;
+  badge: ComponentProps<typeof OpenBadge>;
+  locale: Locale;
+  onClose: () => void;
+}) {
   const t = useTranslations("Places");
   const Icon = CATEGORY_ICONS[place.category];
   const description = localized(place, "description", locale);
@@ -376,7 +425,7 @@ function PlaceSheet({ slug, place, locale, onClose }: { slug: string; place: Pla
             {t(`category.${place.category}`)}
             {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
           </p>
-          <OpenBadge status={place.status} label={t(`status.${place.status.state}`)} />
+          <OpenBadge {...badge} />
           {description && <p className="line-clamp-2 text-[15px]">{description}</p>}
           {comment && (
             <figure className="mt-1 flex flex-col gap-2 rounded-xl bg-favorite-bg px-3 py-2">

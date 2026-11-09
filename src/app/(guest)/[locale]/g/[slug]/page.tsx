@@ -11,6 +11,7 @@ import { Emblem } from "@/components/guide/emblem";
 import { FavoritesCarousel } from "@/components/guide/favorites-carousel";
 import { InstallPrompt } from "@/components/guide/install-prompt";
 import { IconBadge, SECTION_ICONS } from "@/components/guide/section-icon";
+import { StayBanner } from "@/components/guide/stay-banner";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
@@ -91,6 +92,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
           <p className="text-sm text-muted">{t("welcome")}</p>
           <h1 className="text-[32px] leading-tight">{property.name}</h1>
           {welcome && <RichText text={welcome.text} lang={welcome.lang} />}
+          <StayBanner slug={slug} />
         </header>
 
         {tiles.length > 0 && (

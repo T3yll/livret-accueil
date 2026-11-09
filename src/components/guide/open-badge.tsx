@@ -9,7 +9,7 @@ const STYLES: Record<TodayStatus["state"], string> = {
   unknown: "text-info",
 };
 
-export function OpenBadge({ status, label }: { status: TodayStatus; label: string }) {
+export function OpenBadge({ status, label }: { status: { state: TodayStatus["state"] }; label: string }) {
   return (
     <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${STYLES[status.state]}`}>
       <span aria-hidden className="size-2 shrink-0 rounded-full bg-current" />

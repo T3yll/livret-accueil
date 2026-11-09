@@ -1,6 +1,8 @@
 import type { Locale } from "@/i18n/routing";
 import { distanceKm } from "@/lib/distance";
 import type { Guide } from "@/lib/guide";
+import type { Stay } from "@/lib/stay";
+import { weekdayOf } from "@/lib/stay";
 import type { Enums } from "@/types/database";
 
 export type GuidePlace = Guide["places"][number];
@@ -59,4 +61,26 @@ export function formatDate(date: string, locale: Locale): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(
     new Date(`${date}T00:00:00Z`),
   );
+}
+
+const shortDate = (date: string, locale: Locale, options: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat(intlLocale(locale), { ...options, timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
+
+// « 12 → 15 déc. », ou « 28 déc. → 2 janv. » à cheval sur deux mois.
+export function formatStayRange({ from, to }: Stay, locale: Locale): string {
+  const sameMonth = from.slice(0, 7) === to.slice(0, 7);
+  const start = shortDate(from, locale, sameMonth ? { day: "numeric" } : { day: "numeric", month: "short" });
+  return `${start} → ${shortDate(to, locale, { day: "numeric", month: "short" })}`;
+}
+
+// Jours d'ouverture pendant le séjour : « sam. et mar. ». Un même jour de la semaine n'est cité qu'une fois.
+export function formatStayDays(days: string[], locale: Locale): string {
+  const seen = new Set<number>();
+  const names = days.flatMap((date) => {
+    const weekday = weekdayOf(date);
+    if (seen.has(weekday)) return [];
+    seen.add(weekday);
+    return [shortDate(date, locale, { weekday: "short" })];
+  });
+  return new Intl.ListFormat(intlLocale(locale), { style: "long", type: "conjunction" }).format(names);
 }

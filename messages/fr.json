@@ -163,7 +163,7 @@
     "link": "Mentions légales et confidentialité",
     "title": "Mentions légales et confidentialité",
     "publisherTitle": "Éditeur",
-    "publisher": "{product} est édité par Rémi Leroi, entrepreneur individuel, Fajoles (46300), France.\nSIREN : 948 211 727.\nDirecteur de la publication : Rémi Leroi.\nContact : {email}",
+    "publisher": "{product} est édité par Rémi Leroi, entrepreneur individuel, 509 Route du Vallon, 46300 Fajoles, France.\nSIREN : 948 211 727.\nDirecteur de la publication : Rémi Leroi.\nContact : {email}",
     "hostingTitle": "Hébergement",
     "hosting": "Site : Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.\nDonnées du livret et photos : Supabase, serveurs situés en Europe.",
     "privacyTitle": "Vos données",
@@ -176,5 +176,28 @@
     "rights": "Pour toute question sur ces informations ou sur vos données : {email}. Vous pouvez aussi saisir la CNIL (cnil.fr).",
     "creditsTitle": "Photos",
     "credits": "Les photos sous licence libre sont créditées sur la fiche de chaque adresse. Le fond de carte est © les contributeurs d'OpenStreetMap."
+  },
+  "Stay": {
+    "title": "Vos dates de séjour",
+    "from": "Arrivée",
+    "to": "Départ",
+    "save": "Enregistrer",
+    "clear": "Retirer les dates",
+    "close": "Fermer",
+    "show": "Afficher",
+    "hint": "Elles restent sur votre téléphone. Rien n'est envoyé.",
+    "invalid": "Vérifiez les dates : le départ suit l'arrivée, 60 jours au maximum, et le séjour n'est pas terminé.",
+    "banner": "Votre séjour : {range}",
+    "modify": "modifier",
+    "ask": "Indiquer mes dates de séjour",
+    "chip": "Vos dates",
+    "openAll": "Ouvert tous les jours de votre séjour",
+    "openDays": "Ouvert {days} pendant votre séjour",
+    "closed": "Fermé pendant votre séjour",
+    "filter": {
+      "stay": "Ouvert pendant mon séjour",
+      "today": "Ouvert aujourd'hui",
+      "all": "Toutes les adresses"
+    }
   }
 }

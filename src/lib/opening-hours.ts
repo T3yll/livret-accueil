@@ -4,6 +4,8 @@
 //
 // Ce calcul tourne aussi dans le navigateur, pour rester juste hors connexion.
 
+import { stayDates, weekdayOf, type Stay } from "./stay";
+
 export type OpeningMode = "schedule" | "always" | "appointment" | "unknown";
 
 export type HoursRange = { weekday: number; opens_at: string; closes_at: string };
@@ -81,3 +83,34 @@ export function todayStatus(place: PlaceHours, now: Date): TodayStatus {
 
 // Pour le filtre « Ouvert aujourd'hui ».
 export const isOpenToday = (status: TodayStatus) => status.state === "open" || status.state === "always";
+
+export type StayStatus =
+  | { state: "open"; days: string[]; allDays: boolean } // jours d'ouverture pendant le séjour
+  | { state: "always" }
+  | { state: "closed" } // aucun jour d'ouverture : masqué par le filtre « séjour »
+  | { state: "appointment" }
+  | { state: "unknown" }; // horaires à vérifier : reste visible, jamais présenté comme ouvert
+
+// Mêmes règles que todayStatus, appliquées à chaque jour du séjour.
+export function stayStatus(place: PlaceHours, stay: Stay): StayStatus {
+  const dates = stayDates(stay);
+
+  // Une fermeture saisie est une info fiable, quel que soit le mode.
+  const notClosed = dates.filter((date) => !closureOn(place, date));
+  if (notClosed.length === 0) return { state: "closed" };
+
+  switch (place.opening_mode) {
+    case "always":
+      return { state: "always" };
+    case "appointment":
+      return { state: "appointment" };
+    case "unknown":
+      return { state: "unknown" };
+    case "schedule": {
+      if (!place.hours_verified_at || place.hours.length === 0) return { state: "unknown" };
+      const days = notClosed.filter((date) => rangesOn(place, weekdayOf(date)).length > 0);
+      if (days.length === 0) return { state: "closed" };
+      return { state: "open", days, allDays: days.length === dates.length };
+    }
+  }
+}
