@@ -266,5 +266,8 @@
     "book": "Réserver",
     "timeRange": "{start} – {end}",
     "badge": "Expérience"
+  },
+  "Equipment": {
+    "listen": "Écouter l'explication"
   }
 }

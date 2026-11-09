@@ -38,6 +38,10 @@ export type Guide = {
     body_en: string | null;
     data: Json;
     media: Json;
+    audio_path_fr: string | null;
+    audio_path_en: string | null;
+    transcript_fr: string | null;
+    transcript_en: string | null;
     position: number;
     is_active: boolean;
     updated_at: string;

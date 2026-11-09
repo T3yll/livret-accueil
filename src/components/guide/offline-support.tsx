@@ -17,7 +17,7 @@ function subscribeOnline(callback: () => void) {
   };
 }
 
-export function OfflineSupport({ urls, audioUrl }: { urls: string[]; audioUrl: string | null }) {
+export function OfflineSupport({ urls, audioUrls }: { urls: string[]; audioUrls: string[] }) {
   const t = useTranslations("Offline");
   const online = useSyncExternalStore(
     subscribeOnline,
@@ -27,6 +27,7 @@ export function OfflineSupport({ urls, audioUrl }: { urls: string[]; audioUrl: s
 
   // Clé stable : on ne relance l'enregistrement que si la liste des pages change.
   const urlsKey = urls.join("\n");
+  const audioKey = audioUrls.join("\n");
 
   useEffect(() => {
     if (!SW_ENABLED || !("serviceWorker" in navigator)) return;
@@ -34,12 +35,14 @@ export function OfflineSupport({ urls, audioUrl }: { urls: string[]; audioUrl: s
       .register("/sw.js")
       .then(() => navigator.serviceWorker.ready)
       .then((registration) => {
-        if (urlsKey) registration.active?.postMessage({ type: "precache", urls: urlsKey.split("\n"), audioUrl });
+        if (!urlsKey) return;
+        const audioUrls = audioKey ? audioKey.split("\n") : [];
+        registration.active?.postMessage({ type: "precache", urls: urlsKey.split("\n"), audioUrls });
       })
       .catch(() => {
         // Sans service worker, le livret marche normalement, simplement pas hors connexion.
       });
-  }, [urlsKey, audioUrl]);
+  }, [urlsKey, audioKey]);
 
   if (online) return null;
   return (

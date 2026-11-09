@@ -4,6 +4,7 @@ import { SECTION_LABELS } from "@/components/admin/section-labels";
 import { Button } from "@/components/ui/button";
 import { hasMissingTranslation, isSectionEmpty } from "@/lib/sections";
 import type { Tables } from "@/types/database";
+import { addEquipmentFromTemplate } from "../../equipements/actions";
 import { addEquipment, moveSection, setSectionActive } from "./sections/actions";
 
 type Section = Tables<"guide_sections">;
@@ -20,7 +21,17 @@ const iconButton =
   "inline-flex size-11 items-center justify-center rounded-lg border border-border bg-surface hover:bg-stone " +
   "focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-40";
 
-export function SectionsPanel({ propertyId, sections }: { propertyId: string; sections: Section[] }) {
+type Template = Pick<Tables<"equipment_templates">, "id" | "title_fr">;
+
+export function SectionsPanel({
+  propertyId,
+  sections,
+  templates,
+}: {
+  propertyId: string;
+  sections: Section[];
+  templates: Template[];
+}) {
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -31,6 +42,31 @@ export function SectionsPanel({ propertyId, sections }: { propertyId: string; se
           </Button>
         </form>
       </div>
+      {templates.length > 0 && (
+        <form action={addEquipmentFromTemplate.bind(null, propertyId)} className="flex flex-wrap items-end gap-2">
+          <label className="flex flex-col gap-1 text-sm font-semibold">
+            Ajouter depuis la bibliothèque
+            <select
+              name="template_id"
+              required
+              defaultValue=""
+              className="min-h-11 rounded-xl border border-border bg-surface px-3 text-base font-normal focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <option value="" disabled>
+                Choisir un équipement…
+              </option>
+              {templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.title_fr}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button type="submit" variant="secondary">
+            Ajouter
+          </Button>
+        </form>
+      )}
       <p className="text-sm text-muted">
         Dans l&apos;ordre du livret. Une section vide n&apos;est jamais montrée au voyageur.
       </p>

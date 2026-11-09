@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { SECTION_LABELS } from "@/components/admin/section-labels";
 import { Button } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth";
+import { saveSectionAsTemplate } from "../../../../equipements/actions";
 import { deleteEquipment } from "../actions";
 import { SectionForm } from "./section-form";
 
@@ -37,6 +38,21 @@ export default async function SectionPage({ params }: PageProps<"/admin/logement
       </div>
 
       <SectionForm propertyId={id} section={section} />
+
+      {section.type === "equipment" && (
+        <section className="flex flex-col gap-3 border-t border-border pt-6">
+          <h2 className="text-2xl">Bibliothèque</h2>
+          <p className="max-w-2xl text-sm text-muted">
+            Enregistre une copie de cette fiche (texte, photos, note vocale) pour l&apos;ajouter à d&apos;autres logements.
+            Enregistrez d&apos;abord vos modifications.
+          </p>
+          <form action={saveSectionAsTemplate.bind(null, id, section.id)}>
+            <Button type="submit" variant="secondary">
+              Enregistrer dans la bibliothèque
+            </Button>
+          </form>
+        </section>
+      )}
 
       {section.type === "equipment" && (
         <section className="flex flex-col gap-3 border-t border-border pt-6">

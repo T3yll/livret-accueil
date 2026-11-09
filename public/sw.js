@@ -171,17 +171,19 @@ async function trim(cache, maxEntries) {
 // utilise (sinon une page jamais ouverte s'afficherait hors connexion sans ses composants).
 self.addEventListener("message", (event) => {
   if (event.data?.type !== "precache" || !Array.isArray(event.data.urls)) return;
-  event.waitUntil(precache(event.data.urls.filter((path) => GUIDE_PAGE.test(path)), event.data.audioUrl));
+  // audioUrl (une seule note) : ancien format, envoyé par une page restée ouverte sur l'ancienne version.
+  const audioUrls = Array.isArray(event.data.audioUrls) ? event.data.audioUrls : [event.data.audioUrl];
+  event.waitUntil(precache(event.data.urls.filter((path) => GUIDE_PAGE.test(path)), audioUrls));
 });
 
-async function precache(paths, audioUrl) {
-  // La note vocale d'accueil d'abord : elle doit pouvoir s'écouter sans réseau.
-  if (typeof audioUrl === "string" && AUDIO_FILE.test(new URL(audioUrl).pathname)) {
-    const audio = await caches.open(AUDIO);
-    if (!(await audio.match(audioUrl))) {
-      const response = await fetch(audioUrl, { mode: "cors", credentials: "omit" }).catch(() => null);
-      if (response?.ok) await audio.put(audioUrl, response);
-    }
+async function precache(paths, audioUrls) {
+  // Les notes vocales d'abord (accueil, puis équipements) : elles doivent pouvoir s'écouter sans réseau.
+  const audio = await caches.open(AUDIO);
+  for (const audioUrl of audioUrls) {
+    if (typeof audioUrl !== "string" || !AUDIO_FILE.test(new URL(audioUrl).pathname)) continue;
+    if (await audio.match(audioUrl)) continue;
+    const response = await fetch(audioUrl, { mode: "cors", credentials: "omit" }).catch(() => null);
+    if (response?.ok) await audio.put(audioUrl, response);
   }
 
   const pages = await caches.open(PAGES);

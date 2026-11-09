@@ -266,5 +266,8 @@
     "book": "Book",
     "timeRange": "{start} – {end}",
     "badge": "Experience"
+  },
+  "Equipment": {
+    "listen": "Listen to the explanation"
   }
 }

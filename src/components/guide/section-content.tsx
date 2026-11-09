@@ -25,9 +25,11 @@ import type { Guide } from "@/lib/guide";
 import { formatDistance } from "@/lib/distance";
 import { directionsLinks, formatTime, type GuideSection } from "@/lib/guide-view";
 import type { PlaceWithDistance } from "@/lib/places-view";
-import { localizedWithLang } from "@/lib/localized";
+import { localized, localizedWithLang } from "@/lib/localized";
 import { RichText } from "@/lib/rich-text";
+import { mediaUrl } from "@/lib/guide-view";
 import { parseMedia, parseSectionData, PROVIDED_ITEMS, type ProvidedItem } from "@/lib/sections";
+import { AudioPlayer } from "./audio-player";
 import { CopyButton } from "./copy-button";
 import { Directions } from "./directions";
 import { Photos } from "./photos";
@@ -63,12 +65,23 @@ export async function SectionContent({ section, property, locale, nearby = [] }:
       return <PrepareContent section={section} property={property} locale={locale} />;
     case "equipment": {
       const title = localizedWithLang(section, "title", locale);
+      // Note vocale : en premier, c'est plus simple d'écouter devant l'appareil que de lire.
+      const audio = localizedWithLang(section, "audio_path", locale);
+      const tEquipment = await getTranslations("Equipment");
       return (
         <article className="flex flex-col gap-3">
           {title && (
             <h2 lang={title.lang} className="text-2xl font-semibold">
               {title.text}
             </h2>
+          )}
+          {audio && (
+            <AudioPlayer
+              src={mediaUrl(audio.text)}
+              lang={audio.lang}
+              title={tEquipment("listen")}
+              transcript={localized(section, "transcript", audio.lang)}
+            />
           )}
           <Body section={section} locale={locale} />
           {photos}

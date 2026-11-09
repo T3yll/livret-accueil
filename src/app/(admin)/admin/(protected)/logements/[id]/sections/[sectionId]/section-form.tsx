@@ -8,7 +8,8 @@ import { formKey, initialFormState, initialValue, type FormState } from "@/lib/f
 import { KEY_HANDOVER, parseMedia, parseMediaJson, parseSectionData, PROVIDED_ITEMS } from "@/lib/sections";
 import type { Tables } from "@/types/database";
 import { saveSection } from "../actions";
-import { MediaListInput } from "./media-list-input";
+import { MediaListInput } from "@/components/admin/media-list-input";
+import { VoiceNoteFields } from "@/components/admin/voice-note-fields";
 
 const TEXT_HINT = "Une ligne vide sépare deux paragraphes ; « - » en début de ligne crée une liste.";
 
@@ -179,8 +180,21 @@ export function SectionForm({ propertyId, section }: { propertyId: string; secti
         </div>
       </fieldset>
 
+      {section.type === "equipment" && (
+        <VoiceNoteFields
+          pathPrefix={`properties/${propertyId}/sections/${section.id}/voice`}
+          values={{
+            audio_path_fr: initialValue(state, "audio_path_fr", section.audio_path_fr),
+            audio_path_en: initialValue(state, "audio_path_en", section.audio_path_en),
+            transcript_fr: initialValue(state, "transcript_fr", section.transcript_fr),
+            transcript_en: initialValue(state, "transcript_en", section.transcript_en),
+          }}
+        />
+      )}
+
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Photos</legend>
+        {section.type === "equipment" && <p className="text-sm text-muted">Par exemple une photo du bouton à utiliser.</p>}
         <MediaListInput
           initial={state.values?.media ? parseMediaJson(state.values.media) : parseMedia(section.media)}
           pathPrefix={`properties/${propertyId}/sections/${section.id}`}

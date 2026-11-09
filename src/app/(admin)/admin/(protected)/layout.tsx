@@ -8,6 +8,7 @@ const nav = [
   { href: "/admin/hebergeurs", label: "Hébergeurs" },
   { href: "/admin/logements", label: "Logements" },
   { href: "/admin/adresses", label: "Adresses" },
+  { href: "/admin/equipements", label: "Équipements" },
 ] as const;
 
 export default async function ProtectedLayout({ children }: LayoutProps<"/admin">) {

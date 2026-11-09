@@ -25,13 +25,14 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
   const qrQuery = qrPage ? `&page=${qrPage}` : "";
   const { supabase } = await requireAdmin();
 
-  const [{ data: property }, { data: hosts }, { data: modules }, { data: sections }, { data: selectedPlaces }] =
+  const [{ data: property }, { data: hosts }, { data: modules }, { data: sections }, { data: selectedPlaces }, { data: templates }] =
     await Promise.all([
       supabase.from("properties").select("*").eq("id", id).maybeSingle(),
       supabase.from("hosts").select("id, name").order("name"),
       supabase.from("property_modules").select("module_key, is_active").eq("property_id", id),
       supabase.from("guide_sections").select("*").eq("property_id", id).order("position").order("created_at"),
       supabase.from("property_places").select("is_favorite, places(category, archived_at)").eq("property_id", id),
+      supabase.from("equipment_templates").select("id, title_fr").order("title_fr"),
     ]);
   if (!property) notFound();
 
@@ -174,7 +175,7 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
         )}
       </section>
 
-      <SectionsPanel propertyId={property.id} sections={sections ?? []} />
+      <SectionsPanel propertyId={property.id} sections={sections ?? []} templates={templates ?? []} />
 
       <PropertyForm property={property} hosts={hosts ?? []} />
 

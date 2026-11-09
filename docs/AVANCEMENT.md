@@ -175,7 +175,16 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
   randonnée temporaire (effacée). **8 randonnées saisies** (`supabase/data/2026-11-randonnees.sql`, fiches officielles
   Lot Tourisme, label Qualirando), rattachées au gîte de démo : de 1 h (landes du Frau) à 4 h (Causse Toujours).
   Départs = coordonnées des liens d'itinéraire des fiches, **à confirmer** ; difficulté ramenée à 3 niveaux.
-- À faire : équipements à écouter + bibliothèque.
+- **Équipements à écouter : fait.** Fiche équipement : note vocale FR/EN + transcription (`VoiceNoteFields`), lecteur
+  avant le mode d'emploi dans le livret, photo du bouton via les photos de la fiche. Hors connexion : `sw.js` reçoit
+  maintenant une liste `audioUrls` (accueil + équipements, l'ancien `audioUrl` reste accepté).
+  Bibliothèque : menu « Équipements » de l'admin (`/admin/equipements`), modèles créés de zéro ou depuis une fiche
+  (« Enregistrer dans la bibliothèque »), ajoutés à un logement depuis la fiche du logement (« Ajouter depuis la
+  bibliothèque ») : copie, pas de lien. Fichiers partagés par chemin (rien n'est supprimé du stockage).
+  Testé côté voyageur avec une note temporaire (retirée). **Pas testé : les écrans admin (session expirée) et la mise
+  en cache des notes d'équipement dans un vrai téléphone.** Bibliothèque vide : modèles à rédiger.
+
+**Tous les points P2 sont développés.**
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
 précédente (ordre imposé par Supabase), pas à la date réelle.

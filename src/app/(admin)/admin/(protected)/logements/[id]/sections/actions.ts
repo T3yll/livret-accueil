@@ -131,6 +131,11 @@ export async function saveSection(
     .update({
       title_fr: type === "equipment" ? clean(values.title_fr) : null,
       title_en: type === "equipment" ? clean(values.title_en) : null,
+      // Note vocale : seulement sur les fiches équipement.
+      audio_path_fr: type === "equipment" ? clean(values.audio_path_fr) : null,
+      audio_path_en: type === "equipment" ? clean(values.audio_path_en) : null,
+      transcript_fr: type === "equipment" ? clean(values.transcript_fr) : null,
+      transcript_en: type === "equipment" ? clean(values.transcript_en) : null,
       body_fr: clean(values.body_fr),
       body_en: clean(values.body_en),
       data,

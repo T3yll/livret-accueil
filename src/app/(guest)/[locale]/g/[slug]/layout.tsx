@@ -4,7 +4,7 @@ import { StayFromLink } from "@/components/guide/stay-from-link";
 import { WelcomeIntro } from "@/components/guide/welcome-intro";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
-import { mediaUrl, visibleSectionTypes } from "@/lib/guide-view";
+import { mediaUrl, visibleSectionsOfType, visibleSectionTypes } from "@/lib/guide-view";
 import { localized, localizedWithLang } from "@/lib/localized";
 import { guidePlaces } from "@/lib/places-view";
 
@@ -42,11 +42,19 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
   // Repli sur le français si la note anglaise manque, comme pour les textes.
   const audio = guide ? localizedWithLang(guide.property, "welcome_audio_path", locale) : null;
   const audioUrl = audio ? mediaUrl(audio.text) : null;
+  // Plus les notes des équipements, à écouter devant l'appareil, parfois sans réseau.
+  const equipmentAudio = guide
+    ? visibleSectionsOfType(guide, "equipment", locale).flatMap((s) => {
+        const a = localizedWithLang(s, "audio_path", locale);
+        return a ? [mediaUrl(a.text)] : [];
+      })
+    : [];
+  const audioUrls = [...(audioUrl ? [audioUrl] : []), ...equipmentAudio];
 
   return (
     <>
       {children}
-      <OfflineSupport urls={urls} audioUrl={audioUrl} />
+      <OfflineSupport urls={urls} audioUrls={audioUrls} />
       <StayFromLink slug={slug} />
       {guide && (
         <WelcomeIntro
