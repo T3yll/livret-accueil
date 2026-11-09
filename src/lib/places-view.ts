@@ -9,10 +9,12 @@ export type GuidePlace = Guide["places"][number];
 export type PlaceCategory = Enums<"place_category">;
 
 // Peu de filtres à l'écran : les catégories sont regroupées (Santé à part : section Urgences).
+// Les randonnées ont leur filtre à elles et n'apparaissent pas sans lui (trop nombreuses pour la carte).
 export const PLACE_GROUPS = {
   eat: ["restaurant", "producer", "market"],
   visit: ["heritage", "activity"],
-  move: ["hiking", "horse_riding", "bike_rental"],
+  hikes: ["hiking"],
+  move: ["horse_riding", "bike_rental"],
   kids: ["family", "kids_leisure"],
   practical: ["groceries", "shop", "pharmacy", "transport"],
 } as const satisfies Record<string, readonly PlaceCategory[]>;
@@ -22,6 +24,9 @@ export const PLACE_GROUP_KEYS = Object.keys(PLACE_GROUPS) as PlaceGroup[];
 
 export const isInGroup = (category: PlaceCategory, group: PlaceGroup) =>
   (PLACE_GROUPS[group] as readonly PlaceCategory[]).includes(category);
+
+// Sans filtre de catégorie (ni recherche), les randonnées restent cachées.
+export const shownWithoutGroup = (category: PlaceCategory) => category !== "hiking";
 
 export type PlaceWithDistance = GuidePlace & { km: number | null };
 
@@ -120,3 +125,16 @@ export function formatEventTime(time: string, locale: Locale): string {
     new Date(Date.UTC(2025, 0, 1, h, m)),
   );
 }
+
+// Durée d'une randonnée : « 2 h 30 », « 45 min » (FR) ; « 2 hr 30 », « 45 min » (EN).
+export function formatHikeDuration(minutes: number, locale: Locale): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m} min`;
+  const hours = locale === "fr" ? `${h} h` : `${h} hr`;
+  return m === 0 ? hours : `${hours} ${String(m).padStart(2, "0")}`;
+}
+
+// « 8,5 km » / « 8.5 km » (la base renvoie un numeric, parfois sous forme de texte).
+export const formatHikeDistance = (km: number | string, locale: Locale) =>
+  `${new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 1 }).format(Number(km))} km`;

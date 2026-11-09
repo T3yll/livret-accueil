@@ -13,10 +13,11 @@ import { formatDistance } from "@/lib/distance";
 import { mediaUrl } from "@/lib/guide-view";
 import { localized, localizedWithLang } from "@/lib/localized";
 import { isOpenToday, rangesOn, stayStatus, todayStatus } from "@/lib/opening-hours";
-import { formatStayDays, formatStayRange, isInGroup, PLACE_GROUP_KEYS, weekdayName, type PlaceGroup, type PlaceWithDistance } from "@/lib/places-view";
+import { formatStayDays, formatStayRange, isInGroup, PLACE_GROUP_KEYS, shownWithoutGroup, weekdayName, type PlaceGroup, type PlaceWithDistance } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
 import { useStay } from "@/lib/use-stay";
 import { CuratorAvatar } from "./curator-avatar";
+import { HikeFacts } from "./hike-facts";
 import { floatingButton } from "./map-ui";
 import { OpenBadge } from "./open-badge";
 import { CATEGORY_ICONS } from "./place-icons";
@@ -100,7 +101,8 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
   const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const filtered = withStatus.filter(
     (p) =>
-      (!group || isInGroup(p.category, group)) &&
+      // Sans filtre, les randonnées restent cachées ; une recherche par nom les retrouve.
+      (group ? isInGroup(p.category, group) : shownWithoutGroup(p.category) || query.trim() !== "") &&
       (openFilter !== "today" || isOpenToday(p.status)) &&
       (openFilter !== "stay" || p.stay?.state !== "closed") &&
       (!favoritesOnly || p.is_favorite) &&
@@ -354,7 +356,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
                       {t(`category.${place.category}`)}
                       {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
                     </span>
-                    <OpenBadge {...badgeFor(place)} />
+                    {place.category === "hiking" ? <HikeFacts place={place} /> : <OpenBadge {...badgeFor(place)} />}
                     {description && <span className="line-clamp-2 text-sm">{description}</span>}
                   </span>
                 </Link>
@@ -451,7 +453,7 @@ function PlaceSheet({
             {t(`category.${place.category}`)}
             {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
           </p>
-          <OpenBadge {...badge} />
+          {place.category === "hiking" ? <HikeFacts place={place} className="text-[15px]" /> : <OpenBadge {...badge} />}
           {description && <p className="line-clamp-2 text-[15px]">{description}</p>}
           {comment && (
             <figure className="mt-1 flex flex-col gap-2 rounded-xl bg-favorite-bg px-3 py-2">

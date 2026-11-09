@@ -30,6 +30,20 @@ const checkbox = z
   .optional()
   .transform((value) => value === "on");
 
+// Nombre facultatif (virgule acceptée) : vide = null.
+const optionalNumber = (max: number, integer = false) =>
+  optionalText.pipe(
+    z
+      .string()
+      .transform((v) => Number(v.replace(",", ".")))
+      .pipe(
+        (integer ? z.number().int("Nombre entier attendu.") : z.number())
+          .positive("Nombre positif attendu.")
+          .max(max, `${max} au maximum.`),
+      )
+      .nullable(),
+  );
+
 const placeSchema = z.object({
   name: requiredText("Le nom est obligatoire."),
   category: z.enum(Constants.public.Enums.place_category, {
@@ -52,6 +66,11 @@ const placeSchema = z.object({
   has_drive: checkbox,
   booking_required: checkbox,
   is_experience: checkbox,
+  // Randonnée : champs envoyés seulement pour la catégorie « randonnée » (sinon null).
+  hike_duration_min: optionalNumber(1440, true),
+  hike_distance_km: optionalNumber(999),
+  hike_difficulty: optionalText.pipe(z.enum(Constants.public.Enums.hike_difficulty).nullable()),
+  trail_url: optionalUrl,
   practical_note_fr: optionalText,
   practical_note_en: optionalText,
   photo_credit: optionalText,

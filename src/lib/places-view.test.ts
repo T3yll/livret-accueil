@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Guide } from "./guide";
-import { experiencesDuring, formatDate, formatEventDate, formatEventTime, formatStayDays, formatStayRange, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, weekdayName } from "./places-view";
+import { experiencesDuring, formatDate, formatEventDate, formatEventTime, formatHikeDistance, formatHikeDuration, formatStayDays, formatStayRange, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, shownWithoutGroup, weekdayName } from "./places-view";
 
 const place = (overrides: Partial<Guide["places"][number]>): Guide["places"][number] => ({
   id: "x",
@@ -69,7 +69,10 @@ describe("filtres regroupés", () => {
     const all = Object.values(PLACE_GROUPS).flat();
     expect(new Set(all).size).toBe(all.length);
     expect(all).not.toContain("health");
-    expect(isInGroup("hiking", "move")).toBe(true);
+    expect(isInGroup("hiking", "hikes")).toBe(true);
+    expect(isInGroup("hiking", "move")).toBe(false);
+    expect(shownWithoutGroup("hiking")).toBe(false);
+    expect(shownWithoutGroup("restaurant")).toBe(true);
     expect(isInGroup("hiking", "eat")).toBe(false);
   });
 
@@ -142,5 +145,16 @@ describe("formatEventDate / formatEventTime", () => {
     expect(formatEventDate("2026-12-12", "en")).toBe("Sat 12 Dec");
     expect(formatEventTime("20:30:00", "fr")).toBe("20:30");
     expect(formatEventTime("20:30:00", "en")).toBe("20:30"); // en-GB : format 24 h
+  });
+});
+
+describe("formatHikeDuration / formatHikeDistance", () => {
+  it("formate durée et distance", () => {
+    expect(formatHikeDuration(150, "fr")).toBe("2 h 30");
+    expect(formatHikeDuration(185, "en")).toBe("3 hr 05");
+    expect(formatHikeDuration(120, "fr")).toBe("2 h");
+    expect(formatHikeDuration(45, "fr")).toBe("45 min");
+    expect(formatHikeDistance("8.5", "fr")).toBe("8,5 km");
+    expect(formatHikeDistance(12, "en")).toBe("12 km");
   });
 });

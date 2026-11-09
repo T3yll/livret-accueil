@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CATEGORY_LABELS, OPENING_MODE_LABELS } from "@/components/admin/place-labels";
+import { CATEGORY_LABELS, HIKE_DIFFICULTY_LABELS, OPENING_MODE_LABELS } from "@/components/admin/place-labels";
 import { SinglePhotoInput } from "@/components/admin/single-photo-input";
 import { Button } from "@/components/ui/button";
 import { Field, Select, TextArea } from "@/components/ui/field";
@@ -62,6 +62,7 @@ function PlaceFields({
 }: Props & { state: FormState; v: (name: keyof Tables<"places">) => string; e: Record<string, string> }) {
   const [mode, setMode] = useState(v("opening_mode") || "schedule");
   const [verifiedAt, setVerifiedAt] = useState(v("hours_verified_at"));
+  const [category, setCategory] = useState(v("category"));
 
   // Après une erreur, les horaires repartent de la dernière saisie, pas de la base.
   const initialHours = state.values?.hours ? ((parseJsonField(state.values.hours) as HoursInput) ?? hours) : hours;
@@ -75,7 +76,14 @@ function PlaceFields({
       <fieldset className="flex max-w-2xl flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Identité</legend>
         <Field label="Nom" name="name" defaultValue={v("name")} error={e.name} required />
-        <Select label="Catégorie" name="category" defaultValue={v("category")} error={e.category} required>
+        <Select
+          label="Catégorie"
+          name="category"
+          defaultValue={v("category")}
+          onChange={(event) => setCategory(event.target.value)}
+          error={e.category}
+          required
+        >
           <option value="" disabled>
             Choisir…
           </option>
@@ -105,6 +113,50 @@ function PlaceFields({
           <TextArea label="English" name="description_en" lang="en" rows={4} defaultValue={v("description_en")} />
         </div>
       </fieldset>
+
+      {category === "hiking" && (
+        <fieldset className="flex max-w-2xl flex-col gap-4">
+          <legend className="mb-2 font-heading text-2xl">Randonnée</legend>
+          <p className="text-sm text-muted">
+            Les randonnées n&apos;apparaissent pas sur la carte par défaut : le voyageur les trouve avec le filtre
+            « Randonnées ». L&apos;adresse et les coordonnées ci-dessous sont celles du point de départ.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field
+              label="Durée (minutes)"
+              name="hike_duration_min"
+              inputMode="numeric"
+              defaultValue={v("hike_duration_min")}
+              error={e.hike_duration_min}
+              hint="Ex. 150 pour 2 h 30"
+            />
+            <Field
+              label="Distance (km)"
+              name="hike_distance_km"
+              inputMode="decimal"
+              defaultValue={v("hike_distance_km")}
+              error={e.hike_distance_km}
+              hint="Ex. 8,5"
+            />
+            <Select label="Difficulté" name="hike_difficulty" defaultValue={v("hike_difficulty")} error={e.hike_difficulty}>
+              <option value="">Non précisée</option>
+              {(Object.keys(HIKE_DIFFICULTY_LABELS) as Enums<"hike_difficulty">[]).map((key) => (
+                <option key={key} value={key}>
+                  {HIKE_DIFFICULTY_LABELS[key]}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <Field
+            label="Fiche officielle ou trace GPX"
+            name="trail_url"
+            type="url"
+            defaultValue={v("trail_url")}
+            error={e.trail_url}
+            hint="Lien vers la fiche de l'office de tourisme, Visorando, ou un fichier GPX."
+          />
+        </fieldset>
+      )}
 
       <fieldset className="flex max-w-2xl flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Adresse</legend>

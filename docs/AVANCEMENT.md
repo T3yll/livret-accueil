@@ -168,7 +168,12 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
   pendant le séjour (5 au plus ; une date pendant une fermeture du lieu est écartée) ; « Prochaines dates » sur la fiche.
   Testé côté voyageur avec une expérience temporaire (effacée). **Formulaire admin non testé dans le navigateur** (session
   admin expirée) : à essayer par Rémi. Reste à saisir : les vraies expériences de l'hiver et du printemps.
-- À faire : randonnées (vue dédiée), équipements à écouter + bibliothèque.
+- **Randonnées : fait.** Filtre « Randonnées » à part (Bouger garde cheval et vélo) ; sans ce filtre, les randonnées
+  sont cachées de la carte et de la liste (une recherche par nom les retrouve). Durée, distance « à pied » et difficulté
+  à la place de l'état d'ouverture (liste, fiche résumée, fiche) ; bouton « Fiche du sentier et trace » ; « Point de
+  départ » au lieu de « Y aller ». Admin : rubrique « Randonnée » visible seulement pour cette catégorie. Testé avec une
+  randonnée temporaire (effacée). **Aucune randonnée en base** : sélection de 5 à 10 à saisir.
+- À faire : équipements à écouter + bibliothèque.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
 précédente (ordre imposé par Supabase), pas à la date réelle.

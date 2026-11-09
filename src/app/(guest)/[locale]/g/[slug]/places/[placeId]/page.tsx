@@ -1,4 +1,4 @@
-import { CalendarCheck, Car, ChevronLeft, ExternalLink, Globe, Phone, Sparkles, Truck, type LucideIcon } from "lucide-react";
+import { CalendarCheck, Car, ChevronLeft, ExternalLink, Globe, Phone, Route, Sparkles, Truck, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { CuratorAvatar } from "@/components/guide/curator-avatar";
 import { DraftNotice } from "@/components/guide/guide-header";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
+import { HikeFacts } from "@/components/guide/hike-facts";
 import { CATEGORY_ICONS } from "@/components/guide/place-icons";
 import { PlaceStayDays, PlaceTodayStatus, PlaceWeek } from "@/components/guide/place-schedule";
 import { curator } from "@/config/brand";
@@ -64,6 +65,7 @@ export default async function PlacePage({ params }: Props) {
   // Expérience : ses prochaines dates (6 au plus, le reste est résumé).
   const events = place.is_experience ? upcomingEvents(place, parisDay(new Date()).date) : [];
   const shownEvents = events.slice(0, 6);
+  const isHike = place.category === "hiking";
   const address = [place.address, [place.postal_code, place.city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
   return (
@@ -111,8 +113,14 @@ export default async function PlacePage({ params }: Props) {
             {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
           </p>
           <h1 className="text-[28px] leading-tight font-semibold">{place.name}</h1>
-          <PlaceTodayStatus place={place} nowIso={nowIso} />
-          <PlaceStayDays place={place} slug={slug} />
+          {isHike ? (
+            <HikeFacts place={place} className="text-base" />
+          ) : (
+            <>
+              <PlaceTodayStatus place={place} nowIso={nowIso} />
+              <PlaceStayDays place={place} slug={slug} />
+            </>
+          )}
         </header>
 
         {place.is_favorite && (
@@ -209,6 +217,12 @@ export default async function PlacePage({ params }: Props) {
               </span>
             </a>
           )}
+          {place.trail_url && (
+            <a href={place.trail_url} target="_blank" rel="noopener noreferrer" className={actionLink}>
+              <Route size={20} className="text-primary" aria-hidden />
+              {t("hike.trail")}
+            </a>
+          )}
           {place.booking_url && (
             <a href={place.booking_url} target="_blank" rel="noopener noreferrer" className={actionLink}>
               <ExternalLink size={20} className="text-primary" aria-hidden />
@@ -223,15 +237,15 @@ export default async function PlacePage({ params }: Props) {
           )}
         </div>
 
-        <PlaceWeek place={place} nowIso={nowIso} />
+        {!isHike && <PlaceWeek place={place} nowIso={nowIso} />}
 
-        {place.hours_verified_at && (
+        {!isHike && place.hours_verified_at && (
           <p className="text-sm text-muted">{t("verifiedOn", { date: formatDate(place.hours_verified_at, locale) })}</p>
         )}
 
         <section aria-labelledby="place-directions" className="flex flex-col gap-3">
           <h2 id="place-directions" className="text-2xl">
-            {tGuide("directions")}
+            {isHike ? t("hike.start") : tGuide("directions")}
           </h2>
           {address && <p>{address}</p>}
           <ul className="flex flex-col gap-2">

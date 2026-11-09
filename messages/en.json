@@ -125,13 +125,27 @@
     "groups": {
       "eat": "Food",
       "visit": "Visit",
+      "hikes": "Hikes",
       "move": "Outdoors",
       "kids": "Kids",
       "practical": "Practical"
     },
     "delivers": "Home delivery",
     "drive": "Click & collect",
-    "bookingRequired": "Booking required"
+    "bookingRequired": "Booking required",
+    "hike": {
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Moderate",
+        "hard": "Hard"
+      },
+      "trail": "Trail guide and GPS track",
+      "start": "Starting point",
+      "duration": "Duration",
+      "distance": "Distance",
+      "level": "Difficulty",
+      "distanceValue": "{distance} on foot"
+    }
   },
   "LanguageSwitcher": {
     "label": "Language",

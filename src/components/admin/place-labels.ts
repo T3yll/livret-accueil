@@ -19,6 +19,12 @@ export const CATEGORY_LABELS: Record<Enums<"place_category">, string> = {
   transport: "Transport (taxi, gare)",
 };
 
+export const HIKE_DIFFICULTY_LABELS: Record<Enums<"hike_difficulty">, string> = {
+  easy: "Facile",
+  medium: "Moyenne",
+  hard: "Difficile",
+};
+
 export const OPENING_MODE_LABELS: Record<Enums<"opening_mode">, string> = {
   schedule: "Horaires par jour",
   always: "Accès libre, toujours ouvert",

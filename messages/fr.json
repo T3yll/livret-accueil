@@ -125,13 +125,27 @@
     "groups": {
       "eat": "Manger",
       "visit": "Visiter",
+      "hikes": "Randonnées",
       "move": "Bouger",
       "kids": "Enfants",
       "practical": "Pratique"
     },
     "delivers": "Livre à domicile",
     "drive": "Drive",
-    "bookingRequired": "Sur réservation"
+    "bookingRequired": "Sur réservation",
+    "hike": {
+      "difficulty": {
+        "easy": "Facile",
+        "medium": "Moyenne",
+        "hard": "Difficile"
+      },
+      "trail": "Fiche du sentier et trace",
+      "start": "Point de départ",
+      "duration": "Durée",
+      "distance": "Distance",
+      "level": "Difficulté",
+      "distanceValue": "{distance} à pied"
+    }
   },
   "LanguageSwitcher": {
     "label": "Langue",
