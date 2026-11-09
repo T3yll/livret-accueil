@@ -142,6 +142,11 @@ Fait au 9 novembre (plan validé par Rémi) :
 - QR code vers une page : choix « Page ouverte par le QR » sur la fiche du logement (accueil, carte, ou une section) ;
   aperçu, PNG, SVG et carte A6 suivent ; la phrase du recto s'adapte. L'adresse reste sans langue (`/g/<slug>/places`).
 
+- Horaires de l'hiver 2026-2027 relevés le 9 nov. sur les sites officiels pour 13 adresses (`supabase/data/2026-11-horaires-hiver.sql`,
+  source par adresse) ; fermetures d'hiver pour Padirac, Cougnac, Forêt des Singes (dates de réouverture à confirmer).
+  **Aucune adresse n'est marquée vérifiée** : Rémi confirme. Sans horaires trouvés : Le Grand Bleu (heures de fin absentes),
+  La Chèvre et le Chou, Le Bacchus, Le Pot Occitan.
+
 **Tous les points P1 sont développés.** Reste : validation des critères de la V2 sur de vrais téléphones, horaires et
 fermetures des adresses (décidé : en dernier), domaine définitif avant d'imprimer les cartes.
 
