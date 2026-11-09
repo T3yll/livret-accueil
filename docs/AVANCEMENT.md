@@ -172,7 +172,9 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
   sont cachées de la carte et de la liste (une recherche par nom les retrouve). Durée, distance « à pied » et difficulté
   à la place de l'état d'ouverture (liste, fiche résumée, fiche) ; bouton « Fiche du sentier et trace » ; « Point de
   départ » au lieu de « Y aller ». Admin : rubrique « Randonnée » visible seulement pour cette catégorie. Testé avec une
-  randonnée temporaire (effacée). **Aucune randonnée en base** : sélection de 5 à 10 à saisir.
+  randonnée temporaire (effacée). **8 randonnées saisies** (`supabase/data/2026-11-randonnees.sql`, fiches officielles
+  Lot Tourisme, label Qualirando), rattachées au gîte de démo : de 1 h (landes du Frau) à 4 h (Causse Toujours).
+  Départs = coordonnées des liens d'itinéraire des fiches, **à confirmer** ; difficulté ramenée à 3 niveaux.
 - À faire : équipements à écouter + bibliothèque.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
