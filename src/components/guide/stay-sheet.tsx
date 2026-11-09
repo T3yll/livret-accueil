@@ -10,6 +10,61 @@ import { todayInParis } from "@/lib/use-stay";
 
 export type OpenFilter = "stay" | "today" | "all";
 
+// Les deux dates et le bouton d'envoi : dans cette fenêtre et dans l'accueil de Rémi.
+export function StayForm({ stay, submitLabel, onSubmit }: { stay: Stay | null; submitLabel: string; onSubmit: (stay: Stay) => void }) {
+  const t = useTranslations("Stay");
+  const [from, setFrom] = useState(stay?.from ?? "");
+  const [to, setTo] = useState(stay?.to ?? "");
+  const [invalid, setInvalid] = useState(false);
+  const [today] = useState(todayInParis);
+
+  const submit = () => {
+    const next = parseStay(from, to, today);
+    if (next) onSubmit(next);
+    else setInvalid(true);
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-3">
+        <Field
+          label={t("from")}
+          type="date"
+          value={from}
+          min={today}
+          onChange={(e) => {
+            const value = e.target.value;
+            setFrom(value);
+            setInvalid(false);
+            // Départ proposé le jour de l'arrivée : évite un départ avant l'arrivée.
+            if (value && (!to || to < value)) setTo(value);
+          }}
+        />
+        <Field
+          label={t("to")}
+          type="date"
+          value={to}
+          min={from || today}
+          onChange={(e) => {
+            setTo(e.target.value);
+            setInvalid(false);
+          }}
+        />
+      </div>
+      {invalid ? (
+        <p role="alert" className="text-sm text-favorite">
+          {t("invalid")}
+        </p>
+      ) : (
+        <p className="text-sm text-muted">{t("hint")}</p>
+      )}
+      <Button type="button" onClick={submit} className="min-h-12">
+        {submitLabel}
+      </Button>
+    </div>
+  );
+}
+
 type Props = {
   stay: Stay | null;
   onSave: (stay: Stay | null) => void;
@@ -23,22 +78,10 @@ type Props = {
 export function StaySheet({ stay, onSave, onClose, filter }: Props) {
   const t = useTranslations("Stay");
   const dialog = useRef<HTMLDialogElement>(null);
-  const [from, setFrom] = useState(stay?.from ?? "");
-  const [to, setTo] = useState(stay?.to ?? "");
-  const [invalid, setInvalid] = useState(false);
-  const [today] = useState(todayInParis);
 
   useEffect(() => {
     dialog.current?.showModal();
   }, []);
-
-  const submit = () => {
-    const next = parseStay(from, to, today);
-    if (!next) return setInvalid(true);
-    onSave(next);
-    filter?.onChange("stay");
-    onClose();
-  };
 
   const choices: OpenFilter[] = stay ? ["stay", "today", "all"] : ["today", "all"];
 
@@ -83,43 +126,17 @@ export function StaySheet({ stay, onSave, onClose, filter }: Props) {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <Field
-            label={t("from")}
-            type="date"
-            value={from}
-            min={today}
-            onChange={(e) => {
-              const value = e.target.value;
-              setFrom(value);
-              setInvalid(false);
-              // Départ proposé le jour de l'arrivée : évite un départ avant l'arrivée.
-              if (value && (!to || to < value)) setTo(value);
-            }}
-          />
-          <Field
-            label={t("to")}
-            type="date"
-            value={to}
-            min={from || today}
-            onChange={(e) => {
-              setTo(e.target.value);
-              setInvalid(false);
-            }}
-          />
-        </div>
-        {invalid ? (
-          <p role="alert" className="text-sm text-favorite">
-            {t("invalid")}
-          </p>
-        ) : (
-          <p className="text-sm text-muted">{t("hint")}</p>
-        )}
+        <StayForm
+          stay={stay}
+          submitLabel={t("save")}
+          onSubmit={(next) => {
+            onSave(next);
+            filter?.onChange("stay");
+            onClose();
+          }}
+        />
 
         <div className="flex flex-col gap-2">
-          <Button type="button" onClick={submit} className="min-h-12">
-            {t("save")}
-          </Button>
           {stay && (
             <Button
               type="button"

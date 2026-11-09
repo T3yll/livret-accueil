@@ -129,7 +129,12 @@ Fait au 9 novembre (plan validé par Rémi) :
   jours d'ouverture sur les cartes, la fiche résumée et la fiche.
 - Gîte de démo : prénoms des hôtes « Pascal et Brigitte ».
 
-Reste, dans l'ordre : accueil de Rémi et audio, Préparer mon séjour, QR par page.
+- Accueil de Rémi : fenêtre à la première ouverture (`welcome-intro.tsx`), une fois par livret, rouvrable depuis le portrait du
+  carrousel ; note vocale et transcription saisies sur la fiche du logement dans l'admin (M4A, MP3 ou AAC).
+- Audio hors connexion : `audioResponse` dans `sw.js`, fichier gardé entier et servi par morceaux (Range, exigé par Safari).
+  Testé serveur coupé dans Edge avec un faux fichier. **À vérifier sur iPhone et Android avec les vraies notes.**
+
+Reste, dans l'ordre : Préparer mon séjour, QR par page.
 
 **Décision de Rémi (9 nov.) : horaires et fermetures remplis en dernier, juste avant la démo.** D'ici là, toutes les
 adresses restent « à vérifier » : le filtre séjour ne masque que les lieux ayant une fermeture saisie.

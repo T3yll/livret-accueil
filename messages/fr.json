@@ -199,5 +199,19 @@
       "today": "Ouvert aujourd'hui",
       "all": "Toutes les adresses"
     }
+  },
+  "Welcome": {
+    "greeting": "Bonjour, je suis {name}.",
+    "intro": "{hosts}, les propriétaires de ce lieu, m'ont confié leurs petits coins préférés pour vous.",
+    "introNoHosts": "Les propriétaires de ce lieu m'ont confié leurs petits coins préférés pour vous.",
+    "listen": "Écouter le message de {name}",
+    "pause": "Mettre en pause",
+    "transcript": "Lire le texte",
+    "continue": "Continuer",
+    "start": "Découvrir le livret",
+    "skip": "Passer",
+    "datesQuestion": "Vous êtes là du… au… ?",
+    "datesSubmit": "Voir ce qui sera ouvert",
+    "reopen": "Réécouter le message de {name}"
   }
 }

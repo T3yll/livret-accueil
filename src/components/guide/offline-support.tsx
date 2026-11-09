@@ -17,7 +17,7 @@ function subscribeOnline(callback: () => void) {
   };
 }
 
-export function OfflineSupport({ urls }: { urls: string[] }) {
+export function OfflineSupport({ urls, audioUrl }: { urls: string[]; audioUrl: string | null }) {
   const t = useTranslations("Offline");
   const online = useSyncExternalStore(
     subscribeOnline,
@@ -34,12 +34,12 @@ export function OfflineSupport({ urls }: { urls: string[] }) {
       .register("/sw.js")
       .then(() => navigator.serviceWorker.ready)
       .then((registration) => {
-        if (urlsKey) registration.active?.postMessage({ type: "precache", urls: urlsKey.split("\n") });
+        if (urlsKey) registration.active?.postMessage({ type: "precache", urls: urlsKey.split("\n"), audioUrl });
       })
       .catch(() => {
         // Sans service worker, le livret marche normalement, simplement pas hors connexion.
       });
-  }, [urlsKey]);
+  }, [urlsKey, audioUrl]);
 
   if (online) return null;
   return (

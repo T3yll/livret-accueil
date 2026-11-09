@@ -199,5 +199,19 @@
       "today": "Open today",
       "all": "All places"
     }
+  },
+  "Welcome": {
+    "greeting": "Hello, I'm {name}.",
+    "intro": "{hosts}, the owners of this place, have shared their favourite little spots with me for you.",
+    "introNoHosts": "The owners of this place have shared their favourite little spots with me for you.",
+    "listen": "Listen to {name}'s message",
+    "pause": "Pause",
+    "transcript": "Read the text",
+    "continue": "Continue",
+    "start": "Explore the guide",
+    "skip": "Skip",
+    "datesQuestion": "When are you here?",
+    "datesSubmit": "See what will be open",
+    "reopen": "Listen to {name}'s message again"
   }
 }

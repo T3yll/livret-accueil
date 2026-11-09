@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { OfflineSupport } from "@/components/guide/offline-support";
 import { StayFromLink } from "@/components/guide/stay-from-link";
+import { WelcomeIntro } from "@/components/guide/welcome-intro";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
-import { visibleSectionTypes } from "@/lib/guide-view";
+import { mediaUrl, visibleSectionTypes } from "@/lib/guide-view";
+import { localized, localizedWithLang } from "@/lib/localized";
 import { guidePlaces } from "@/lib/places-view";
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]/g/[slug]">): Promise<Metadata> {
@@ -37,11 +39,23 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
       ]
     : [];
 
+  // Repli sur le français si la note anglaise manque, comme pour les textes.
+  const audio = guide ? localizedWithLang(guide.property, "welcome_audio_path", locale) : null;
+  const audioUrl = audio ? mediaUrl(audio.text) : null;
+
   return (
     <>
       {children}
-      <OfflineSupport urls={urls} />
+      <OfflineSupport urls={urls} audioUrl={audioUrl} />
       <StayFromLink slug={slug} />
+      {guide && (
+        <WelcomeIntro
+          slug={slug}
+          hosts={guide.property.host_display_names}
+          audio={audio && audioUrl ? { src: audioUrl, lang: audio.lang } : null}
+          transcript={localized(guide.property, "welcome_transcript", locale)}
+        />
+      )}
     </>
   );
 }

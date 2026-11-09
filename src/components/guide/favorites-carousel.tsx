@@ -8,8 +8,8 @@ import { formatDistance } from "@/lib/distance";
 import { mediaUrl } from "@/lib/guide-view";
 import { localizedWithLang } from "@/lib/localized";
 import type { PlaceWithDistance } from "@/lib/places-view";
-import { CuratorAvatar } from "./curator-avatar";
 import { CATEGORY_ICONS } from "./place-icons";
+import { WelcomeReopen } from "./welcome-reopen";
 
 // Les coups de cœur, dès l'accueil du livret : grandes cartes à faire défiler, signées par
 // quelqu'un du coin. C'est la valeur du livret face aux outils génériques.
@@ -20,7 +20,7 @@ export async function FavoritesCarousel({ slug, places, locale }: { slug: string
   return (
     <section aria-labelledby="favorites-title" className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <CuratorAvatar size={48} />
+        <WelcomeReopen size={48} />
         <div className="flex flex-col">
           <h2 id="favorites-title" className="text-[28px] leading-tight">
             {t("title", { name: curator.name })}

@@ -6,6 +6,7 @@ import { Field, Select, TextArea } from "@/components/ui/field";
 import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
 import type { Tables } from "@/types/database";
 import { saveProperty } from "./actions";
+import { AudioInput } from "@/components/admin/audio-input";
 import { CoverPhotoInput } from "./cover-photo-input";
 
 type Props = {
@@ -91,6 +92,48 @@ export function PropertyForm({ property, hosts, defaultHostId }: Props) {
           <TextArea label="English" name="welcome_en" lang="en" rows={5} defaultValue={initialValue(state, "welcome_en", property?.welcome_en)} />
         </div>
       </fieldset>
+
+      {property && (
+        <fieldset className="flex flex-col gap-4">
+          <legend className="mb-2 font-heading text-2xl">Note vocale d&apos;accueil</legend>
+          <p className="max-w-2xl text-sm text-muted">
+            Écoutée par le voyageur à la première ouverture du livret. 30 à 60 secondes, au format M4A (mémo vocal) ou MP3.
+          </p>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="flex flex-col gap-4">
+              <AudioInput
+                name="welcome_audio_path_fr"
+                label="Note vocale en français"
+                initialPath={initialValue(state, "welcome_audio_path_fr", property.welcome_audio_path_fr)}
+                pathPrefix={`properties/${property.id}/welcome-fr`}
+              />
+              <TextArea
+                label="Transcription en français"
+                name="welcome_transcript_fr"
+                lang="fr"
+                rows={5}
+                defaultValue={initialValue(state, "welcome_transcript_fr", property.welcome_transcript_fr)}
+                hint="Le texte exact de la note, pour ceux qui ne peuvent pas écouter."
+              />
+            </div>
+            <div className="flex flex-col gap-4">
+              <AudioInput
+                name="welcome_audio_path_en"
+                label="Note vocale en anglais"
+                initialPath={initialValue(state, "welcome_audio_path_en", property.welcome_audio_path_en)}
+                pathPrefix={`properties/${property.id}/welcome-en`}
+              />
+              <TextArea
+                label="Transcription en anglais"
+                name="welcome_transcript_en"
+                lang="en"
+                rows={5}
+                defaultValue={initialValue(state, "welcome_transcript_en", property.welcome_transcript_en)}
+              />
+            </div>
+          </div>
+        </fieldset>
+      )}
 
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Photo principale</legend>

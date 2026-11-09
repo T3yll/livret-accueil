@@ -3,19 +3,22 @@
 //
 // - pages du livret (/fr/g/…, /en/g/…) : réseau d'abord, cache si le réseau échoue ou traîne ;
 // - fichiers de l'appli (/_next/static, immuables) : cache d'abord ;
-// - photos (/_next/image) et tuiles de carte vues : cache d'abord, en nombre limité.
+// - photos (/_next/image) et tuiles de carte vues : cache d'abord, en nombre limité ;
+// - notes vocales (stockage Supabase) : enregistrées entières, servies par morceaux (voir audioResponse).
 //
 // L'admin, l'authentification et le reste du site ne passent jamais par ce cache.
 // Changer VERSION vide les anciens caches au prochain chargement.
 
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `pages-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
 const IMAGES = `images-${VERSION}`;
 const TILES = `tiles-${VERSION}`;
-const CACHES = [PAGES, ASSETS, IMAGES, TILES];
+const AUDIO = `audio-${VERSION}`;
+const CACHES = [PAGES, ASSETS, IMAGES, TILES, AUDIO];
 
 const OFFLINE_PAGE = "/offline.html";
+const AUDIO_FILE = /\/storage\/v1\/object\/public\/media\/.+\.(m4a|mp3|aac)$/i;
 const GUIDE_PAGE = /^\/(fr|en)\/g\/[^/]+(\/.*)?$/;
 // Au-delà, on sert la version enregistrée (réseau faible à la campagne) ; la réponse
 // du réseau, si elle arrive, met quand même le cache à jour pour la visite suivante.
@@ -63,12 +66,54 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  if (AUDIO_FILE.test(url.pathname)) {
+    event.respondWith(audioResponse(request));
+    return;
+  }
+
   // Tuiles OpenStreetMap : seulement celles déjà vues (pas de téléchargement en masse,
   // interdit par les conditions d'utilisation d'OSM).
   if (url.hostname.endsWith("tile.openstreetmap.org")) {
     event.respondWith(cacheFirst(TILES, request, MAX_TILES));
   }
 });
+
+// Safari (iPhone) ne lit un audio que si le serveur répond aux demandes par morceaux (en-tête Range).
+// Le fichier est donc gardé entier et le service worker découpe lui-même le morceau demandé.
+async function audioResponse(request) {
+  const cache = await caches.open(AUDIO);
+  let file = await cache.match(request.url);
+  if (!file) {
+    const response = await fetch(request.url, { mode: "cors", credentials: "omit" });
+    if (!response.ok) return response;
+    await cache.put(request.url, response.clone());
+    file = response;
+  }
+
+  const body = await file.arrayBuffer();
+  const total = body.byteLength;
+  const type = file.headers.get("content-type") ?? "audio/mp4";
+  const match = /bytes=(\d*)-(\d*)/.exec(request.headers.get("range") ?? "");
+  if (!match || (!match[1] && !match[2])) {
+    return new Response(body, { headers: { "Content-Type": type, "Content-Length": String(total), "Accept-Ranges": "bytes" } });
+  }
+
+  // « bytes=-500 » désigne les 500 derniers octets.
+  const start = match[1] ? Number(match[1]) : Math.max(0, total - Number(match[2]));
+  const end = match[1] && match[2] ? Math.min(Number(match[2]), total - 1) : total - 1;
+  if (start > end || start >= total) {
+    return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${total}` } });
+  }
+  return new Response(body.slice(start, end + 1), {
+    status: 206,
+    headers: {
+      "Content-Type": type,
+      "Content-Length": String(end - start + 1),
+      "Content-Range": `bytes ${start}-${end}/${total}`,
+      "Accept-Ranges": "bytes",
+    },
+  });
+}
 
 // Les pages sont rangées sans paramètres d'URL : une seule version par page.
 const pageKey = (url) => url.origin + url.pathname;
@@ -126,10 +171,19 @@ async function trim(cache, maxEntries) {
 // utilise (sinon une page jamais ouverte s'afficherait hors connexion sans ses composants).
 self.addEventListener("message", (event) => {
   if (event.data?.type !== "precache" || !Array.isArray(event.data.urls)) return;
-  event.waitUntil(precache(event.data.urls.filter((path) => GUIDE_PAGE.test(path))));
+  event.waitUntil(precache(event.data.urls.filter((path) => GUIDE_PAGE.test(path)), event.data.audioUrl));
 });
 
-async function precache(paths) {
+async function precache(paths, audioUrl) {
+  // La note vocale d'accueil d'abord : elle doit pouvoir s'écouter sans réseau.
+  if (typeof audioUrl === "string" && AUDIO_FILE.test(new URL(audioUrl).pathname)) {
+    const audio = await caches.open(AUDIO);
+    if (!(await audio.match(audioUrl))) {
+      const response = await fetch(audioUrl, { mode: "cors", credentials: "omit" }).catch(() => null);
+      if (response?.ok) await audio.put(audioUrl, response);
+    }
+  }
+
   const pages = await caches.open(PAGES);
   const assets = await caches.open(ASSETS);
   // Une page à la fois : ne pas saturer une connexion faible.

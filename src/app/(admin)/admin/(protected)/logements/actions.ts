@@ -30,6 +30,10 @@ const propertySchema = z.object({
   cover_photo_path: optionalText,
   cover_photo_alt_fr: optionalText,
   cover_photo_alt_en: optionalText,
+  welcome_audio_path_fr: optionalText,
+  welcome_audio_path_en: optionalText,
+  welcome_transcript_fr: optionalText,
+  welcome_transcript_en: optionalText,
 });
 
 const DB_ERROR = "Enregistrement impossible. Réessayez.";
