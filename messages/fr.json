@@ -158,5 +158,23 @@
     "title": "Les coups de cœur de {name}",
     "intro": "{name} vit à {home}, dans le Lot. Ses adresses préférées, testées pour vous.",
     "seeOnMap": "Voir sur la carte"
+  },
+  "Legal": {
+    "link": "Mentions légales et confidentialité",
+    "title": "Mentions légales et confidentialité",
+    "publisherTitle": "Éditeur",
+    "publisher": "{product} est édité par Rémi Leroi, entrepreneur individuel, Fajoles (46300), France.\nSIREN : 948 211 727.\nDirecteur de la publication : Rémi Leroi.\nContact : {email}",
+    "hostingTitle": "Hébergement",
+    "hosting": "Site : Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.\nDonnées du livret et photos : Supabase, serveurs situés en Europe.",
+    "privacyTitle": "Vos données",
+    "privacy": "Ce livret ne vous demande aucun compte et ne collecte aucune donnée personnelle. Il n'y a ni publicité, ni cookie de suivi, ni mesure d'audience.",
+    "storageTitle": "Ce qui reste sur votre téléphone",
+    "storage": "Un cookie retient votre langue. Le téléphone garde aussi les pages du livret, pour les consulter sans réseau, et vos choix d'affichage.\nVotre position n'est utilisée que si vous l'autorisez, pour vous situer sur la carte : elle n'est ni envoyée ni enregistrée.",
+    "thirdPartiesTitle": "Services extérieurs",
+    "thirdParties": "Le fond de carte vient d'OpenStreetMap : votre navigateur lui demande les images de la zone affichée, ce qui lui transmet votre adresse IP. Les liens vers Google Maps, Plans, Waze ou les sites des adresses ouvrent des services soumis à leurs propres règles.",
+    "rightsTitle": "Vos droits",
+    "rights": "Pour toute question sur ces informations ou sur vos données : {email}. Vous pouvez aussi saisir la CNIL (cnil.fr).",
+    "creditsTitle": "Photos",
+    "credits": "Les photos sous licence libre sont créditées sur la fiche de chaque adresse. Le fond de carte est © les contributeurs d'OpenStreetMap."
   }
 }

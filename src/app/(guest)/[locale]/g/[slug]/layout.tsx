@@ -30,6 +30,7 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
   const urls = guide
     ? [
         base,
+        `${base}/informations`,
         ...visibleSectionTypes(guide, locale).map((type) => `${base}/${type}`),
         ...(places.length > 0 ? [`${base}/places`, ...places.map((p) => `${base}/places/${p.id}`)] : []),
       ]

@@ -158,5 +158,23 @@
     "title": "{name}'s favourites",
     "intro": "{name} lives in {home}, in the Lot. Favourite places, tried and tested for you.",
     "seeOnMap": "See on the map"
+  },
+  "Legal": {
+    "link": "Legal notice and privacy",
+    "title": "Legal notice and privacy",
+    "publisherTitle": "Publisher",
+    "publisher": "{product} is published by Rémi Leroi, sole trader (entrepreneur individuel), Fajoles (46300), France.\nSIREN: 948 211 727.\nPublication director: Rémi Leroi.\nContact: {email}",
+    "hostingTitle": "Hosting",
+    "hosting": "Website: Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.\nGuide data and photos: Supabase, servers located in Europe.",
+    "privacyTitle": "Your data",
+    "privacy": "This guide requires no account and collects no personal data. There is no advertising, no tracking cookie and no audience measurement.",
+    "storageTitle": "What stays on your phone",
+    "storage": "A cookie remembers your language. Your phone also keeps the guide's pages, so you can read them without signal, and your display choices.\nYour location is only used if you allow it, to show you on the map: it is neither sent nor stored.",
+    "thirdPartiesTitle": "External services",
+    "thirdParties": "The base map comes from OpenStreetMap: your browser requests the images of the area shown, which sends it your IP address. Links to Google Maps, Apple Maps, Waze or the places' websites open services with their own rules.",
+    "rightsTitle": "Your rights",
+    "rights": "For any question about this information or your data: {email}. You can also contact the French data protection authority, the CNIL (cnil.fr).",
+    "creditsTitle": "Photos",
+    "credits": "Openly licensed photos are credited on each place's page. The base map is © OpenStreetMap contributors."
   }
 }

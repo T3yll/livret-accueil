@@ -39,10 +39,11 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
   const guide = await getGuide(slug);
   if (!guide) notFound();
 
-  const [t, tSections, tPlaces] = await Promise.all([
+  const [t, tSections, tPlaces, tLegal] = await Promise.all([
     getTranslations("Guide"),
     getTranslations("Sections"),
     getTranslations("Places"),
+    getTranslations("Legal"),
   ]);
   const { property } = guide;
   const welcome = localizedWithLang(property, "welcome", locale);
@@ -170,6 +171,12 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
           <p className="text-xs tracking-[0.25em] text-muted uppercase">
             {brand.name} · {brand.territory}
           </p>
+          <Link
+            href={`${base}/informations`}
+            className="inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            {tLegal("link")}
+          </Link>
         </footer>
       </div>
     </main>

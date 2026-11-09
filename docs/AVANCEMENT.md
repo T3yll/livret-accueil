@@ -114,6 +114,24 @@ Pour créer ou appliquer des migrations : `npx supabase login`, puis
   Quand le domaine sera choisi, mettre quand même Supabase → Authentication → URL Configuration → Site URL
   sur l'adresse définitive (utilisée dans les emails, par exemple mot de passe oublié).
 
+## V2 en cours (voir `docs/BRIEF_V2.md`, démo prête le 5 décembre)
+
+Fait au 9 novembre (plan validé par Rémi) :
+- Migrations `20261201000100` et `20261201000200` appliquées : nouvelles catégories, section `prepare`, `hosts.display_names`,
+  accueil vocal sur `properties`, infos pratiques sur `places`, audio autorisé dans le stockage, `get_guide` à jour.
+- Coups de cœur : icône de catégorie et anneau terre cuite. Filtres regroupés : Coups de cœur, Manger, Visiter, Bouger,
+  Enfants, Pratique (un filtre sans adresse est caché ; plus de « Tout »). Lascaux IV et le Musée passent en « site ».
+- Admin : prénoms des hôtes, livraison, drive, réservation et précision ; pictogrammes sur la fiche.
+- Mentions légales et confidentialité : `/g/<slug>/informations`, lien en bas de l'accueil du livret.
+  **Texte à faire relire ; manque l'adresse complète de l'éditeur** (seuls « Fajoles (46300) » et le SIREN y figurent).
+
+Reste, dans l'ordre : dates de séjour (16 → 22 nov.), accueil de Rémi et audio (23 → 29 nov.), Préparer mon séjour
+et QR par page (30 nov. → 5 déc.). Décidé : Itinéraire retiré de l'accueil au profit de « Préparer mon séjour » ;
+pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout) ; `is_experience` reporté en P2.
+
+Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
+précédente (ordre imposé par Supabase), pas à la date réelle.
+
 ## Prochaine étape
 
 1. Domaine définitif dans Vercel (`conciergerie-des-deux-vallees.fr` ou sous-domaine), DNS, puis
