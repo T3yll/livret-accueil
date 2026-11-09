@@ -4,9 +4,9 @@ import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
 import { parseStay, type Stay } from "@/lib/stay";
 import { todayInParis } from "@/lib/use-stay";
+import { DateField } from "./date-field";
 
 export type OpenFilter = "stay" | "today" | "all";
 
@@ -27,26 +27,23 @@ export function StayForm({ stay, submitLabel, onSubmit }: { stay: Stay | null; s
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3">
-        <Field
+        <DateField
           label={t("from")}
-          type="date"
           value={from}
           min={today}
-          onChange={(e) => {
-            const value = e.target.value;
+          onChange={(value) => {
             setFrom(value);
             setInvalid(false);
             // Départ proposé le jour de l'arrivée : évite un départ avant l'arrivée.
             if (value && (!to || to < value)) setTo(value);
           }}
         />
-        <Field
+        <DateField
           label={t("to")}
-          type="date"
           value={to}
           min={from || today}
-          onChange={(e) => {
-            setTo(e.target.value);
+          onChange={(value) => {
+            setTo(value);
             setInvalid(false);
           }}
         />

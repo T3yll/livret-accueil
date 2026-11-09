@@ -201,7 +201,8 @@
     },
     "nudge": "Pour voir ce qui sera ouvert pendant votre séjour.",
     "nudgeShort": "Pas encore de dates :",
-    "nudgeAction": "voir ce qui sera ouvert"
+    "nudgeAction": "voir ce qui sera ouvert",
+    "pick": "Choisir"
   },
   "Welcome": {
     "greeting": "Bonjour, je suis {name}.",
