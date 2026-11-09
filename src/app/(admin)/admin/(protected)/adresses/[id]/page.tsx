@@ -12,10 +12,16 @@ export default async function PlacePage({ params }: PageProps<"/admin/adresses/[
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
-  const [{ data: place }, { data: hours }, { data: closures }, { data: usedBy }] = await Promise.all([
+  const [{ data: place }, { data: hours }, { data: closures }, { data: events }, { data: usedBy }] = await Promise.all([
     supabase.from("places").select("*").eq("id", id).maybeSingle(),
     supabase.from("place_opening_hours").select("weekday, opens_at, closes_at").eq("place_id", id),
     supabase.from("place_closures").select("starts_on, ends_on, reason_fr, reason_en").eq("place_id", id).order("starts_on"),
+    supabase
+      .from("place_events")
+      .select("starts_on, start_time, end_time, label_fr, label_en, booking_url")
+      .eq("place_id", id)
+      .order("starts_on")
+      .order("start_time"),
     supabase.from("property_places").select("is_favorite, properties(id, name)").eq("place_id", id),
   ]);
   if (!place) notFound();
@@ -79,6 +85,11 @@ export default async function PlacePage({ params }: PageProps<"/admin/adresses/[
         place={place}
         hours={(hours ?? []).map((h) => ({ ...h, opens_at: h.opens_at.slice(0, 5), closes_at: h.closes_at.slice(0, 5) }))}
         closures={closures ?? []}
+        events={(events ?? []).map((ev) => ({
+          ...ev,
+          start_time: ev.start_time?.slice(0, 5) ?? null,
+          end_time: ev.end_time?.slice(0, 5) ?? null,
+        }))}
         today={parisDay(new Date()).date}
       />
     </div>

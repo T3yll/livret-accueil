@@ -11,6 +11,7 @@ import { FavoritesCarousel } from "@/components/guide/favorites-carousel";
 import { InstallPrompt } from "@/components/guide/install-prompt";
 import { IconBadge, SECTION_ICONS } from "@/components/guide/section-icon";
 import { StayBanner } from "@/components/guide/stay-banner";
+import { StayExperiences } from "@/components/guide/stay-experiences";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getGuide } from "@/lib/guide";
@@ -127,6 +128,9 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
 
         {/* Juste après les accès rapides (arrivée, Wi-Fi…) : les coups de cœur, visibles sans chercher. */}
         <FavoritesCarousel slug={slug} places={places.filter((p) => p.is_favorite)} locale={locale} />
+
+        {/* Les expériences datées, seulement quand le voyageur a donné ses dates (rien sinon). */}
+        <StayExperiences slug={slug} places={places.filter((p) => p.is_experience && p.events.length > 0)} />
 
         {(sections.length > 0 || hasPlaces) && (
           <section aria-labelledby="guide-title" className="flex flex-col gap-3">

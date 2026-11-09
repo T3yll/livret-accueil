@@ -1,4 +1,4 @@
-import { CalendarCheck, Car, ChevronLeft, ExternalLink, Globe, Phone, Truck, type LucideIcon } from "lucide-react";
+import { CalendarCheck, Car, ChevronLeft, ExternalLink, Globe, Phone, Sparkles, Truck, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -15,7 +15,8 @@ import { formatDistance } from "@/lib/distance";
 import { getGuide } from "@/lib/guide";
 import { directionsLinks, mediaUrl } from "@/lib/guide-view";
 import { localizedWithLang } from "@/lib/localized";
-import { formatDate, guidePlaces } from "@/lib/places-view";
+import { parisDay } from "@/lib/opening-hours";
+import { formatDate, formatEventDate, formatEventTime, guidePlaces, upcomingEvents } from "@/lib/places-view";
 import { RichText } from "@/lib/rich-text";
 
 type Props = PageProps<"/[locale]/g/[slug]/places/[placeId]">;
@@ -44,7 +45,11 @@ export default async function PlacePage({ params }: Props) {
   if (!found) notFound();
   const { guide, place } = found;
 
-  const [t, tGuide] = await Promise.all([getTranslations("Places"), getTranslations("Guide")]);
+  const [t, tGuide, tExp] = await Promise.all([
+    getTranslations("Places"),
+    getTranslations("Guide"),
+    getTranslations("Experiences"),
+  ]);
   const nowIso = new Date().toISOString();
   const Icon = CATEGORY_ICONS[place.category];
   const description = localizedWithLang(place, "description", locale);
@@ -56,6 +61,9 @@ export default async function PlacePage({ params }: Props) {
     place.has_drive && { icon: Car, label: t("drive") },
     place.booking_required && { icon: CalendarCheck, label: t("bookingRequired") },
   ].filter((item): item is { icon: LucideIcon; label: string } => Boolean(item));
+  // Expérience : ses prochaines dates (6 au plus, le reste est résumé).
+  const events = place.is_experience ? upcomingEvents(place, parisDay(new Date()).date) : [];
+  const shownEvents = events.slice(0, 6);
   const address = [place.address, [place.postal_code, place.city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
   return (
@@ -98,6 +106,7 @@ export default async function PlacePage({ params }: Props) {
         <header className="flex flex-col gap-2">
           <p className="flex items-center gap-2 text-sm text-muted">
             <Icon size={18} strokeWidth={1.75} className="text-primary" aria-hidden />
+            {place.is_experience && `${tExp("badge")} · `}
             {t(`category.${place.category}`)}
             {place.km !== null && ` · ${formatDistance(place.km, locale)}`}
           </p>
@@ -116,6 +125,54 @@ export default async function PlacePage({ params }: Props) {
               <blockquote lang={comment.lang} className="font-heading text-xl italic">
                 « {comment.text} »
               </blockquote>
+            )}
+          </section>
+        )}
+
+        {shownEvents.length > 0 && (
+          <section aria-labelledby="place-events" className="flex flex-col gap-2">
+            <h2 id="place-events" className="flex items-center gap-2 text-2xl">
+              <Sparkles size={20} className="text-primary" aria-hidden />
+              {tExp("upcoming")}
+            </h2>
+            <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+              {shownEvents.map((event) => {
+                const label = localizedWithLang(event, "label", locale);
+                const time = event.start_time
+                  ? event.end_time
+                    ? tExp("timeRange", { start: formatEventTime(event.start_time, locale), end: formatEventTime(event.end_time, locale) })
+                    : formatEventTime(event.start_time, locale)
+                  : null;
+                return (
+                  <li key={event.id} className="flex min-h-14 items-center gap-3 px-4 py-2">
+                    <span className="flex flex-1 flex-col">
+                      <span className="font-semibold">
+                        {formatEventDate(event.starts_on, locale)}
+                        {time && ` · ${time}`}
+                      </span>
+                      {label && (
+                        <span lang={label.lang} className="text-sm text-muted">
+                          {label.text}
+                        </span>
+                      )}
+                    </span>
+                    {event.booking_url && (
+                      <a
+                        href={event.booking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-primary hover:bg-stone focus-visible:outline-2 focus-visible:outline-primary"
+                      >
+                        <ExternalLink size={16} aria-hidden />
+                        {tExp("book")}
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            {events.length > shownEvents.length && (
+              <p className="text-sm text-muted">{tExp("more", { count: events.length - shownEvents.length })}</p>
             )}
           </section>
         )}

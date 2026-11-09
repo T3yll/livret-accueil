@@ -1,9 +1,9 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Repeat, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { WEEKDAY_LABELS } from "@/components/admin/place-labels";
-import type { ClosuresInput, HoursInput } from "@/lib/place-schedule";
+import { weeklyDates, type ClosuresInput, type EventsInput, type HoursInput } from "@/lib/place-schedule";
 
 const timeInput =
   "min-h-11 rounded-xl border border-border bg-surface px-2 text-base focus-visible:outline-2 focus-visible:outline-primary";
@@ -173,6 +173,163 @@ export function ClosuresEditor({ initial, error }: { initial: ClosuresInput; err
         >
           <Plus size={16} aria-hidden /> Ajouter une fermeture
         </button>
+      </div>
+      {error && (
+        <p role="alert" className="text-sm text-favorite">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+type EventRow = EventsInput[number];
+const emptyEvent: EventRow = { starts_on: "", start_time: null, end_time: null, label_fr: null, label_en: null, booking_url: null };
+
+// Dates d'une expérience (soirée aux flambeaux, atelier…). Champ caché « events » (JSON).
+// « Répéter chaque semaine » copie une date (heures, libellés, lien) sur les semaines suivantes.
+export function EventsEditor({ initial, error, today }: { initial: EventsInput; error?: string; today: string }) {
+  const [events, setEvents] = useState(initial);
+  const [repeatIndex, setRepeatIndex] = useState<number | null>(null);
+  const [repeatUntil, setRepeatUntil] = useState("");
+
+  const update = (index: number, patch: Partial<EventRow>) =>
+    setEvents((current) => current.map((e, i) => (i === index ? { ...e, ...patch } : e)));
+
+  const repeat = (index: number) => {
+    const source = events[index];
+    const known = new Set(events.map((e) => e.starts_on));
+    const copies = weeklyDates(source.starts_on, repeatUntil)
+      .filter((d) => !known.has(d))
+      .map((starts_on) => ({ ...source, starts_on }));
+    setEvents((current) => [...current, ...copies].sort((a, b) => a.starts_on.localeCompare(b.starts_on)));
+    setRepeatIndex(null);
+    setRepeatUntil("");
+  };
+
+  const past = events.filter((e) => e.starts_on && e.starts_on < today).length;
+
+  return (
+    <div className="flex flex-col gap-3">
+      <input type="hidden" name="events" value={JSON.stringify(events)} />
+      {events.length === 0 && <p className="text-sm text-muted">Aucune date prévue.</p>}
+      <ul className="flex flex-col gap-3">
+        {events.map((ev, index) => (
+          <li
+            key={index}
+            className={`flex flex-col gap-2 rounded-2xl border border-border bg-surface p-3 ${ev.starts_on && ev.starts_on < today ? "opacity-60" : ""}`}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex flex-col gap-1 text-sm font-semibold">
+                Date
+                <input
+                  type="date"
+                  className={timeInput}
+                  value={ev.starts_on}
+                  onChange={(e) => update(index, { starts_on: e.target.value })}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm font-semibold">
+                De (facultatif)
+                <input
+                  type="time"
+                  className={timeInput}
+                  value={ev.start_time ?? ""}
+                  onChange={(e) => update(index, { start_time: e.target.value || null })}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm font-semibold">
+                À
+                <input
+                  type="time"
+                  className={timeInput}
+                  value={ev.end_time ?? ""}
+                  onChange={(e) => update(index, { end_time: e.target.value || null })}
+                />
+              </label>
+              <button
+                type="button"
+                className={`${smallButton} self-end`}
+                aria-expanded={repeatIndex === index}
+                disabled={!ev.starts_on}
+                onClick={() => setRepeatIndex(repeatIndex === index ? null : index)}
+              >
+                <Repeat size={16} aria-hidden /> Répéter
+              </button>
+              <button
+                type="button"
+                className={`${iconButton} self-end`}
+                aria-label="Supprimer cette date"
+                onClick={() => setEvents((current) => current.filter((_, i) => i !== index))}
+              >
+                <Trash2 size={18} aria-hidden />
+              </button>
+            </div>
+            {repeatIndex === index && (
+              <div className="flex flex-wrap items-end gap-2 rounded-xl bg-stone p-3">
+                <label className="flex flex-col gap-1 text-sm font-semibold">
+                  Chaque semaine jusqu&apos;au (inclus)
+                  <input
+                    type="date"
+                    className={timeInput}
+                    min={ev.starts_on}
+                    value={repeatUntil}
+                    onChange={(e) => setRepeatUntil(e.target.value)}
+                  />
+                </label>
+                <button type="button" className={smallButton} disabled={!repeatUntil} onClick={() => repeat(index)}>
+                  Ajouter les dates
+                </button>
+              </div>
+            )}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="flex flex-col gap-1 text-sm font-semibold">
+                Libellé (FR, facultatif)
+                <input
+                  lang="fr"
+                  className={`${timeInput} px-3`}
+                  value={ev.label_fr ?? ""}
+                  placeholder="Ex. Visite aux flambeaux"
+                  onChange={(e) => update(index, { label_fr: e.target.value || null })}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm font-semibold">
+                Label (EN)
+                <input
+                  lang="en"
+                  className={`${timeInput} px-3`}
+                  value={ev.label_en ?? ""}
+                  placeholder="E.g. Torchlight tour"
+                  onChange={(e) => update(index, { label_en: e.target.value || null })}
+                />
+              </label>
+            </div>
+            <label className="flex flex-col gap-1 text-sm font-semibold">
+              Lien de réservation pour cette date (facultatif)
+              <input
+                type="url"
+                className={`${timeInput} px-3`}
+                value={ev.booking_url ?? ""}
+                placeholder="https://"
+                onChange={(e) => update(index, { booking_url: e.target.value || null })}
+              />
+            </label>
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="button" className={smallButton} onClick={() => setEvents((current) => [...current, emptyEvent])}>
+          <Plus size={16} aria-hidden /> Ajouter une date
+        </button>
+        {past > 0 && (
+          <button
+            type="button"
+            className={smallButton}
+            onClick={() => setEvents((current) => current.filter((e) => !e.starts_on || e.starts_on >= today))}
+          >
+            Retirer les {past} date{past > 1 ? "s" : ""} passée{past > 1 ? "s" : ""}
+          </button>
+        )}
       </div>
       {error && (
         <p role="alert" className="text-sm text-favorite">

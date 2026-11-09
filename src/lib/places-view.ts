@@ -84,3 +84,39 @@ export function formatStayDays(days: string[], locale: Locale): string {
   });
   return new Intl.ListFormat(intlLocale(locale), { style: "long", type: "conjunction" }).format(names);
 }
+
+export type PlaceEvent = GuidePlace["events"][number];
+export type StayExperience = { place: PlaceWithDistance; event: PlaceEvent };
+
+// Expériences ayant une date pendant le séjour (arrivée et départ compris), par date puis heure.
+// Une date qui tombe pendant une fermeture du lieu est écartée : la fermeture fait foi.
+export function experiencesDuring(places: PlaceWithDistance[], { from, to }: Stay): StayExperience[] {
+  return places
+    .filter((place) => place.is_experience)
+    .flatMap((place) =>
+      place.events
+        .filter((event) => event.starts_on >= from && event.starts_on <= to)
+        .filter((event) => !place.closures.some((c) => c.starts_on <= event.starts_on && event.starts_on <= c.ends_on))
+        .map((event) => ({ place, event })),
+    )
+    .sort(
+      (a, b) =>
+        a.event.starts_on.localeCompare(b.event.starts_on) ||
+        (a.event.start_time ?? "").localeCompare(b.event.start_time ?? ""),
+    );
+}
+
+// Dates à venir d'une expérience (le JSON garde la veille, à cause du fuseau du serveur).
+export const upcomingEvents = (place: GuidePlace, today: string) => place.events.filter((e) => e.starts_on >= today);
+
+// « sam. 12 déc. » / « Sat 12 Dec »
+export const formatEventDate = (date: string, locale: Locale) =>
+  shortDate(date, locale, { weekday: "short", day: "numeric", month: "short" });
+
+// « 20:30 » (en-GB compte aussi sur 24 h) (heure SQL « 20:30:00 »).
+export function formatEventTime(time: string, locale: Locale): string {
+  const [h, m] = time.split(":").map(Number);
+  return new Intl.DateTimeFormat(intlLocale(locale), { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(
+    new Date(Date.UTC(2025, 0, 1, h, m)),
+  );
+}

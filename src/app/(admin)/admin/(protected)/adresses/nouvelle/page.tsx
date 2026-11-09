@@ -9,7 +9,7 @@ export default async function NewPlacePage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-[28px]">Nouvelle adresse</h1>
-      <PlaceForm hours={[]} closures={[]} today={parisDay(new Date()).date} />
+      <PlaceForm hours={[]} closures={[]} events={[]} today={parisDay(new Date()).date} />
     </div>
   );
 }

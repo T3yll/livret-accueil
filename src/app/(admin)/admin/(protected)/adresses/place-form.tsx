@@ -6,19 +6,20 @@ import { SinglePhotoInput } from "@/components/admin/single-photo-input";
 import { Button } from "@/components/ui/button";
 import { Field, Select, TextArea } from "@/components/ui/field";
 import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
-import { parseJsonField, type ClosuresInput, type HoursInput } from "@/lib/place-schedule";
+import { parseJsonField, type ClosuresInput, type EventsInput, type HoursInput } from "@/lib/place-schedule";
 import type { Enums, Tables } from "@/types/database";
 import { savePlace } from "./actions";
-import { ClosuresEditor, HoursEditor } from "./schedule-editor";
+import { ClosuresEditor, EventsEditor, HoursEditor } from "./schedule-editor";
 
 type Props = {
   place?: Tables<"places">;
   hours: HoursInput;
   closures: ClosuresInput;
+  events: EventsInput;
   today: string; // date du jour à Paris, pour le bouton « vérifié aujourd'hui »
 };
 
-export function PlaceForm({ place, hours, closures, today }: Props) {
+export function PlaceForm({ place, hours, closures, events, today }: Props) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     savePlace.bind(null, place?.id ?? null),
     initialFormState,
@@ -28,7 +29,7 @@ export function PlaceForm({ place, hours, closures, today }: Props) {
 
   return (
     <form key={formKey(state)} action={action} className="flex flex-col gap-8">
-      <PlaceFields state={state} place={place} hours={hours} closures={closures} today={today} v={v} e={e} />
+      <PlaceFields state={state} place={place} hours={hours} closures={closures} events={events} today={today} v={v} e={e} />
 
       <div className="flex flex-wrap items-center gap-4">
         <Button type="submit" disabled={pending}>
@@ -54,6 +55,7 @@ function PlaceFields({
   place,
   hours,
   closures,
+  events,
   today,
   v,
   e,
@@ -66,6 +68,7 @@ function PlaceFields({
   const initialClosures = state.values?.closures
     ? ((parseJsonField(state.values.closures) as ClosuresInput) ?? closures)
     : closures;
+  const initialEvents = state.values?.events ? ((parseJsonField(state.values.events) as EventsInput) ?? events) : events;
 
   return (
     <>
@@ -157,6 +160,24 @@ function PlaceFields({
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Fermetures</legend>
         <ClosuresEditor initial={initialClosures} error={e.closures} />
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-2 font-heading text-2xl">Expérience à vivre</legend>
+        <label className="flex min-h-11 items-center gap-3">
+          <input
+            type="checkbox"
+            name="is_experience"
+            defaultChecked={state.values ? state.values.is_experience === "on" : Boolean(place?.is_experience)}
+            className="size-5 accent-primary"
+          />
+          <span>C&apos;est une expérience (soirée, atelier, visite spéciale…)</span>
+        </label>
+        <p className="max-w-2xl text-sm text-muted">
+          Quand le voyageur a donné ses dates, l&apos;accueil du livret lui montre les expériences qui ont une date
+          pendant son séjour. Les dates passées ne sont plus montrées.
+        </p>
+        <EventsEditor initial={initialEvents} error={e.events} today={today} />
       </fieldset>
 
       <fieldset className="flex max-w-2xl flex-col gap-2">

@@ -243,5 +243,14 @@
       "dishcloths": "Tea towels",
       "firewood": "Firewood"
     }
+  },
+  "Experiences": {
+    "title": "Things to do during your stay",
+    "intro": "Events that don't happen every day, on the dates of your stay.",
+    "upcoming": "Upcoming dates",
+    "more": "{count, plural, one {and one more date} other {and # more dates}}",
+    "book": "Book",
+    "timeRange": "{start} – {end}",
+    "badge": "Experience"
   }
 }

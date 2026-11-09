@@ -29,8 +29,55 @@ export type Database = {
         }
         Relationships: []
       }
+      equipment_templates: {
+        Row: {
+          audio_path_en: string | null
+          audio_path_fr: string | null
+          body_en: string | null
+          body_fr: string | null
+          created_at: string
+          id: string
+          media: Json
+          title_en: string | null
+          title_fr: string
+          transcript_en: string | null
+          transcript_fr: string | null
+          updated_at: string
+        }
+        Insert: {
+          audio_path_en?: string | null
+          audio_path_fr?: string | null
+          body_en?: string | null
+          body_fr?: string | null
+          created_at?: string
+          id?: string
+          media?: Json
+          title_en?: string | null
+          title_fr: string
+          transcript_en?: string | null
+          transcript_fr?: string | null
+          updated_at?: string
+        }
+        Update: {
+          audio_path_en?: string | null
+          audio_path_fr?: string | null
+          body_en?: string | null
+          body_fr?: string | null
+          created_at?: string
+          id?: string
+          media?: Json
+          title_en?: string | null
+          title_fr?: string
+          transcript_en?: string | null
+          transcript_fr?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guide_sections: {
         Row: {
+          audio_path_en: string | null
+          audio_path_fr: string | null
           body_en: string | null
           body_fr: string | null
           created_at: string
@@ -42,10 +89,14 @@ export type Database = {
           property_id: string
           title_en: string | null
           title_fr: string | null
+          transcript_en: string | null
+          transcript_fr: string | null
           type: Database["public"]["Enums"]["section_type"]
           updated_at: string
         }
         Insert: {
+          audio_path_en?: string | null
+          audio_path_fr?: string | null
           body_en?: string | null
           body_fr?: string | null
           created_at?: string
@@ -57,10 +108,14 @@ export type Database = {
           property_id: string
           title_en?: string | null
           title_fr?: string | null
+          transcript_en?: string | null
+          transcript_fr?: string | null
           type: Database["public"]["Enums"]["section_type"]
           updated_at?: string
         }
         Update: {
+          audio_path_en?: string | null
+          audio_path_fr?: string | null
           body_en?: string | null
           body_fr?: string | null
           created_at?: string
@@ -72,6 +127,8 @@ export type Database = {
           property_id?: string
           title_en?: string | null
           title_fr?: string | null
+          transcript_en?: string | null
+          transcript_fr?: string | null
           type?: Database["public"]["Enums"]["section_type"]
           updated_at?: string
         }
@@ -181,6 +238,57 @@ export type Database = {
           },
         ]
       }
+      place_events: {
+        Row: {
+          booking_url: string | null
+          created_at: string
+          end_time: string | null
+          id: string
+          label_en: string | null
+          label_fr: string | null
+          place_id: string
+          start_time: string | null
+          starts_on: string
+        }
+        Insert: {
+          booking_url?: string | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          label_en?: string | null
+          label_fr?: string | null
+          place_id: string
+          start_time?: string | null
+          starts_on: string
+        }
+        Update: {
+          booking_url?: string | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          label_en?: string | null
+          label_fr?: string | null
+          place_id?: string
+          start_time?: string | null
+          starts_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places_needing_review"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       place_opening_hours: {
         Row: {
           closes_at: string
@@ -233,8 +341,12 @@ export type Database = {
           description_en: string | null
           description_fr: string | null
           has_drive: boolean
+          hike_difficulty: Database["public"]["Enums"]["hike_difficulty"] | null
+          hike_distance_km: number | null
+          hike_duration_min: number | null
           hours_verified_at: string | null
           id: string
+          is_experience: boolean
           lat: number
           lng: number
           name: string
@@ -247,6 +359,7 @@ export type Database = {
           postal_code: string | null
           practical_note_en: string | null
           practical_note_fr: string | null
+          trail_url: string | null
           updated_at: string
           website: string | null
         }
@@ -262,8 +375,14 @@ export type Database = {
           description_en?: string | null
           description_fr?: string | null
           has_drive?: boolean
+          hike_difficulty?:
+            | Database["public"]["Enums"]["hike_difficulty"]
+            | null
+          hike_distance_km?: number | null
+          hike_duration_min?: number | null
           hours_verified_at?: string | null
           id?: string
+          is_experience?: boolean
           lat: number
           lng: number
           name: string
@@ -276,6 +395,7 @@ export type Database = {
           postal_code?: string | null
           practical_note_en?: string | null
           practical_note_fr?: string | null
+          trail_url?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -291,8 +411,14 @@ export type Database = {
           description_en?: string | null
           description_fr?: string | null
           has_drive?: boolean
+          hike_difficulty?:
+            | Database["public"]["Enums"]["hike_difficulty"]
+            | null
+          hike_distance_km?: number | null
+          hike_duration_min?: number | null
           hours_verified_at?: string | null
           id?: string
+          is_experience?: boolean
           lat?: number
           lng?: number
           name?: string
@@ -305,6 +431,7 @@ export type Database = {
           postal_code?: string | null
           practical_note_en?: string | null
           practical_note_fr?: string | null
+          trail_url?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -574,6 +701,7 @@ export type Database = {
       }
     }
     Enums: {
+      hike_difficulty: "easy" | "medium" | "hard"
       opening_mode: "schedule" | "always" | "appointment" | "unknown"
       place_category:
         | "restaurant"
@@ -728,6 +856,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      hike_difficulty: ["easy", "medium", "hard"],
       opening_mode: ["schedule", "always", "appointment", "unknown"],
       place_category: [
         "restaurant",

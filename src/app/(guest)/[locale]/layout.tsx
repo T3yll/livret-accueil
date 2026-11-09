@@ -34,7 +34,7 @@ export default async function GuestLayout({ children, params }: LayoutProps<"/[l
     <html lang={locale} className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-full">
         {/* Seuls les textes des composants navigateur sont envoyés au client (pages légères). */}
-        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher, Places: messages.Places, Offline: messages.Offline, Stay: messages.Stay, Welcome: messages.Welcome }}>
+        <NextIntlClientProvider messages={{ LanguageSwitcher: messages.LanguageSwitcher, Places: messages.Places, Offline: messages.Offline, Stay: messages.Stay, Experiences: messages.Experiences, Welcome: messages.Welcome }}>
           {children}
         </NextIntlClientProvider>
       </body>

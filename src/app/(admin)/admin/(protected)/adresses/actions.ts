@@ -6,7 +6,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { fieldErrorsFrom, formValues, optionalText, requiredText, type FormState } from "@/lib/forms";
 import { Constants } from "@/types/database";
-import { closuresSchema, hoursSchema, parseJsonField } from "@/lib/place-schedule";
+import { closuresSchema, eventsSchema, hoursSchema, parseJsonField } from "@/lib/place-schedule";
 import { parisDay } from "@/lib/opening-hours";
 
 const coordinate = (min: number, max: number) =>
@@ -51,6 +51,7 @@ const placeSchema = z.object({
   delivers: checkbox,
   has_drive: checkbox,
   booking_required: checkbox,
+  is_experience: checkbox,
   practical_note_fr: optionalText,
   practical_note_en: optionalText,
   photo_credit: optionalText,
@@ -67,11 +68,13 @@ export async function savePlace(id: string | null, _prev: FormState, formData: F
   const parsed = placeSchema.safeParse(values);
   const hours = hoursSchema.safeParse(parseJsonField(values.hours));
   const closures = closuresSchema.safeParse(parseJsonField(values.closures));
+  const events = eventsSchema.safeParse(parseJsonField(values.events));
 
   const fieldErrors = parsed.success ? {} : fieldErrorsFrom(parsed.error);
   if (!hours.success) fieldErrors.hours = hours.error.issues[0]?.message ?? "Horaires invalides.";
   if (!closures.success) fieldErrors.closures = closures.error.issues[0]?.message ?? "Fermetures invalides.";
-  if (!parsed.success || !hours.success || !closures.success) return { values, error: null, fieldErrors };
+  if (!events.success) fieldErrors.events = events.error.issues[0]?.message ?? "Dates invalides.";
+  if (!parsed.success || !hours.success || !closures.success || !events.success) return { values, error: null, fieldErrors };
 
   const place = parsed.data;
   let placeId = id;
@@ -90,6 +93,7 @@ export async function savePlace(id: string | null, _prev: FormState, formData: F
   const results = await Promise.all([
     supabase.from("place_opening_hours").delete().eq("place_id", placeId!),
     supabase.from("place_closures").delete().eq("place_id", placeId!),
+    supabase.from("place_events").delete().eq("place_id", placeId!),
   ]);
   if (results.some((r) => r.error)) return { values, error: DB_ERROR, fieldErrors: {} };
 
@@ -100,9 +104,12 @@ export async function savePlace(id: string | null, _prev: FormState, formData: F
     closures.data.length > 0
       ? supabase.from("place_closures").insert(closures.data.map((c) => ({ ...c, place_id: placeId! })))
       : null,
+    events.data.length > 0
+      ? supabase.from("place_events").insert(events.data.map((ev) => ({ ...ev, place_id: placeId! })))
+      : null,
   ]);
   if (inserts.some((r) => r?.error)) {
-    return { values, error: "Fiche enregistrée, mais pas les horaires. Réessayez.", fieldErrors: {} };
+    return { values, error: "Fiche enregistrée, mais pas les horaires ou les dates. Réessayez.", fieldErrors: {} };
   }
 
   revalidatePath("/admin/adresses");

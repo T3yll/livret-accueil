@@ -243,5 +243,14 @@
       "dishcloths": "Torchons",
       "firewood": "Bois"
     }
+  },
+  "Experiences": {
+    "title": "À vivre pendant votre séjour",
+    "intro": "Des rendez-vous qui ne reviennent pas tous les jours, aux dates de votre séjour.",
+    "upcoming": "Prochaines dates",
+    "more": "{count, plural, one {et une autre date} other {et # autres dates}}",
+    "book": "Réserver",
+    "timeRange": "{start} – {end}",
+    "badge": "Expérience"
   }
 }

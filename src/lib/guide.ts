@@ -66,6 +66,11 @@ export type Guide = {
     booking_required: boolean;
     practical_note_fr: string | null;
     practical_note_en: string | null;
+    is_experience: boolean;
+    hike_duration_min: number | null;
+    hike_distance_km: number | null;
+    hike_difficulty: Enums<"hike_difficulty"> | null;
+    trail_url: string | null;
     opening_mode: Enums<"opening_mode">;
     hours_verified_at: string | null;
     is_favorite: boolean;
@@ -73,6 +78,16 @@ export type Guide = {
     comment_en: string | null;
     hours: { weekday: number; opens_at: string; closes_at: string }[];
     closures: { starts_on: string; ends_on: string; reason_fr: string | null; reason_en: string | null }[];
+    // Dates d'une expérience, à venir seulement (triées).
+    events: {
+      id: string;
+      starts_on: string;
+      start_time: string | null;
+      end_time: string | null;
+      label_fr: string | null;
+      label_en: string | null;
+      booking_url: string | null;
+    }[];
   }[];
 };
 

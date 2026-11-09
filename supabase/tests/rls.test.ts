@@ -64,7 +64,7 @@ beforeAll(async () => {
 describe("visiteur anonyme", () => {
   const tables = [
     "admins", "hosts", "properties", "guide_sections", "places", "place_opening_hours",
-    "place_closures", "property_places", "modules", "property_modules",
+    "place_closures", "property_places", "modules", "property_modules", "place_events", "equipment_templates",
   ];
 
   it.each(tables)("ne peut pas lire la table %s", async (table) => {
@@ -109,6 +109,42 @@ describe("données de l'hébergeur dans le livret", () => {
     } finally {
       await db.exec(`update public.properties set status = 'draft' where slug = '${DEMO_SLUG}'`);
     }
+  });
+});
+
+describe("expériences dans le livret", () => {
+  it("n'expose que les dates à venir d'une adresse du livret", async () => {
+    await db.exec(`
+      insert into public.places (id, name, category, lat, lng, is_experience)
+      values ('33333333-3333-4333-8333-333333333333', 'Soirée test', 'activity', 44.7, 1.4, true);
+      insert into public.property_places (property_id, place_id)
+      select id, '33333333-3333-4333-8333-333333333333' from public.properties where slug = '${DEMO_SLUG}';
+      insert into public.place_events (place_id, starts_on, label_fr) values
+        ('33333333-3333-4333-8333-333333333333', current_date - 10, 'Passée'),
+        ('33333333-3333-4333-8333-333333333333', current_date + 3, 'À venir');
+      update public.properties set status = 'published' where slug = '${DEMO_SLUG}';
+    `);
+    try {
+      const guide = (await guideFor("anon", null)) as unknown as {
+        places: { name: string; is_experience: boolean; events: { label_fr: string }[] }[];
+      };
+      const place = guide.places.find((p) => p.name === "Soirée test");
+      expect(place?.is_experience).toBe(true);
+      expect(place?.events.map((e) => e.label_fr)).toEqual(["À venir"]);
+    } finally {
+      await db.exec(`
+        update public.properties set status = 'draft' where slug = '${DEMO_SLUG}';
+        delete from public.property_places where place_id = '33333333-3333-4333-8333-333333333333';
+        delete from public.places where id = '33333333-3333-4333-8333-333333333333';
+      `);
+    }
+  });
+
+  it("refuse les tables d'expériences et de modèles à un connecté non admin", async () => {
+    expect(await as("authenticated", STRANGER, "select id from public.place_events")).toHaveLength(0);
+    await expect(
+      as("authenticated", STRANGER, `insert into public.equipment_templates (title_fr) values ('pirate')`),
+    ).rejects.toThrow(/row-level security/);
   });
 });
 

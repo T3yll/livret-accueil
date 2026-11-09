@@ -155,6 +155,21 @@ adresses restent « à vérifier » : le filtre séjour ne masque que les lieux 
 À prévoir avant le critère « les sites fermés l'hiver n'apparaissent pas ». Décidé : Itinéraire retiré de l'accueil au profit de « Préparer mon séjour » ;
 pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout) ; `is_experience` reporté en P2.
 
+### P2 (plan et migration validés par Rémi le 9 nov.)
+
+- Migration `20261201000300` appliquée, pour les trois P2 d'un coup : `places.is_experience` + table `place_events`
+  (une ligne par date, heures et libellé facultatifs, lien de réservation par date) ; infos de randonnée sur `places`
+  (`hike_duration_min`, `hike_distance_km`, `hike_difficulty`, `trail_url`) ; note vocale par section (`guide_sections.audio_path_*`,
+  `transcript_*`) ; table `equipment_templates` (bibliothèque, copiée et non liée). RLS admin seulement ; `get_guide` expose
+  les expériences et les dates à venir (la veille comprise, à cause du fuseau du serveur).
+- **Expériences à vivre : fait.** Admin : case « C'est une expérience » et liste de dates sur la fiche de l'adresse, bouton
+  « Répéter chaque semaine jusqu'au… », bouton pour retirer les dates passées. Voyageur (option 2 choisie par Rémi) : encart
+  « À vivre pendant votre séjour » sous les coups de cœur, **seulement** avec des dates de séjour et au moins une date
+  pendant le séjour (5 au plus ; une date pendant une fermeture du lieu est écartée) ; « Prochaines dates » sur la fiche.
+  Testé côté voyageur avec une expérience temporaire (effacée). **Formulaire admin non testé dans le navigateur** (session
+  admin expirée) : à essayer par Rémi. Reste à saisir : les vraies expériences de l'hiver et du printemps.
+- À faire : randonnées (vue dédiée), équipements à écouter + bibliothèque.
+
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
 précédente (ordre imposé par Supabase), pas à la date réelle.
 
