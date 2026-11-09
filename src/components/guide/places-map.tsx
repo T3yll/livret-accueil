@@ -2,7 +2,7 @@
 
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Heart, House, LocateFixed } from "lucide-react";
+import { House, LocateFixed } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
@@ -35,14 +35,12 @@ type Props = {
 type Position = { lat: number; lng: number; accuracy: number };
 
 // Marqueurs de la DA : ronds ivoire, contour vert foncé, icône au centre ;
-// pastille terre cuite pour les coups de cœur ; le logement et le lieu choisi en vert plein.
+// anneau terre cuite pour les coups de cœur ; le logement et le lieu choisi en vert plein.
 function markerIcon(category: PlaceCategory | "home", favorite: boolean, selected = false) {
   const home = category === "home";
-  // Coup de cœur : rond terre cuite avec un cœur blanc, plus gros que les autres lieux.
-  const highlighted = favorite && !selected;
-  const Icon = home ? House : highlighted ? Heart : CATEGORY_ICONS[category];
-  const size = home || selected || highlighted ? 42 : 34;
-  const background = home || selected ? "var(--color-primary)" : highlighted ? "var(--color-favorite)" : "var(--color-background)";
+  const Icon = home ? House : CATEGORY_ICONS[category];
+  const size = home || selected || favorite ? 42 : 34;
+  const filled = home || selected;
   const html = renderToStaticMarkup(
     <span
       style={{
@@ -52,14 +50,14 @@ function markerIcon(category: PlaceCategory | "home", favorite: boolean, selecte
         alignItems: "center",
         justifyContent: "center",
         borderRadius: "9999px",
-        // Le logement : contour doré (décor, DA) ; coup de cœur : contour blanc ; les autres : vert.
-        border: home ? "3px solid var(--color-accent)" : highlighted ? "3px solid #fff" : "2px solid var(--color-primary)",
-        background,
-        color: background === "var(--color-background)" ? "var(--color-primary)" : "#fff",
-        boxShadow: highlighted ? "0 2px 6px rgb(0 0 0 / 0.35)" : "0 1px 3px rgb(0 0 0 / 0.25)",
+        // Anneau : doré pour le logement (décor, DA), terre cuite pour un coup de cœur, qui garde son icône de catégorie.
+        border: home ? "3px solid var(--color-accent)" : favorite ? "3px solid var(--color-favorite)" : "2px solid var(--color-primary)",
+        background: filled ? "var(--color-primary)" : "var(--color-background)",
+        color: filled ? "#fff" : "var(--color-primary)",
+        boxShadow: favorite ? "0 2px 6px rgb(0 0 0 / 0.35)" : "0 1px 3px rgb(0 0 0 / 0.25)",
       }}
     >
-      <Icon size={size > 34 ? 22 : 18} strokeWidth={2} fill={highlighted ? "currentColor" : "none"} aria-hidden />
+      <Icon size={size > 34 ? 22 : 18} strokeWidth={2} aria-hidden />
     </span>,
   );
   return L.divIcon({ html, className: "", iconSize: [size, size], iconAnchor: [size / 2, size / 2] });

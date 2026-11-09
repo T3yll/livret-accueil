@@ -21,6 +21,11 @@ export type Guide = {
     welcome_en: string | null;
     contact_phone: string | null;
     contact_email: string | null;
+    host_display_names: string | null;
+    welcome_audio_path_fr: string | null;
+    welcome_audio_path_en: string | null;
+    welcome_transcript_fr: string | null;
+    welcome_transcript_en: string | null;
     status: Enums<"property_status">;
     updated_at: string;
   };
@@ -56,6 +61,11 @@ export type Guide = {
     photo_alt_fr: string | null;
     photo_alt_en: string | null;
     photo_credit: string | null;
+    delivers: boolean;
+    has_drive: boolean;
+    booking_required: boolean;
+    practical_note_fr: string | null;
+    practical_note_en: string | null;
     opening_mode: Enums<"opening_mode">;
     hours_verified_at: string | null;
     is_favorite: boolean;

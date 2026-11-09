@@ -71,6 +71,7 @@ const DATA_FIELDS: Record<SectionType, string[]> = {
   departure: ["checkout_time"],
   contacts: [],
   practical: [],
+  prepare: [],
 };
 
 const FIELD_ERRORS: Record<string, string> = {

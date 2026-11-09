@@ -18,6 +18,12 @@ export function HostForm({ host }: { host?: Tables<"hosts"> }) {
     <form key={formKey(state)} action={action} className="flex max-w-xl flex-col gap-4">
       <Field label="Nom de l'établissement" name="name" defaultValue={initialValue(state, "name", host?.name)} error={e.name} required />
       <Field label="Personne à contacter" name="contact_name" defaultValue={initialValue(state, "contact_name", host?.contact_name)} />
+      <Field
+        label="Prénoms à afficher aux voyageurs"
+        name="display_names"
+        defaultValue={initialValue(state, "display_names", host?.display_names)}
+        hint="Ex. : Pascal et Brigitte. Utilisés dans l'accueil du livret."
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Téléphone" name="phone" type="tel" defaultValue={initialValue(state, "phone", host?.phone)} />
         <Field label="Email" name="email" type="email" defaultValue={initialValue(state, "email", host?.email)} error={e.email} />

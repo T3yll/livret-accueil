@@ -9,6 +9,7 @@ import { fieldErrorsFrom, optionalText, requiredText, formValues, type FormState
 const hostSchema = z.object({
   name: requiredText("Le nom est obligatoire."),
   contact_name: optionalText,
+  display_names: optionalText,
   phone: optionalText,
   email: optionalText.pipe(z.email("Email invalide.").nullable()),
   notes: optionalText,

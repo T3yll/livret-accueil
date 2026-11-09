@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Guide } from "./guide";
-import { formatDate, guidePlaces, healthPlaces, weekdayName } from "./places-view";
+import { formatDate, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, weekdayName } from "./places-view";
 
 const place = (overrides: Partial<Guide["places"][number]>): Guide["places"][number] => ({
   id: "x",
@@ -20,6 +20,11 @@ const place = (overrides: Partial<Guide["places"][number]>): Guide["places"][num
   photo_alt_fr: null,
   photo_alt_en: null,
   photo_credit: null,
+  delivers: false,
+  has_drive: false,
+  booking_required: false,
+  practical_note_fr: null,
+  practical_note_en: null,
   opening_mode: "unknown",
   hours_verified_at: null,
   is_favorite: false,
@@ -50,6 +55,24 @@ describe("guidePlaces", () => {
     const g = guide([place({ id: "a" }), place({ id: "h", category: "health" })], []);
     expect(guidePlaces(g)).toEqual([]);
     expect(healthPlaces(g).map((p) => p.id)).toEqual(["h"]);
+  });
+});
+
+describe("filtres regroupés", () => {
+  it("chaque catégorie d'adresse est dans un seul filtre, sauf Santé (section Urgences)", () => {
+    const all = Object.values(PLACE_GROUPS).flat();
+    expect(new Set(all).size).toBe(all.length);
+    expect(all).not.toContain("health");
+    expect(isInGroup("hiking", "move")).toBe(true);
+    expect(isInGroup("hiking", "eat")).toBe(false);
+  });
+
+  it("une pharmacie est dans les adresses et les urgences ; sans module, seulement aux urgences", () => {
+    const p = place({ id: "ph", category: "pharmacy" });
+    expect(guidePlaces(guide([p])).map((x) => x.id)).toEqual(["ph"]);
+    expect(healthPlaces(guide([p])).map((x) => x.id)).toEqual(["ph"]);
+    expect(guidePlaces(guide([p], []))).toEqual([]);
+    expect(healthPlaces(guide([p], [])).map((x) => x.id)).toEqual(["ph"]);
   });
 });
 

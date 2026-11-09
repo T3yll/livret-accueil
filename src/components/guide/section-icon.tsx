@@ -1,4 +1,4 @@
-import { DoorOpen, Flame, House, Info, KeyRound, Phone, Wifi, type LucideIcon } from "lucide-react";
+import { DoorOpen, Flame, House, Info, KeyRound, Luggage, Phone, Wifi, type LucideIcon } from "lucide-react";
 import type { SectionType } from "@/lib/sections";
 
 // Jeu d'icônes de la DA (lucide-react).
@@ -10,6 +10,7 @@ export const SECTION_ICONS: Record<SectionType, LucideIcon> = {
   departure: DoorOpen,
   contacts: Phone,
   practical: Info,
+  prepare: Luggage,
 };
 
 export function IconBadge({ icon: Icon, size = 20 }: { icon: LucideIcon; size?: number }) {

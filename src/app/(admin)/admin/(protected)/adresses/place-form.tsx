@@ -159,6 +159,31 @@ function PlaceFields({
         <ClosuresEditor initial={initialClosures} error={e.closures} />
       </fieldset>
 
+      <fieldset className="flex max-w-2xl flex-col gap-2">
+        <legend className="mb-2 font-heading text-2xl">Infos pratiques</legend>
+        {(
+          [
+            ["delivers", "Livre à domicile"],
+            ["has_drive", "Drive"],
+            ["booking_required", "Sur réservation"],
+          ] as const
+        ).map(([name, label]) => (
+          <label key={name} className="flex min-h-11 items-center gap-3">
+            <input
+              type="checkbox"
+              name={name}
+              defaultChecked={state.values ? state.values[name] === "on" : Boolean(place?.[name])}
+              className="size-5 accent-primary"
+            />
+            <span>{label}</span>
+          </label>
+        ))}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Précision (FR)" name="practical_note_fr" defaultValue={v("practical_note_fr")} hint="Ex. : Livraison 7 €, le soir même" />
+          <Field label="Précision (EN)" name="practical_note_en" lang="en" defaultValue={v("practical_note_en")} hint="Ex. : Delivery €7, same evening" />
+        </div>
+      </fieldset>
+
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 font-heading text-2xl">Photo</legend>
         {place ? (

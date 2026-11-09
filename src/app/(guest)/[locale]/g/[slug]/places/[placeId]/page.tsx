@@ -1,4 +1,4 @@
-import { ChevronLeft, ExternalLink, Globe, Phone } from "lucide-react";
+import { CalendarCheck, Car, ChevronLeft, ExternalLink, Globe, Phone, Truck, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -50,6 +50,12 @@ export default async function PlacePage({ params }: Props) {
   const description = localizedWithLang(place, "description", locale);
   const comment = localizedWithLang(place, "comment", locale);
   const photoAlt = localizedWithLang(place, "photo_alt", locale);
+  const practicalNote = localizedWithLang(place, "practical_note", locale);
+  const practical = [
+    place.delivers && { icon: Truck, label: t("delivers") },
+    place.has_drive && { icon: Car, label: t("drive") },
+    place.booking_required && { icon: CalendarCheck, label: t("bookingRequired") },
+  ].filter((item): item is { icon: LucideIcon; label: string } => Boolean(item));
   const address = [place.address, [place.postal_code, place.city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
   return (
@@ -114,6 +120,26 @@ export default async function PlacePage({ params }: Props) {
         )}
 
         {description && <RichText text={description.text} lang={description.lang} />}
+
+        {(practical.length > 0 || practicalNote) && (
+          <div className="flex flex-col gap-2">
+            {practical.length > 0 && (
+              <ul className="flex flex-wrap gap-2">
+                {practical.map(({ icon: PracticalIcon, label }) => (
+                  <li key={label} className="inline-flex items-center gap-1.5 rounded-full bg-stone px-3 py-1.5 text-sm font-semibold">
+                    <PracticalIcon size={16} className="text-primary" aria-hidden />
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {practicalNote && (
+              <p lang={practicalNote.lang} className="text-sm">
+                {practicalNote.text}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           {place.phone && (

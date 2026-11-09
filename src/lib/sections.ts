@@ -17,6 +17,7 @@ export const SECTION_TYPES = [
   "departure",
   "contacts",
   "practical",
+  "prepare",
 ] as const satisfies readonly SectionType[];
 
 export const isSectionType = (value: string): value is SectionType =>
@@ -54,6 +55,7 @@ export const sectionDataSchemas = {
   }),
   contacts: z.object({}),
   practical: z.object({}),
+  prepare: z.object({}),
 } satisfies Record<SectionType, z.ZodType>;
 
 export type SectionData<T extends SectionType> = z.infer<(typeof sectionDataSchemas)[T]>;

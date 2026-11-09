@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { fieldErrorsFrom, formValues, optionalText, requiredText, type FormState } from "@/lib/forms";
+import { Constants } from "@/types/database";
 import { closuresSchema, hoursSchema, parseJsonField } from "@/lib/place-schedule";
 import { parisDay } from "@/lib/opening-hours";
 
@@ -23,9 +24,15 @@ const optionalUrl = optionalText.pipe(
     .nullable(),
 );
 
+// Case à cocher : le navigateur n'envoie le champ que si elle est cochée.
+const checkbox = z
+  .string()
+  .optional()
+  .transform((value) => value === "on");
+
 const placeSchema = z.object({
   name: requiredText("Le nom est obligatoire."),
-  category: z.enum(["restaurant", "producer", "market", "shop", "activity", "heritage", "family", "health"], {
+  category: z.enum(Constants.public.Enums.place_category, {
     message: "Choisissez une catégorie.",
   }),
   description_fr: optionalText,
@@ -41,6 +48,11 @@ const placeSchema = z.object({
   photo_path: optionalText,
   photo_alt_fr: optionalText,
   photo_alt_en: optionalText,
+  delivers: checkbox,
+  has_drive: checkbox,
+  booking_required: checkbox,
+  practical_note_fr: optionalText,
+  practical_note_en: optionalText,
   photo_credit: optionalText,
   opening_mode: z.enum(["schedule", "always", "appointment", "unknown"]),
   hours_verified_at: optionalText.pipe(z.iso.date("Date invalide.").nullable()),

@@ -9,6 +9,7 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   departure: "Départ",
   contacts: "Contacts utiles",
   practical: "Infos pratiques",
+  prepare: "Préparer mon séjour",
 };
 
 export const KEY_HANDOVER_LABELS: Record<(typeof KEY_HANDOVER)[number], string> = {
@@ -27,4 +28,5 @@ export const SECTION_BODY_HINTS: Record<SectionType, string> = {
   departure: "Consignes : clés, poubelles, lave-vaisselle…",
   contacts: "Autres contacts utiles (médecin, voisin…). Le contact de l'hôte et les urgences s'affichent automatiquement.",
   practical: "Tri des déchets, commerces de base, horaires utiles.",
+  prepare: "Ce qu'il faut savoir pour faire sa valise.",
 };

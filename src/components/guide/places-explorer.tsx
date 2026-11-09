@@ -13,7 +13,7 @@ import { formatDistance } from "@/lib/distance";
 import { mediaUrl } from "@/lib/guide-view";
 import { localized, localizedWithLang } from "@/lib/localized";
 import { isOpenToday, rangesOn, todayStatus } from "@/lib/opening-hours";
-import { GUIDE_CATEGORIES, weekdayName, type PlaceCategory, type PlaceWithDistance } from "@/lib/places-view";
+import { isInGroup, PLACE_GROUP_KEYS, weekdayName, type PlaceGroup, type PlaceWithDistance } from "@/lib/places-view";
 import { useNow } from "@/lib/use-now";
 import { CuratorAvatar } from "./curator-avatar";
 import { floatingButton } from "./map-ui";
@@ -40,7 +40,8 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
   const locale = useLocale() as Locale;
   // L'état « ouvert aujourd'hui » suit l'heure réelle (minuit passé, page venue du cache…).
   const now = useNow(nowIso);
-  const [category, setCategory] = useState<PlaceCategory | "all">("all");
+  // Aucun filtre actif : tout afficher. Toucher le filtre actif le retire.
+  const [group, setGroup] = useState<PlaceGroup | null>(null);
   const [openToday, setOpenToday] = useState(false);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [query, setQuery] = useState("");
@@ -83,13 +84,13 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
   }, [view]);
 
   const withStatus = useMemo(() => places.map((p) => ({ ...p, status: todayStatus(p, now) })), [places, now]);
-  const categories = GUIDE_CATEGORIES.filter((c) => places.some((p) => p.category === c));
+  const groups = PLACE_GROUP_KEYS.filter((g) => places.some((p) => isInGroup(p.category, g)));
   const hasFavorites = places.some((p) => p.is_favorite);
 
   const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const filtered = withStatus.filter(
     (p) =>
-      (category === "all" || p.category === category) &&
+      (!group || isInGroup(p.category, group)) &&
       (!openToday || isOpenToday(p.status)) &&
       (!favoritesOnly || p.is_favorite) &&
       (!query.trim() || normalize(p.name).includes(normalize(query.trim()))),
@@ -108,12 +109,9 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
 
   const categoryChips = (
     <>
-      <button type="button" className={chip} aria-pressed={category === "all"} onClick={() => setCategory("all")}>
-        {t("all")}
-      </button>
-      {categories.map((c) => (
-        <button key={c} type="button" className={chip} aria-pressed={category === c} onClick={() => setCategory(c)}>
-          {t(`categories.${c}`)}
+      {groups.map((g) => (
+        <button key={g} type="button" className={chip} aria-pressed={group === g} onClick={() => setGroup(group === g ? null : g)}>
+          {t(`groups.${g}`)}
         </button>
       ))}
     </>
@@ -304,7 +302,7 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
         </ul>
       )}
 
-      {view === "list" && marketDays.length > 0 && (category === "all" || category === "market") && (
+      {view === "list" && marketDays.length > 0 && (!group || group === "eat") && (
         <section aria-labelledby="markets-title" className="mt-4 flex flex-col gap-3">
           <h2 id="markets-title" className="text-[28px]">
             {t("markets")}

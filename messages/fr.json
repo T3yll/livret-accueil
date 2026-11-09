@@ -24,7 +24,8 @@
     "equipment": "Équipements",
     "departure": "Départ",
     "contacts": "Contacts utiles",
-    "practical": "Infos pratiques"
+    "practical": "Infos pratiques",
+    "prepare": "Préparer mon séjour"
   },
   "Arrival": {
     "checkinFrom": "À partir de {time}",
@@ -66,17 +67,6 @@
   "Places": {
     "title": "Bonnes adresses autour de vous",
     "tile": "Bonnes adresses",
-    "all": "Tout",
-    "categories": {
-      "restaurant": "Restaurants",
-      "producer": "Producteurs",
-      "market": "Marchés",
-      "shop": "Commerces",
-      "activity": "Activités",
-      "heritage": "Sites à visiter",
-      "family": "Sorties en famille",
-      "health": "Santé"
-    },
     "category": {
       "restaurant": "Restaurant",
       "producer": "Producteur",
@@ -85,7 +75,14 @@
       "activity": "Activité",
       "heritage": "Site à visiter",
       "family": "Sortie en famille",
-      "health": "Santé"
+      "health": "Santé",
+      "hiking": "Randonnée",
+      "horse_riding": "Équitation",
+      "bike_rental": "Location de vélos",
+      "kids_leisure": "Loisirs enfants",
+      "groceries": "Courses",
+      "pharmacy": "Pharmacie",
+      "transport": "Transport"
     },
     "filters": "Filtres",
     "openToday": "Ouvert aujourd'hui",
@@ -124,7 +121,17 @@
     "showStay": "Voir le logement",
     "youAreHere": "Vous êtes ici",
     "locationDenied": "Localisation refusée : autorisez-la dans les réglages du navigateur.",
-    "locationUnavailable": "Position introuvable pour le moment."
+    "locationUnavailable": "Position introuvable pour le moment.",
+    "groups": {
+      "eat": "Manger",
+      "visit": "Visiter",
+      "move": "Bouger",
+      "kids": "Enfants",
+      "practical": "Pratique"
+    },
+    "delivers": "Livre à domicile",
+    "drive": "Drive",
+    "bookingRequired": "Sur réservation"
   },
   "LanguageSwitcher": {
     "label": "Langue",

@@ -6,8 +6,20 @@ import type { Enums } from "@/types/database";
 export type GuidePlace = Guide["places"][number];
 export type PlaceCategory = Enums<"place_category">;
 
-// Ordre d'affichage des catégories dans les filtres (Santé à part : section Urgences).
-export const GUIDE_CATEGORIES: PlaceCategory[] = ["restaurant", "producer", "market", "shop", "activity", "heritage", "family"];
+// Peu de filtres à l'écran : les catégories sont regroupées (Santé à part : section Urgences).
+export const PLACE_GROUPS = {
+  eat: ["restaurant", "producer", "market"],
+  visit: ["heritage", "activity"],
+  move: ["hiking", "horse_riding", "bike_rental"],
+  kids: ["family", "kids_leisure"],
+  practical: ["groceries", "shop", "pharmacy", "transport"],
+} as const satisfies Record<string, readonly PlaceCategory[]>;
+
+export type PlaceGroup = keyof typeof PLACE_GROUPS;
+export const PLACE_GROUP_KEYS = Object.keys(PLACE_GROUPS) as PlaceGroup[];
+
+export const isInGroup = (category: PlaceCategory, group: PlaceGroup) =>
+  (PLACE_GROUPS[group] as readonly PlaceCategory[]).includes(category);
 
 export type PlaceWithDistance = GuidePlace & { km: number | null };
 
@@ -22,12 +34,12 @@ export function guidePlaces(guide: Guide): PlaceWithDistance[] {
     .sort((a, b) => Number(b.is_favorite) - Number(a.is_favorite) || (a.km ?? 0) - (b.km ?? 0));
 }
 
-// Adresses santé (hôpital, pharmacie…) pour la section Urgences, les plus proches d'abord.
+// Adresses santé et pharmacies pour la section Urgences, les plus proches d'abord.
 export function healthPlaces(guide: Guide): PlaceWithDistance[] {
   const { lat, lng } = guide.property;
   const origin = lat !== null && lng !== null ? { lat, lng } : null;
   return guide.places
-    .filter((p) => p.category === "health")
+    .filter((p) => p.category === "health" || p.category === "pharmacy")
     .map((p) => ({ ...p, km: origin ? distanceKm(origin, p) : null }))
     .sort((a, b) => (a.km ?? 0) - (b.km ?? 0));
 }

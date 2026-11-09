@@ -24,7 +24,8 @@
     "equipment": "Equipment",
     "departure": "Departure",
     "contacts": "Useful contacts",
-    "practical": "Practical information"
+    "practical": "Practical information",
+    "prepare": "Prepare your stay"
   },
   "Arrival": {
     "checkinFrom": "From {time}",
@@ -66,17 +67,6 @@
   "Places": {
     "title": "Good places around you",
     "tile": "Good places",
-    "all": "All",
-    "categories": {
-      "restaurant": "Restaurants",
-      "producer": "Producers",
-      "market": "Markets",
-      "shop": "Shops",
-      "activity": "Activities",
-      "heritage": "Places to visit",
-      "family": "Family outings",
-      "health": "Health"
-    },
     "category": {
       "restaurant": "Restaurant",
       "producer": "Producer",
@@ -85,7 +75,14 @@
       "activity": "Activity",
       "heritage": "Place to visit",
       "family": "Family outing",
-      "health": "Health"
+      "health": "Health",
+      "hiking": "Hiking",
+      "horse_riding": "Horse riding",
+      "bike_rental": "Bike hire",
+      "kids_leisure": "Kids' activities",
+      "groceries": "Groceries",
+      "pharmacy": "Pharmacy",
+      "transport": "Transport"
     },
     "filters": "Filters",
     "openToday": "Open today",
@@ -124,7 +121,17 @@
     "showStay": "Show the accommodation",
     "youAreHere": "You are here",
     "locationDenied": "Location access denied: allow it in your browser settings.",
-    "locationUnavailable": "Your position can't be found right now."
+    "locationUnavailable": "Your position can't be found right now.",
+    "groups": {
+      "eat": "Food",
+      "visit": "Visit",
+      "move": "Outdoors",
+      "kids": "Kids",
+      "practical": "Practical"
+    },
+    "delivers": "Home delivery",
+    "drive": "Click & collect",
+    "bookingRequired": "Booking required"
   },
   "LanguageSwitcher": {
     "label": "Language",

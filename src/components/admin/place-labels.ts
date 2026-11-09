@@ -10,6 +10,13 @@ export const CATEGORY_LABELS: Record<Enums<"place_category">, string> = {
   heritage: "Site à visiter",
   family: "Sortie en famille",
   health: "Santé (urgences)",
+  hiking: "Randonnée",
+  horse_riding: "Équitation",
+  bike_rental: "Location de vélos",
+  kids_leisure: "Loisirs enfants",
+  groceries: "Courses",
+  pharmacy: "Pharmacie",
+  transport: "Transport (taxi, gare)",
 };
 
 export const OPENING_MODE_LABELS: Record<Enums<"opening_mode">, string> = {
