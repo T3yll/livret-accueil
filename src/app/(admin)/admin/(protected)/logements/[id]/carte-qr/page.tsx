@@ -37,6 +37,8 @@ export default async function QrCardPage({ params, searchParams }: PageProps<"/a
   const scanFr = !page ? fr("scan") : page === "places" ? fr("scanPlaces") : fr("scanSection", { section: frSections(page) });
   const scanEn = !page ? en("scan") : page === "places" ? en("scanPlaces") : en("scanSection", { section: enSections(page) });
   const displayUrl = url.replace(/^https?:\/\//, "");
+  // Au verso, l'adresse du livret entier, même quand le QR ouvre une page précise.
+  const guideAddress = guideUrl(property.slug).replace(/^https?:\/\//, "");
 
   const card =
     "relative flex h-[148mm] w-[105mm] shrink-0 flex-col items-center overflow-hidden bg-background text-center " +
@@ -134,7 +136,7 @@ export default async function QrCardPage({ params, searchParams }: PageProps<"/a
               </p>
               {/* Retour à la ligne après un « / » plutôt qu'au milieu d'un mot. */}
               <p className="text-[10pt] font-semibold [overflow-wrap:anywhere]">
-                {displayUrl.split("/").map((part, i) => (
+                {guideAddress.split("/").map((part, i) => (
                   <Fragment key={i}>
                     {i > 0 && (
                       <>
