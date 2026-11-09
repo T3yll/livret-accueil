@@ -1,4 +1,24 @@
-import { Mail, Navigation, Phone, PlayCircle } from "lucide-react";
+import {
+  Armchair,
+  Baby,
+  Bath,
+  BedDouble,
+  Check,
+  Coffee,
+  Droplet,
+  Flame,
+  Layers,
+  Leaf,
+  Luggage,
+  Mail,
+  Navigation,
+  Phone,
+  PlayCircle,
+  TrainFront,
+  Wind,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import type { Guide } from "@/lib/guide";
@@ -7,7 +27,7 @@ import { directionsLinks, formatTime, type GuideSection } from "@/lib/guide-view
 import type { PlaceWithDistance } from "@/lib/places-view";
 import { localizedWithLang } from "@/lib/localized";
 import { RichText } from "@/lib/rich-text";
-import { parseMedia, parseSectionData } from "@/lib/sections";
+import { parseMedia, parseSectionData, PROVIDED_ITEMS, type ProvidedItem } from "@/lib/sections";
 import { CopyButton } from "./copy-button";
 import { Directions } from "./directions";
 import { Photos } from "./photos";
@@ -39,6 +59,8 @@ export async function SectionContent({ section, property, locale, nearby = [] }:
       return <DepartureContent section={section} locale={locale} />;
     case "contacts":
       return <ContactsContent section={section} property={property} locale={locale} nearby={nearby} />;
+    case "prepare":
+      return <PrepareContent section={section} property={property} locale={locale} />;
     case "equipment": {
       const title = localizedWithLang(section, "title", locale);
       return (
@@ -272,6 +294,113 @@ async function ContactsContent({ section, property, locale, nearby = [] }: Props
           ))}
         </ul>
       </section>
+    </div>
+  );
+}
+
+const PROVIDED_ICONS: Record<ProvidedItem, LucideIcon> = {
+  sheets: BedDouble,
+  towels: Bath,
+  coffee: Coffee,
+  soap: Droplet,
+  hairdryer: Wind,
+  baby_cot: Baby,
+  high_chair: Armchair,
+  dishcloths: Layers,
+  firewood: Flame,
+};
+
+// « Préparer mon séjour » : de quoi faire sa valise en 30 secondes. Icônes et lignes courtes, pas de paragraphe.
+async function PrepareContent({ section, property, locale }: Props) {
+  const t = await getTranslations("Prepare");
+  const d = parseSectionData("prepare", section.data);
+  const provided = PROVIDED_ITEMS.flatMap((item) => {
+    const value = d[`provided_${item}`];
+    return value ? [{ item, value }] : [];
+  });
+  // Ce qui est fourni d'abord, puis ce qu'il faut apporter.
+  provided.sort((a, b) => Number(a.value === "no") - Number(b.value === "no"));
+  const coffeeMaker = localizedWithLang(d, "coffee_maker", locale);
+  const bring = localizedWithLang(d, "bring", locale);
+  const bringLines = bring?.text.split("\n").map((line) => line.replace(/^\s*-\s*/, "").trim()).filter(Boolean) ?? [];
+  const taxi = localizedWithLang(d, "taxi", locale);
+
+  return (
+    <div className="flex flex-col gap-8">
+      {(provided.length > 0 || d.dry_toilets) && (
+        <section aria-labelledby="provided-title" className="flex flex-col gap-3">
+          <h2 id="provided-title" className="text-2xl">
+            {t("provided")}
+          </h2>
+          <ul className="grid grid-cols-2 gap-2">
+            {provided.map(({ item, value }) => {
+              const Icon = PROVIDED_ICONS[item];
+              return (
+                <li key={item} className="flex items-start gap-2 rounded-2xl bg-surface p-3">
+                  <Icon size={20} strokeWidth={1.75} className="mt-0.5 shrink-0 text-primary" aria-hidden />
+                  <span className="flex min-w-0 flex-col">
+                    <span className="font-semibold">{t(`items.${item}`)}</span>
+                    <span className={`inline-flex items-center gap-1 text-sm ${value === "yes" ? "text-open" : "text-favorite"}`}>
+                      {value === "yes" ? <Check size={14} aria-hidden /> : <X size={14} aria-hidden />}
+                      {value === "yes" ? t("yes") : t("no")}
+                    </span>
+                    {item === "coffee" && coffeeMaker && (
+                      <span lang={coffeeMaker.lang} className="text-sm text-muted">
+                        {coffeeMaker.text}
+                      </span>
+                    )}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          {d.dry_toilets && (
+            <p className="flex items-center gap-2 text-sm">
+              <Leaf size={18} className="shrink-0 text-primary" aria-hidden />
+              {t("dryToilets")}
+            </p>
+          )}
+        </section>
+      )}
+
+      {bringLines.length > 0 && (
+        <section aria-labelledby="bring-title" className="flex flex-col gap-3">
+          <h2 id="bring-title" className="text-2xl">
+            {t("bring")}
+          </h2>
+          <ul lang={bring?.lang} className="flex flex-col gap-2">
+            {bringLines.map((line) => (
+              <li key={line} className="flex items-center gap-2">
+                <Luggage size={18} className="shrink-0 text-primary" aria-hidden />
+                {line}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <Body section={section} locale={locale} />
+      <Photos items={parseMedia(section.media)} locale={locale} />
+
+      <Directions property={property} locale={locale} />
+      {d.station && (
+        <div className={card}>
+          <p className="flex items-center gap-2 font-semibold">
+            <TrainFront size={20} className="text-primary" aria-hidden />
+            {t("byTrain")}
+          </p>
+          <p>
+            {d.station_minutes
+              ? t("stationWithTime", { station: d.station, minutes: d.station_minutes })
+              : t("station", { station: d.station })}
+          </p>
+          {taxi && (
+            <p lang={taxi.lang} className="text-sm">
+              {taxi.text}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,16 @@
-import type { KEY_HANDOVER, SectionType } from "@/lib/sections";
+import type { KEY_HANDOVER, ProvidedItem, SectionType } from "@/lib/sections";
+
+export const PROVIDED_LABELS: Record<ProvidedItem, string> = {
+  sheets: "Draps",
+  towels: "Serviettes de toilette",
+  coffee: "Café",
+  soap: "Savon, gel douche",
+  hairdryer: "Sèche-cheveux",
+  baby_cot: "Lit bébé",
+  high_chair: "Chaise haute",
+  dishcloths: "Torchons",
+  firewood: "Bois de chauffage",
+};
 
 // Libellés de l'admin (en français uniquement).
 export const SECTION_LABELS: Record<SectionType, string> = {

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { formValues, type FormState } from "@/lib/forms";
-import { parseMediaJson, sectionDataSchemas, type SectionType } from "@/lib/sections";
+import { parseMediaJson, sectionDataSchemas, type SectionType, PROVIDED_ITEMS } from "@/lib/sections";
 import type { Json } from "@/types/database";
 
 const propertyPath = (propertyId: string) => `/admin/logements/${propertyId}`;
@@ -71,10 +71,24 @@ const DATA_FIELDS: Record<SectionType, string[]> = {
   departure: ["checkout_time"],
   contacts: [],
   practical: [],
-  prepare: [],
+  prepare: [
+    ...PROVIDED_ITEMS.map((item) => `provided_${item}`),
+    "coffee_maker_fr",
+    "coffee_maker_en",
+    "dry_toilets",
+    "bring_fr",
+    "bring_en",
+    "station",
+    "station_minutes",
+    "taxi_fr",
+    "taxi_en",
+  ],
 };
 
+const CHECKBOXES = ["no_wifi", "dry_toilets"];
+
 const FIELD_ERRORS: Record<string, string> = {
+  station_minutes: "Nombre de minutes attendu (ex. 15).",
   checkin_from: "Heure invalide.",
   checkin_until: "Heure invalide.",
   checkout_time: "Heure invalide.",
@@ -96,7 +110,7 @@ export async function saveSection(
   // Construit `data` à partir des champs du type, puis le valide.
   const raw: Record<string, string | boolean> = {};
   for (const field of DATA_FIELDS[type]) {
-    if (field === "no_wifi") raw.no_wifi = values.no_wifi === "on";
+    if (CHECKBOXES.includes(field)) raw[field] = values[field] === "on";
     else if (clean(values[field])) raw[field] = clean(values[field])!;
   }
   const parsed = sectionDataSchemas[type].parse(raw) as Record<string, unknown>;

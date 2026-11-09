@@ -202,7 +202,9 @@
     "nudge": "To see what will be open during your stay.",
     "nudgeShort": "No dates yet:",
     "nudgeAction": "see what will be open",
-    "pick": "Select"
+    "pick": "Select",
+    "prepare": "Prepare your stay",
+    "arrivalIn": "{days, plural, one {Arriving tomorrow} other {Arriving in # days}}"
   },
   "Welcome": {
     "greeting": "Hello, I'm {name}.",
@@ -218,5 +220,26 @@
     "datesSubmit": "See what will be open",
     "reopen": "Listen to {name}'s message again",
     "chooseLanguage": "Choose your language"
+  },
+  "Prepare": {
+    "provided": "What's provided",
+    "yes": "Provided",
+    "no": "Bring your own",
+    "bring": "Don't forget",
+    "dryToilets": "Dry (compost) toilets in the house.",
+    "byTrain": "By train",
+    "station": "{station} station",
+    "stationWithTime": "{station} station · {minutes} min by car",
+    "items": {
+      "sheets": "Bed linen",
+      "towels": "Towels",
+      "coffee": "Coffee",
+      "soap": "Soap",
+      "hairdryer": "Hairdryer",
+      "baby_cot": "Baby cot",
+      "high_chair": "High chair",
+      "dishcloths": "Tea towels",
+      "firewood": "Firewood"
+    }
   }
 }

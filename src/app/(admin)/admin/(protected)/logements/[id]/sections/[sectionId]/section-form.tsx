@@ -1,11 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { KEY_HANDOVER_LABELS, SECTION_BODY_HINTS } from "@/components/admin/section-labels";
+import { KEY_HANDOVER_LABELS, PROVIDED_LABELS, SECTION_BODY_HINTS } from "@/components/admin/section-labels";
 import { Button } from "@/components/ui/button";
 import { Field, Select, TextArea } from "@/components/ui/field";
 import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
-import { KEY_HANDOVER, parseMedia, parseMediaJson, parseSectionData } from "@/lib/sections";
+import { KEY_HANDOVER, parseMedia, parseMediaJson, parseSectionData, PROVIDED_ITEMS } from "@/lib/sections";
 import type { Tables } from "@/types/database";
 import { saveSection } from "../actions";
 import { MediaListInput } from "./media-list-input";
@@ -102,6 +102,63 @@ export function SectionForm({ propertyId, section }: { propertyId: string; secti
             <Field label="Mot de passe" name="password" autoComplete="off" defaultValue={v("password")} />
           </div>
         </fieldset>
+      )}
+
+      {section.type === "prepare" && (
+        <>
+          <fieldset className="flex max-w-3xl flex-col gap-4">
+            <legend className="mb-2 font-heading text-2xl">Ce qui est fourni</legend>
+            <p className="text-sm text-muted">« Non précisé » : l&apos;élément n&apos;apparaît pas dans le livret.</p>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {PROVIDED_ITEMS.map((item) => (
+                <Select key={item} label={PROVIDED_LABELS[item]} name={`provided_${item}`} defaultValue={v(`provided_${item}`)}>
+                  <option value="">Non précisé</option>
+                  <option value="yes">Fourni</option>
+                  <option value="no">À apporter</option>
+                </Select>
+              ))}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Machine à café (FR)" name="coffee_maker_fr" lang="fr" defaultValue={v("coffee_maker_fr")} hint="Ex. Nespresso, cafetière à filtre" />
+              <Field label="Coffee maker (EN)" name="coffee_maker_en" lang="en" defaultValue={v("coffee_maker_en")} hint="Ex. Nespresso, filter coffee maker" />
+            </div>
+            <label className="flex min-h-11 items-center gap-3">
+              <input
+                type="checkbox"
+                name="dry_toilets"
+                defaultChecked={state.values ? state.values.dry_toilets === "on" : Boolean(stored.dry_toilets)}
+                className="size-5 accent-primary"
+              />
+              <span>Toilettes sèches</span>
+            </label>
+          </fieldset>
+
+          <fieldset className="flex max-w-3xl flex-col gap-4">
+            <legend className="mb-2 font-heading text-2xl">À ne pas oublier</legend>
+            <p className="text-sm text-muted">Une chose par ligne, 10 mots maximum. Ex. « Un pull pour les soirées fraîches ».</p>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <TextArea label="Français" name="bring_fr" lang="fr" rows={5} defaultValue={v("bring_fr")} />
+              <TextArea label="English" name="bring_en" lang="en" rows={5} defaultValue={v("bring_en")} />
+            </div>
+          </fieldset>
+
+          <fieldset className="flex max-w-3xl flex-col gap-4">
+            <legend className="mb-2 font-heading text-2xl">Venir en train</legend>
+            <p className="text-sm text-muted">L&apos;itinéraire en voiture s&apos;affiche automatiquement depuis l&apos;adresse du logement.</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Gare la plus proche" name="station" defaultValue={v("station")} hint="Ex. Gourdon" />
+              <Field
+                label="Trajet gare → logement (minutes en voiture)"
+                name="station_minutes"
+                inputMode="numeric"
+                defaultValue={v("station_minutes")}
+                error={e.station_minutes}
+              />
+              <Field label="Taxi conseillé (FR)" name="taxi_fr" lang="fr" defaultValue={v("taxi_fr")} hint="Ex. À réserver la veille : Taxi Dupont, 05 65 00 00 00" />
+              <Field label="Taxi (EN)" name="taxi_en" lang="en" defaultValue={v("taxi_en")} />
+            </div>
+          </fieldset>
+        </>
       )}
 
       {section.type === "departure" && (

@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import { DraftNotice } from "@/components/guide/guide-header";
 import { brand } from "@/config/brand";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
-import { Directions } from "@/components/guide/directions";
 import { Emblem } from "@/components/guide/emblem";
 import { FavoritesCarousel } from "@/components/guide/favorites-carousel";
 import { InstallPrompt } from "@/components/guide/install-prompt";
@@ -92,7 +91,7 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
           <p className="text-sm text-muted">{t("welcome")}</p>
           <h1 className="text-[32px] leading-tight">{property.name}</h1>
           {welcome && <RichText text={welcome.text} lang={welcome.lang} />}
-          <StayBanner slug={slug} />
+          <StayBanner slug={slug} prepareHref={sections.includes("prepare") ? `${base}/prepare` : null} />
         </header>
 
         {tiles.length > 0 && (
@@ -163,7 +162,6 @@ export default async function GuidePage({ params }: PageProps<"/[locale]/g/[slug
           </section>
         )}
 
-        <Directions property={property} locale={locale} />
 
         <InstallPrompt />
 

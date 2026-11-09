@@ -134,7 +134,12 @@ Fait au 9 novembre (plan validé par Rémi) :
 - Audio hors connexion : `audioResponse` dans `sw.js`, fichier gardé entier et servi par morceaux (Range, exigé par Safari).
   Testé serveur coupé dans Edge avec un faux fichier. **À vérifier sur iPhone et Android avec les vraies notes.**
 
-Reste, dans l'ordre : Préparer mon séjour, QR par page.
+- Accueil : choix de la langue en première étape ; dates facultatives mais rappel visible sans dates (accueil, carte, liste).
+- Préparer mon séjour : section `prepare` (fourni oui/non, machine à café, toilettes sèches, à ne pas oublier, gare et taxi),
+  saisie dans l'admin, itinéraire en voiture repris de l'adresse ; encart « Arrivée dans N jours » en tête de l'accueil
+  avant l'arrivée. Itinéraire retiré de l'accueil (toujours dans Arrivée et Préparer). Contenu d'exemple sur le gîte de démo.
+
+Reste : QR code vers une page précise (lot 7), puis validation des critères de la V2 sur de vrais téléphones.
 
 **Décision de Rémi (9 nov.) : horaires et fermetures remplis en dernier, juste avant la démo.** D'ici là, toutes les
 adresses restent « à vérifier » : le filtre séjour ne masque que les lieux ayant une fermeture saisie.

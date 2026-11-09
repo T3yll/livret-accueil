@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseRichText } from "./rich-text";
-import { isSectionEmpty, parseSectionData, type SectionLike } from "./sections";
+import { hasMissingTranslation, isSectionEmpty, parseSectionData, type SectionLike } from "./sections";
 
 const section = (overrides: Partial<SectionLike>): SectionLike => ({
   type: "house",
@@ -57,6 +57,31 @@ describe("isSectionEmpty", () => {
   it("Équipement : visible avec un nom ou une photo", () => {
     expect(isSectionEmpty(section({ type: "equipment", title_fr: "Poêle à bois" }), "fr")).toBe(false);
     expect(isSectionEmpty(section({ type: "equipment", media: [{ path: "a.webp" }] }), "fr")).toBe(false);
+  });
+});
+
+describe("Préparer mon séjour", () => {
+  const prepare = (data: Record<string, string>) => section({ type: "prepare", data });
+
+  it("vide par défaut, visible dès qu'un élément est renseigné", () => {
+    expect(isSectionEmpty(prepare({}), "fr")).toBe(true);
+    expect(isSectionEmpty(prepare({ provided_towels: "no" }), "fr")).toBe(false);
+    expect(isSectionEmpty(prepare({ station: "Gourdon" }), "fr")).toBe(false);
+  });
+
+  it("la liste « à ne pas oublier » en français sert de repli en anglais", () => {
+    expect(isSectionEmpty(prepare({ bring_fr: "Un pull" }), "en")).toBe(false);
+  });
+
+  it("ignore une valeur inconnue et un temps de trajet mal saisi", () => {
+    const d = parseSectionData("prepare", { provided_sheets: "peut-être", station_minutes: "dix" });
+    expect(d.provided_sheets).toBeUndefined();
+    expect(d.station_minutes).toBeUndefined();
+  });
+
+  it("signale une traduction manquante", () => {
+    expect(hasMissingTranslation(prepare({ bring_fr: "Un pull" }))).toBe(true);
+    expect(hasMissingTranslation(prepare({ bring_fr: "Un pull", bring_en: "A jumper" }))).toBe(false);
   });
 });
 

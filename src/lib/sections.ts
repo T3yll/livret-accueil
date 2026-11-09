@@ -33,6 +33,21 @@ const url = z.url({ protocol: /^https$/ }).optional().catch(undefined);
 
 export const KEY_HANDOVER = ["key_box", "in_person", "smart_lock", "other"] as const;
 
+// « Préparer mon séjour » : ce qui est fourni, en oui / non (non renseigné = rien n'est affiché).
+export const PROVIDED_ITEMS = [
+  "sheets",
+  "towels",
+  "coffee",
+  "soap",
+  "hairdryer",
+  "baby_cot",
+  "high_chair",
+  "dishcloths",
+  "firewood",
+] as const;
+export type ProvidedItem = (typeof PROVIDED_ITEMS)[number];
+const yesNo = z.enum(["yes", "no"]).optional().catch(undefined);
+
 export const sectionDataSchemas = {
   arrival: z.object({
     checkin_from: time,
@@ -55,7 +70,30 @@ export const sectionDataSchemas = {
   }),
   contacts: z.object({}),
   practical: z.object({}),
-  prepare: z.object({}),
+  prepare: z.object({
+    provided_sheets: yesNo,
+    provided_towels: yesNo,
+    provided_coffee: yesNo,
+    provided_soap: yesNo,
+    provided_hairdryer: yesNo,
+    provided_baby_cot: yesNo,
+    provided_high_chair: yesNo,
+    provided_dishcloths: yesNo,
+    provided_firewood: yesNo,
+    coffee_maker_fr: text,
+    coffee_maker_en: text,
+    dry_toilets: z.boolean().optional().catch(undefined),
+    bring_fr: text,
+    bring_en: text,
+    station: text,
+    station_minutes: z
+      .string()
+      .regex(/^\d{1,3}$/)
+      .optional()
+      .catch(undefined),
+    taxi_fr: text,
+    taxi_en: text,
+  }),
 } satisfies Record<SectionType, z.ZodType>;
 
 export type SectionData<T extends SectionType> = z.infer<(typeof sectionDataSchemas)[T]>;
@@ -106,6 +144,10 @@ export function hasMissingTranslation(section: SectionLike): boolean {
     const d = parseSectionData("arrival", section.data);
     return missing(d.parking_fr, d.parking_en);
   }
+  if (section.type === "prepare") {
+    const d = parseSectionData("prepare", section.data);
+    return missing(d.bring_fr, d.bring_en) || missing(d.coffee_maker_fr, d.coffee_maker_en) || missing(d.taxi_fr, d.taxi_en);
+  }
   return false;
 }
 
@@ -131,6 +173,16 @@ export function isSectionEmpty(section: SectionLike, locale: Locale): boolean {
     case "contacts":
       // Jamais vide : les numéros d'urgence s'affichent toujours.
       return false;
+    case "prepare": {
+      const d = parseSectionData("prepare", section.data);
+      return !(
+        PROVIDED_ITEMS.some((item) => d[`provided_${item}`]) ||
+        d.dry_toilets ||
+        d.station ||
+        localized(d, "bring", locale) ||
+        localized(d, "taxi", locale)
+      );
+    }
     default:
       return true;
   }
