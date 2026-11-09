@@ -1,8 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { curator } from "@/config/brand";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { routing, type Locale } from "@/i18n/routing";
 import { useStay } from "@/lib/use-stay";
 import { AudioPlayer } from "./audio-player";
 import { CuratorAvatar } from "./curator-avatar";
@@ -11,6 +14,18 @@ import { StayForm } from "./stay-sheet";
 const OPEN_EVENT = "welcome-open";
 const SEEN_EVENT = "welcome-seen";
 const seenKey = (slug: string) => `welcome-seen:${slug}`;
+// Le changement de langue recharge la page : on retient qu'il faut reprendre après le choix de langue.
+const resumeKey = (slug: string) => `welcome-resume:${slug}`;
+
+function takeResume(slug: string) {
+  try {
+    const resume = sessionStorage.getItem(resumeKey(slug)) === "1";
+    sessionStorage.removeItem(resumeKey(slug));
+    return resume;
+  } catch {
+    return false;
+  }
+}
 
 function readSeen(slug: string) {
   try {
@@ -45,12 +60,23 @@ export function WelcomeIntro({ slug, ...content }: Props) {
     () => true,
   );
   const [reopened, setReopened] = useState(false);
+  // Première ouverture : la langue d'abord. Réouverture ou retour après le choix : directement le message.
+  const [startStep, setStartStep] = useState<"language" | "hello">("language");
 
   useEffect(() => {
-    const onOpen = () => setReopened(true);
+    const resume = setTimeout(() => {
+      if (takeResume(slug)) setStartStep("hello");
+    }, 0);
+    const onOpen = () => {
+      setStartStep("hello");
+      setReopened(true);
+    };
     window.addEventListener(OPEN_EVENT, onOpen);
-    return () => window.removeEventListener(OPEN_EVENT, onOpen);
-  }, []);
+    return () => {
+      clearTimeout(resume);
+      window.removeEventListener(OPEN_EVENT, onOpen);
+    };
+  }, [slug]);
 
   if (seen && !reopened) return null;
 
@@ -64,14 +90,37 @@ export function WelcomeIntro({ slug, ...content }: Props) {
     setReopened(false);
   };
 
-  return <WelcomeDialog slug={slug} onClose={close} {...content} />;
+  return <WelcomeDialog key={startStep} slug={slug} startStep={startStep} onClose={close} {...content} />;
 }
 
-function WelcomeDialog({ slug, hosts, audio, transcript, onClose }: Omit<Props, "slug"> & { slug: string; onClose: () => void }) {
+function WelcomeDialog({
+  slug,
+  hosts,
+  audio,
+  transcript,
+  startStep,
+  onClose,
+}: Omit<Props, "slug"> & { slug: string; startStep: "language" | "hello"; onClose: () => void }) {
   const t = useTranslations("Welcome");
+  const tLanguage = useTranslations("LanguageSwitcher");
+  const locale = useLocale() as Locale;
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams();
   const dialog = useRef<HTMLDialogElement>(null);
   const { stay, save } = useStay(slug);
-  const [step, setStep] = useState<"hello" | "dates">("hello");
+  const [step, setStep] = useState<"language" | "hello" | "dates">(startStep);
+
+  const chooseLanguage = (code: Locale) => {
+    if (code === locale) return setStep("hello");
+    try {
+      sessionStorage.setItem(resumeKey(slug), "1");
+    } catch {
+      // sans stockage, l'accueil repartira du choix de langue : pas grave
+    }
+    // @ts-expect-error -- les params de la route courante sont valides pour cette route
+    router.replace({ pathname, params }, { locale: code });
+  };
 
   useEffect(() => {
     dialog.current?.showModal();
@@ -94,7 +143,27 @@ function WelcomeDialog({ slug, hosts, audio, transcript, onClose }: Omit<Props, 
       aria-labelledby="welcome-title"
       className="m-auto w-[calc(100%-2rem)] max-w-md rounded-3xl bg-background p-6 text-text backdrop:bg-text/50"
     >
-      {step === "hello" ? (
+      {step === "language" ? (
+        <div className="flex flex-col items-center gap-5 text-center">
+          <CuratorAvatar size={72} />
+          <h2 id="welcome-title" className="text-[28px] leading-tight">
+            {t("chooseLanguage")}
+          </h2>
+          <div className="flex w-full flex-col gap-2">
+            {routing.locales.map((code) => (
+              <button
+                key={code}
+                type="button"
+                lang={code}
+                onClick={() => chooseLanguage(code)}
+                className="min-h-14 rounded-xl border-2 border-border bg-surface px-4 text-lg font-semibold hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                {tLanguage(code)}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : step === "hello" ? (
         <div className="flex flex-col items-center gap-4 text-center">
           <CuratorAvatar size={88} />
           <h2 id="welcome-title" className="text-[28px] leading-tight">

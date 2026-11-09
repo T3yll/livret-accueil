@@ -269,7 +269,7 @@ export default function PlacesMap({ origin, places, selectedId, onSelect, origin
       {live.error && (
         <p
           role="status"
-          className="absolute inset-x-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+5rem)] z-[1000] rounded-xl bg-surface px-3 py-2 text-sm shadow-[0_1px_6px_rgb(0_0_0/0.25)]"
+          className="absolute inset-x-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+7.5rem)] z-[1000] rounded-xl bg-surface px-3 py-2 text-sm shadow-[0_1px_6px_rgb(0_0_0/0.25)]"
         >
           {live.error === "denied" ? labels.locationDenied : labels.locationUnavailable}
         </p>

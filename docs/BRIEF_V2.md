@@ -62,6 +62,9 @@ Idée la plus forte de l'entretien.
 
 - Juste après l'accueil (étape 1) : « Vous êtes là du … au … ? » avec un sélecteur de dates simple.
   Facultatif (« Passer »), modifiable ensuite depuis un bandeau discret (« Votre séjour : 12 → 15 déc. · modifier »).
+  **Décision du 9 novembre** : les dates restent facultatives (accès au code et au Wi-Fi jamais bloqué), mais sans
+  dates, un rappel visible s'affiche sur l'accueil, la carte et la liste. La fenêtre d'accueil commence par le choix
+  de la langue.
 - **Les dates peuvent arriver par le lien** : `…/g/<slug>?du=2026-12-12&au=2026-12-15`, pour que
   l'hébergeur les mette dans son message de pré-séjour. Dans ce cas, on ne pose pas la question.
 - Avec des dates, la carte et la liste des bonnes adresses s'ouvrent filtrées sur

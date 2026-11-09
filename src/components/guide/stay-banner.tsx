@@ -20,15 +20,22 @@ export function StayBanner({ slug }: { slug: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="-mx-2 inline-flex min-h-11 items-center gap-2 self-start rounded-lg px-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"
+        className={
+          stay
+            ? "-mx-2 inline-flex min-h-11 items-center gap-2 self-start rounded-lg px-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"
+            : "flex min-h-14 w-full items-center gap-3 rounded-2xl border border-primary/30 bg-surface px-4 py-3 text-left focus-visible:outline-2 focus-visible:outline-primary"
+        }
       >
-        <CalendarDays size={18} className="shrink-0 text-primary" aria-hidden />
+        <CalendarDays size={stay ? 18 : 22} className="shrink-0 text-primary" aria-hidden />
         {stay ? (
-          <span>
+          <span className="text-sm">
             {t("banner", { range: formatStayRange(stay, locale) })} · <span className="font-semibold text-primary underline underline-offset-2">{t("modify")}</span>
           </span>
         ) : (
-          <span className="font-semibold text-primary underline underline-offset-2">{t("ask")}</span>
+          <span className="flex flex-col">
+            <span className="font-semibold text-primary">{t("ask")}</span>
+            <span className="text-sm text-muted">{t("nudge")}</span>
+          </span>
         )}
       </button>
       {open && <StaySheet stay={stay} onSave={save} onClose={() => setOpen(false)} />}

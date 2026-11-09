@@ -219,6 +219,19 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
             </div>
           </div>
 
+          {!stay && !selected && (
+            <button
+              type="button"
+              onClick={() => setStaySheetOpen(true)}
+              className="absolute inset-x-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+4.5rem)] z-[1000] flex min-h-11 items-center gap-2 rounded-xl bg-surface/95 px-3 py-2 text-left text-sm shadow-[0_1px_6px_rgb(0_0_0/0.2)] focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <CalendarDays size={18} className="shrink-0 text-primary" aria-hidden />
+              <span>
+                {tStay("nudgeShort")} <span className="font-semibold text-primary underline underline-offset-2">{tStay("nudgeAction")}</span>
+              </span>
+            </button>
+          )}
+
           <p aria-live="polite" className="sr-only">
             {t("count", { count: filtered.length })}
           </p>
@@ -266,6 +279,19 @@ export function PlacesExplorer({ slug, places, origin, nowIso, originLabel }: Pr
         {stayChip}
         {favoritesChip}
       </div>
+
+      {!stay && (
+        <button
+          type="button"
+          onClick={() => setStaySheetOpen(true)}
+          className="flex min-h-11 items-center gap-2 rounded-xl bg-stone px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <CalendarDays size={18} className="shrink-0 text-primary" aria-hidden />
+          <span>
+            {tStay("nudgeShort")} <span className="font-semibold text-primary underline underline-offset-2">{tStay("nudgeAction")}</span>
+          </span>
+        </button>
+      )}
 
       <div className="flex items-center justify-between gap-3">
         <p aria-live="polite" className="text-sm text-muted">

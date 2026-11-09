@@ -198,7 +198,10 @@
       "stay": "Ouvert pendant mon séjour",
       "today": "Ouvert aujourd'hui",
       "all": "Toutes les adresses"
-    }
+    },
+    "nudge": "Pour voir ce qui sera ouvert pendant votre séjour.",
+    "nudgeShort": "Pas encore de dates :",
+    "nudgeAction": "voir ce qui sera ouvert"
   },
   "Welcome": {
     "greeting": "Bonjour, je suis {name}.",
@@ -212,6 +215,7 @@
     "skip": "Passer",
     "datesQuestion": "Vous êtes là du… au… ?",
     "datesSubmit": "Voir ce qui sera ouvert",
-    "reopen": "Réécouter le message de {name}"
+    "reopen": "Réécouter le message de {name}",
+    "chooseLanguage": "Choisissez votre langue"
   }
 }
