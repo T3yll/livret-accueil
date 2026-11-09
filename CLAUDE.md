@@ -64,6 +64,9 @@ que FR/EN. La structure doit cependant prévoir l'activation de modules par loge
 - `docs/CAHIER_DES_CHARGES.md` : fonctionnalités, modèle de données, critères de validation, planning
 - `docs/DIRECTION_ARTISTIQUE.md` : palette, typographie, composants, écrans (version corrigée)
 - `docs/CONTEXTE.md` : contexte métier, terrain, concurrence, décisions déjà prises
+- `docs/BRIEF_V2.md` : **périmètre en cours** (V2, démo début décembre 2026)
+- `docs/IDEES_ET_VISION.md` : idées en réserve et vision long terme — **ne pas développer sans décision**
+- `docs/AVANCEMENT.md` : état du projet, à tenir à jour
 
 ## Façon de travailler avec moi
 

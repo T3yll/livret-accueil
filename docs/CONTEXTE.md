@@ -61,6 +61,14 @@ de visible.
 - **Modèle** : module payant « Conseiller personnalisé », activable par logement.
 - **Avant de développer** : demander aux 3 hébergeurs de la démo si ça les intéresse.
 
+### Retours du 2e entretien avec Christelle (9 novembre 2026)
+
+Synthèse et décisions dans `docs/BRIEF_V2.md` (ce qu'on développe) et `docs/IDEES_ET_VISION.md`
+(ce qu'on garde pour plus tard). En bref : la V1 est belle et claire mais encore « sans vie » ;
+priorité à la personnification (Rémi, notes vocales), aux dates de séjour (ne montrer que ce qui
+sera ouvert) et à la préparation du séjour (les voyageurs ne lisent pas). Christelle et Anne-Laure
+veulent voir la V2 la première quinzaine de décembre 2026.
+
 ## Concurrence observée
 
 - notre.guide (outil utilisé par le domaine visité) : menu latéral de 12 rubriques, liens vers
