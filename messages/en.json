@@ -152,7 +152,9 @@
     "scan": "Scan to open your welcome guide",
     "noApp": "No app to install",
     "guideAddress": "Your guide online",
-    "contact": "Your host"
+    "contact": "Your host",
+    "scanPlaces": "Scan to see good places nearby",
+    "scanSection": "Scan to open: {section}"
   },
   "Favorites": {
     "title": "{name}'s favourites",

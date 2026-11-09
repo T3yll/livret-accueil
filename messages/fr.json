@@ -152,7 +152,9 @@
     "scan": "Scannez pour découvrir votre livret",
     "noApp": "Sans application à installer",
     "guideAddress": "Votre livret en ligne",
-    "contact": "Votre hôte"
+    "contact": "Votre hôte",
+    "scanPlaces": "Scannez pour voir les bonnes adresses autour de vous",
+    "scanSection": "Scannez pour ouvrir : {section}"
   },
   "Favorites": {
     "title": "Les coups de cœur de {name}",

@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth";
+import { QrPageSelect } from "@/components/admin/qr-page-select";
 import { guideUrl, isLocalUrl, qrSvg } from "@/lib/qr";
+import { parseQrPage } from "@/lib/qr-pages";
 import { deleteProperty, regenerateSlug, setModule, setPublished } from "../actions";
 import { PropertyForm } from "../property-form";
 import { missingForPublication } from "../publication";
@@ -18,7 +20,9 @@ const errors: Record<string, string> = {
 
 export default async function PropertyPage({ params, searchParams }: PageProps<"/admin/logements/[id]">) {
   const { id } = await params;
-  const { error } = await searchParams;
+  const { error, qr: qrParam } = await searchParams;
+  const qrPage = parseQrPage(qrParam);
+  const qrQuery = qrPage ? `&page=${qrPage}` : "";
   const { supabase } = await requireAdmin();
 
   const [{ data: property }, { data: hosts }, { data: modules }, { data: sections }, { data: selectedPlaces }] =
@@ -42,7 +46,7 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
     archived: selectedPlaces?.filter((p) => p.places?.archived_at).length ?? 0,
   };
   const errorMessage = typeof error === "string" ? errors[error] : undefined;
-  const qrUrl = guideUrl(property.slug);
+  const qrUrl = guideUrl(property.slug, qrPage);
   const qr = await qrSvg(qrUrl);
 
   return (
@@ -107,6 +111,9 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
             dangerouslySetInnerHTML={{ __html: qr }}
           />
           <div className="flex min-w-0 flex-1 flex-col gap-3">
+            <div className="max-w-sm">
+              <QrPageSelect value={qrPage} />
+            </div>
             <p className="text-sm break-all">
               Ouvre : <code className="rounded bg-stone px-1.5 py-0.5">{qrUrl}</code>
             </p>
@@ -118,16 +125,18 @@ export default async function PropertyPage({ params, searchParams }: PageProps<"
             )}
             {!published && <p className="text-sm text-info">Livret en brouillon : le QR code n&apos;ouvrira rien tant qu&apos;il n&apos;est pas publié.</p>}
             <div className="flex flex-wrap gap-3">
-              <ButtonLink href={`/admin/logements/${property.id}/carte-qr`}>Carte A6 à imprimer</ButtonLink>
+              <ButtonLink href={`/admin/logements/${property.id}/carte-qr${qrPage ? `?page=${qrPage}` : ""}`}>
+                Carte A6 à imprimer
+              </ButtonLink>
               <a
-                href={`/admin/logements/${property.id}/qr?format=png`}
+                href={`/admin/logements/${property.id}/qr?format=png${qrQuery}`}
                 download
                 className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-[15px] font-semibold hover:bg-stone"
               >
                 Télécharger en PNG
               </a>
               <a
-                href={`/admin/logements/${property.id}/qr?format=svg`}
+                href={`/admin/logements/${property.id}/qr?format=svg${qrQuery}`}
                 download
                 className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-[15px] font-semibold hover:bg-stone"
               >

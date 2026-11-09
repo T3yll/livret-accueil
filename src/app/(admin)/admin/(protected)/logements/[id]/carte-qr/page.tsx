@@ -8,13 +8,15 @@ import { Emblem } from "@/components/guide/emblem";
 import { brand } from "@/config/brand";
 import { requireAdmin } from "@/lib/auth";
 import { guideUrl, isLocalUrl, qrSvg } from "@/lib/qr";
+import { parseQrPage } from "@/lib/qr-pages";
 
 export const metadata = { title: "Carte QR à imprimer" };
 
 // Carte A6 (105 × 148 mm) d'après la DA : recto pour scanner, verso pour le logement.
 // À l'impression, chaque face occupe une page A6 et l'en-tête de l'admin disparaît.
-export default async function QrCardPage({ params }: PageProps<"/admin/logements/[id]/carte-qr">) {
+export default async function QrCardPage({ params, searchParams }: PageProps<"/admin/logements/[id]/carte-qr">) {
   const { id } = await params;
+  const page = parseQrPage((await searchParams).page);
   const { supabase } = await requireAdmin();
   const { data: property } = await supabase
     .from("properties")
@@ -23,12 +25,17 @@ export default async function QrCardPage({ params }: PageProps<"/admin/logements
     .maybeSingle();
   if (!property) notFound();
 
-  const url = guideUrl(property.slug);
-  const [svg, fr, en] = await Promise.all([
+  const url = guideUrl(property.slug, page);
+  const [svg, fr, en, frSections, enSections] = await Promise.all([
     qrSvg(url),
     getTranslations({ locale: "fr", namespace: "QrCard" }),
     getTranslations({ locale: "en", namespace: "QrCard" }),
+    getTranslations({ locale: "fr", namespace: "Sections" }),
+    getTranslations({ locale: "en", namespace: "Sections" }),
   ]);
+  // La phrase sous le QR dit ce qu'il ouvre : le livret, la carte ou une section.
+  const scanFr = !page ? fr("scan") : page === "places" ? fr("scanPlaces") : fr("scanSection", { section: frSections(page) });
+  const scanEn = !page ? en("scan") : page === "places" ? en("scanPlaces") : en("scanSection", { section: enSections(page) });
   const displayUrl = url.replace(/^https?:\/\//, "");
 
   const card =
@@ -95,9 +102,9 @@ export default async function QrCardPage({ params }: PageProps<"/admin/logements
           />
 
           <div className="flex flex-col items-center gap-[1mm]">
-            <p className="text-[10pt] font-semibold">{fr("scan")}</p>
+            <p className="text-[10pt] font-semibold">{scanFr}</p>
             <p lang="en" className="text-[8.5pt] text-muted">
-              {en("scan")}
+              {scanEn}
             </p>
           </div>
 

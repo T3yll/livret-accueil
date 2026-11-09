@@ -1,12 +1,14 @@
 import "server-only";
 import QRCode, { type QRCodeToStringOptions } from "qrcode";
 import { brandColors } from "@/config/brand";
+import type { QrPage } from "@/lib/qr-pages";
 
 // Adresse encodée dans le QR code : sans langue, pour que le livret s'ouvre dans celle du téléphone.
-export function guideUrl(slug: string): string {
+// Avec une page (carte, Wi-Fi…), le QR ouvre directement cette page du livret.
+export function guideUrl(slug: string, page: QrPage | null = null): string {
   // Une variable présente mais vide (oubli dans Vercel) compte comme absente.
   const site = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
-  return `${site}/g/${slug}`;
+  return `${site}/g/${slug}${page ? `/${page}` : ""}`;
 }
 
 // Un QR code vers localhost ne fonctionne sur aucun téléphone : à signaler dans l'admin.

@@ -139,7 +139,11 @@ Fait au 9 novembre (plan validé par Rémi) :
   saisie dans l'admin, itinéraire en voiture repris de l'adresse ; encart « Arrivée dans N jours » en tête de l'accueil
   avant l'arrivée. Itinéraire retiré de l'accueil (toujours dans Arrivée et Préparer). Contenu d'exemple sur le gîte de démo.
 
-Reste : QR code vers une page précise (lot 7), puis validation des critères de la V2 sur de vrais téléphones.
+- QR code vers une page : choix « Page ouverte par le QR » sur la fiche du logement (accueil, carte, ou une section) ;
+  aperçu, PNG, SVG et carte A6 suivent ; la phrase du recto s'adapte. L'adresse reste sans langue (`/g/<slug>/places`).
+
+**Tous les points P1 sont développés.** Reste : validation des critères de la V2 sur de vrais téléphones, horaires et
+fermetures des adresses (décidé : en dernier), domaine définitif avant d'imprimer les cartes.
 
 **Décision de Rémi (9 nov.) : horaires et fermetures remplis en dernier, juste avant la démo.** D'ici là, toutes les
 adresses restent « à vérifier » : le filtre séjour ne masque que les lieux ayant une fermeture saisie.
