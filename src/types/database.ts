@@ -89,6 +89,7 @@ export type Database = {
         Row: {
           contact_name: string | null
           created_at: string
+          display_names: string | null
           email: string | null
           id: string
           name: string
@@ -99,6 +100,7 @@ export type Database = {
         Insert: {
           contact_name?: string | null
           created_at?: string
+          display_names?: string | null
           email?: string | null
           id?: string
           name: string
@@ -109,6 +111,7 @@ export type Database = {
         Update: {
           contact_name?: string | null
           created_at?: string
+          display_names?: string | null
           email?: string | null
           id?: string
           name?: string
@@ -221,12 +224,15 @@ export type Database = {
         Row: {
           address: string | null
           archived_at: string | null
+          booking_required: boolean
           booking_url: string | null
           category: Database["public"]["Enums"]["place_category"]
           city: string | null
           created_at: string
+          delivers: boolean
           description_en: string | null
           description_fr: string | null
+          has_drive: boolean
           hours_verified_at: string | null
           id: string
           lat: number
@@ -239,18 +245,23 @@ export type Database = {
           photo_credit: string | null
           photo_path: string | null
           postal_code: string | null
+          practical_note_en: string | null
+          practical_note_fr: string | null
           updated_at: string
           website: string | null
         }
         Insert: {
           address?: string | null
           archived_at?: string | null
+          booking_required?: boolean
           booking_url?: string | null
           category: Database["public"]["Enums"]["place_category"]
           city?: string | null
           created_at?: string
+          delivers?: boolean
           description_en?: string | null
           description_fr?: string | null
+          has_drive?: boolean
           hours_verified_at?: string | null
           id?: string
           lat: number
@@ -263,18 +274,23 @@ export type Database = {
           photo_credit?: string | null
           photo_path?: string | null
           postal_code?: string | null
+          practical_note_en?: string | null
+          practical_note_fr?: string | null
           updated_at?: string
           website?: string | null
         }
         Update: {
           address?: string | null
           archived_at?: string | null
+          booking_required?: boolean
           booking_url?: string | null
           category?: Database["public"]["Enums"]["place_category"]
           city?: string | null
           created_at?: string
+          delivers?: boolean
           description_en?: string | null
           description_fr?: string | null
+          has_drive?: boolean
           hours_verified_at?: string | null
           id?: string
           lat?: number
@@ -287,6 +303,8 @@ export type Database = {
           photo_credit?: string | null
           photo_path?: string | null
           postal_code?: string | null
+          practical_note_en?: string | null
+          practical_note_fr?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -312,8 +330,12 @@ export type Database = {
           slug: string
           status: Database["public"]["Enums"]["property_status"]
           updated_at: string
+          welcome_audio_path_en: string | null
+          welcome_audio_path_fr: string | null
           welcome_en: string | null
           welcome_fr: string | null
+          welcome_transcript_en: string | null
+          welcome_transcript_fr: string | null
         }
         Insert: {
           address?: string | null
@@ -334,8 +356,12 @@ export type Database = {
           slug: string
           status?: Database["public"]["Enums"]["property_status"]
           updated_at?: string
+          welcome_audio_path_en?: string | null
+          welcome_audio_path_fr?: string | null
           welcome_en?: string | null
           welcome_fr?: string | null
+          welcome_transcript_en?: string | null
+          welcome_transcript_fr?: string | null
         }
         Update: {
           address?: string | null
@@ -356,8 +382,12 @@ export type Database = {
           slug?: string
           status?: Database["public"]["Enums"]["property_status"]
           updated_at?: string
+          welcome_audio_path_en?: string | null
+          welcome_audio_path_fr?: string | null
           welcome_en?: string | null
           welcome_fr?: string | null
+          welcome_transcript_en?: string | null
+          welcome_transcript_fr?: string | null
         }
         Relationships: [
           {
@@ -554,6 +584,13 @@ export type Database = {
         | "heritage"
         | "family"
         | "health"
+        | "hiking"
+        | "horse_riding"
+        | "bike_rental"
+        | "kids_leisure"
+        | "groceries"
+        | "pharmacy"
+        | "transport"
       property_status: "draft" | "published"
       section_type:
         | "arrival"
@@ -563,6 +600,7 @@ export type Database = {
         | "departure"
         | "contacts"
         | "practical"
+        | "prepare"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -700,6 +738,13 @@ export const Constants = {
         "heritage",
         "family",
         "health",
+        "hiking",
+        "horse_riding",
+        "bike_rental",
+        "kids_leisure",
+        "groceries",
+        "pharmacy",
+        "transport",
       ],
       property_status: ["draft", "published"],
       section_type: [
@@ -710,6 +755,7 @@ export const Constants = {
         "departure",
         "contacts",
         "practical",
+        "prepare",
       ],
     },
   },

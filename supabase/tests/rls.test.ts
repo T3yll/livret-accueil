@@ -93,6 +93,25 @@ describe("visiteur anonyme", () => {
   });
 });
 
+describe("données de l'hébergeur dans le livret", () => {
+  it("n'expose que les prénoms à afficher, jamais le reste de la fiche", async () => {
+    await db.exec(`
+      update public.hosts set display_names = 'Pascal et Brigitte', phone = '0600000000', email = 'prive@test.fr',
+        notes = 'note privée', contact_name = 'Nom privé'
+      where id = '00000000-0000-4000-8000-000000000001';
+      update public.properties set status = 'published' where slug = '${DEMO_SLUG}';
+    `);
+    try {
+      const guide = await guideFor("anon", null);
+      const json = JSON.stringify(guide);
+      expect(json).toContain("Pascal et Brigitte");
+      for (const secret of ["0600000000", "prive@test.fr", "note privée", "Nom privé"]) expect(json).not.toContain(secret);
+    } finally {
+      await db.exec(`update public.properties set status = 'draft' where slug = '${DEMO_SLUG}'`);
+    }
+  });
+});
+
 describe("utilisateur connecté non admin", () => {
   it("ne voit aucune ligne", async () => {
     expect(await as("authenticated", STRANGER, "select id from public.properties")).toHaveLength(0);
@@ -141,7 +160,7 @@ describe("sections par défaut", () => {
       )
     ).rows.map((r) => r.type);
 
-  const expected = ["arrival", "wifi", "house", "departure", "contacts", "practical"];
+  const expected = ["arrival", "wifi", "house", "departure", "contacts", "practical", "prepare"];
 
   it("sont créées pour un nouveau logement", async () => {
     await db.exec(`insert into public.properties (host_id, name, slug)
