@@ -193,6 +193,11 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
   Encart de l'accueil : les dates d'un même rendez-vous sont regroupées (« lun. 28 déc. → jeu. 31 déc. »).
   **À reconfirmer avant la démo** (programmes de Lalbenque et Gourdon pas encore publiés). Rien trouvé de daté au
   printemps ni pour Castelnaud et Marqueyssac à Noël 2026 (pages encore sur 2025-2026).
+- Marchés aux truffes de la vallée de la Dordogne ajoutés le 16 nov. (`supabase/data/2026-11-marches-truffes.sql`) :
+  Cuzance (12 déc., programme de la journée), Martel (19 déc., 16 janv., 13 févr.), Gramat (31 déc.), Souillac (30 janv.,
+  emplacement place Saint-Martin à confirmer). Fermetures avant/après les dates. Saint-Céré écarté (trop loin).
+  Printemps 2027 : rien de publié pour l'instant (fête des fromages de Rocamadour probablement le 16 mai, à la
+  Pentecôte, mais non annoncée : non saisie). À rechercher de nouveau en février-mars.
 - **Randonnées mises de côté par Rémi (16 nov.)** : départs à confirmer et coups de cœur à choisir plus tard.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
