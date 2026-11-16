@@ -1,10 +1,11 @@
 "use client";
 
+import { CloudOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { curator } from "@/config/brand";
 import { useStay } from "@/lib/use-stay";
-import { WelcomeVideo } from "./welcome-video";
+import { useOnline, WelcomeVideo } from "./welcome-video";
 import { CuratorAvatar } from "./curator-avatar";
 import { StayForm } from "./stay-sheet";
 
@@ -77,6 +78,8 @@ function WelcomeDialog({
   const dialog = useRef<HTMLDialogElement>(null);
   const { stay, save } = useStay(slug);
   const [step, setStep] = useState<"hello" | "dates">("hello");
+  const online = useOnline();
+  const showVideo = video !== null && online;
 
   useEffect(() => {
     dialog.current?.showModal();
@@ -97,16 +100,48 @@ function WelcomeDialog({
       ref={dialog}
       onClose={onClose}
       aria-labelledby="welcome-title"
-      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-3xl bg-background p-6 text-text backdrop:bg-text/50"
+      className={`m-auto w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-3xl bg-background text-text shadow-2xl backdrop:bg-text/60 backdrop:backdrop-blur-sm ${
+        step === "hello" && showVideo ? "p-0" : "p-6"
+      }`}
     >
       {step === "hello" ? (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <CuratorAvatar size={64} />
-          <h2 id="welcome-title" className="text-[28px] leading-tight">
-            {t("greeting", { name: curator.name })}
-          </h2>
-          {video && <WelcomeVideo src={video.src} lang={video.lang} label={t("watch", { name: curator.name })} transcript={transcript} />}
-          <div className="flex w-full flex-col gap-1">
+        <div className="flex flex-col items-center text-center">
+          {showVideo ? (
+            <WelcomeVideo
+              src={video.src}
+              lang={video.lang}
+              label={t("watch", { name: curator.name })}
+              title={
+                <h2 id="welcome-title" className="text-[26px] leading-tight text-white drop-shadow">
+                  {t("greeting", { name: curator.name })}
+                </h2>
+              }
+            />
+          ) : (
+            <>
+              <CuratorAvatar size={64} />
+              <h2 id="welcome-title" className="mt-4 text-[28px] leading-tight">
+                {t("greeting", { name: curator.name })}
+              </h2>
+            </>
+          )}
+          <div className={`flex w-full flex-col gap-1 ${showVideo ? "px-5 pt-3 pb-4" : "pt-4"}`}>
+            {video && !online && (
+              <p className="flex items-center justify-center gap-2 pb-1 text-sm text-muted">
+                <CloudOff size={16} aria-hidden />
+                {t("videoOffline")}
+              </p>
+            )}
+            {transcript && (
+              <details open={!online} className="pb-2 text-sm">
+                <summary className="mx-auto flex min-h-11 w-fit cursor-pointer items-center rounded-lg px-3 font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-primary">
+                  {t("transcript")}
+                </summary>
+                <p lang={video?.lang} className="max-h-40 overflow-y-auto rounded-xl bg-stone p-3 text-left text-[15px] whitespace-pre-line">
+                  {transcript}
+                </p>
+              </details>
+            )}
             {/* Dates déjà connues (lien de l'hébergeur) : on ne repose pas la question. */}
             <button
               type="button"

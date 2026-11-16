@@ -207,6 +207,9 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
   vertical dans la fenêtre d'accueil (`welcome-video.tsx`), rien de téléchargé avant lecture ; **pas de vidéo hors
   connexion** : sans réseau, le texte s'affiche. Testé avec un chemin factice (affichage seulement) : **lecture réelle à
   vérifier avec la vraie vidéo sur iPhone et Android**. Les anciennes notes vocales d'accueil restent dans le stockage.
+  **Nouveau design (16 nov.)** : la vidéo occupe le haut de la fenêtre, bord à bord ; portrait et « Bonjour, je suis
+  Rémi » posés sur l'image tant qu'elle ne joue pas ; grand bouton lecture, appui sur la vidéo pour la pause, fine barre
+  d'avancement, pas de commandes natives. Hors connexion : retour au portrait et texte déplié.
 - **Randonnées mises de côté par Rémi (16 nov.)** : départs à confirmer et coups de cœur à choisir plus tard.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
