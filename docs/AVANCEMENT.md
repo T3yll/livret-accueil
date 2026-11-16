@@ -201,6 +201,12 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
 - Langue (16 nov., décision de Rémi) : plus de choix de langue dans la fenêtre d'accueil ; le livret s'ouvre dans la
   langue du téléphone (en-tête Accept-Language, déjà lu par le proxy). Téléphone ni FR ni EN : anglais
   (`src/i18n/accept-language.ts`). Le bouton FR/EN reste en haut ; son choix (cookie) passe avant l'en-tête.
+- **Vidéo d'accueil à la place de la note vocale** (16 nov., décision de Rémi) : migration `20261201000400`
+  (`welcome_video_path_fr/en`, colonnes audio supprimées, MOV accepté, 50 Mo par fichier). Admin : « Vidéo d'accueil »
+  sur la fiche du logement (`VideoInput`, réglages iPhone 720p / « Le plus compatible » rappelés). Livret : lecteur
+  vertical dans la fenêtre d'accueil (`welcome-video.tsx`), rien de téléchargé avant lecture ; **pas de vidéo hors
+  connexion** : sans réseau, le texte s'affiche. Testé avec un chemin factice (affichage seulement) : **lecture réelle à
+  vérifier avec la vraie vidéo sur iPhone et Android**. Les anciennes notes vocales d'accueil restent dans le stockage.
 - **Randonnées mises de côté par Rémi (16 nov.)** : départs à confirmer et coups de cœur à choisir plus tard.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la

@@ -22,8 +22,8 @@ export type Guide = {
     contact_phone: string | null;
     contact_email: string | null;
     host_display_names: string | null;
-    welcome_audio_path_fr: string | null;
-    welcome_audio_path_en: string | null;
+    welcome_video_path_fr: string | null;
+    welcome_video_path_en: string | null;
     welcome_transcript_fr: string | null;
     welcome_transcript_en: string | null;
     status: Enums<"property_status">;

@@ -226,7 +226,6 @@
     "greeting": "Hello, I'm {name}.",
     "intro": "{hosts}, the owners of this place, have shared their favourite little spots with me for you.",
     "introNoHosts": "The owners of this place have shared their favourite little spots with me for you.",
-    "listen": "Listen to {name}'s message",
     "pause": "Pause",
     "transcript": "Read the text",
     "continue": "Continue",
@@ -234,7 +233,9 @@
     "skip": "Skip",
     "datesQuestion": "When are you here?",
     "datesSubmit": "See what will be open",
-    "reopen": "Listen to {name}'s message again"
+    "reopen": "Watch {name}'s video again",
+    "watch": "{name}'s welcome video",
+    "videoOffline": "No signal for the video. Here is what I say:"
   },
   "Prepare": {
     "provided": "What's provided",

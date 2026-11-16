@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { curator } from "@/config/brand";
 import { useStay } from "@/lib/use-stay";
-import { AudioPlayer } from "./audio-player";
+import { WelcomeVideo } from "./welcome-video";
 import { CuratorAvatar } from "./curator-avatar";
 import { StayForm } from "./stay-sheet";
 
@@ -32,7 +32,7 @@ export function openWelcome() {
 type Props = {
   slug: string;
   hosts: string | null;
-  audio: { src: string; lang: string } | null;
+  video: { src: string; lang: string } | null;
   transcript: string | null;
 };
 
@@ -71,7 +71,7 @@ export function WelcomeIntro({ slug, ...content }: Props) {
 function WelcomeDialog({
   slug,
   hosts,
-  audio,
+  video,
   transcript,
   onClose,
 }: Omit<Props, "slug"> & { slug: string; onClose: () => void }) {
@@ -108,7 +108,7 @@ function WelcomeDialog({
             {t("greeting", { name: curator.name })}
           </h2>
           <p>{hosts ? t("intro", { hosts }) : t("introNoHosts")}</p>
-          {audio && <AudioPlayer src={audio.src} lang={audio.lang} title={t("listen", { name: curator.name })} transcript={transcript} />}
+          {video && <WelcomeVideo src={video.src} lang={video.lang} label={t("watch", { name: curator.name })} transcript={transcript} />}
           <div className="flex w-full flex-col gap-1">
             {/* Dates déjà connues (lien de l'hébergeur) : on ne repose pas la question. */}
             <button

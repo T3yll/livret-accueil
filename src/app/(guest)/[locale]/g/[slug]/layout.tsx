@@ -39,17 +39,16 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
       ]
     : [];
 
-  // Repli sur le français si la note anglaise manque, comme pour les textes.
-  const audio = guide ? localizedWithLang(guide.property, "welcome_audio_path", locale) : null;
-  const audioUrl = audio ? mediaUrl(audio.text) : null;
-  // Plus les notes des équipements, à écouter devant l'appareil, parfois sans réseau.
+  // Vidéo d'accueil : repli sur le français si l'anglaise manque, comme pour les textes.
+  // Elle n'est pas enregistrée hors connexion (trop lourde) ; les notes des équipements, si.
+  const video = guide ? localizedWithLang(guide.property, "welcome_video_path", locale) : null;
   const equipmentAudio = guide
     ? visibleSectionsOfType(guide, "equipment", locale).flatMap((s) => {
         const a = localizedWithLang(s, "audio_path", locale);
         return a ? [mediaUrl(a.text)] : [];
       })
     : [];
-  const audioUrls = [...(audioUrl ? [audioUrl] : []), ...equipmentAudio];
+  const audioUrls = equipmentAudio;
 
   return (
     <>
@@ -60,8 +59,9 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
         <WelcomeIntro
           slug={slug}
           hosts={guide.property.host_display_names}
-          audio={audio && audioUrl ? { src: audioUrl, lang: audio.lang } : null}
-          transcript={localized(guide.property, "welcome_transcript", locale)}
+          video={video ? { src: mediaUrl(video.text), lang: video.lang } : null}
+          // Le texte dans la langue de la vidéo (une vidéo française en repli garde son texte français).
+          transcript={video ? localized(guide.property, "welcome_transcript", video.lang as Locale) : null}
         />
       )}
     </>

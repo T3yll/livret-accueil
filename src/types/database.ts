@@ -457,12 +457,12 @@ export type Database = {
           slug: string
           status: Database["public"]["Enums"]["property_status"]
           updated_at: string
-          welcome_audio_path_en: string | null
-          welcome_audio_path_fr: string | null
           welcome_en: string | null
           welcome_fr: string | null
           welcome_transcript_en: string | null
           welcome_transcript_fr: string | null
+          welcome_video_path_en: string | null
+          welcome_video_path_fr: string | null
         }
         Insert: {
           address?: string | null
@@ -483,12 +483,12 @@ export type Database = {
           slug: string
           status?: Database["public"]["Enums"]["property_status"]
           updated_at?: string
-          welcome_audio_path_en?: string | null
-          welcome_audio_path_fr?: string | null
           welcome_en?: string | null
           welcome_fr?: string | null
           welcome_transcript_en?: string | null
           welcome_transcript_fr?: string | null
+          welcome_video_path_en?: string | null
+          welcome_video_path_fr?: string | null
         }
         Update: {
           address?: string | null
@@ -509,12 +509,12 @@ export type Database = {
           slug?: string
           status?: Database["public"]["Enums"]["property_status"]
           updated_at?: string
-          welcome_audio_path_en?: string | null
-          welcome_audio_path_fr?: string | null
           welcome_en?: string | null
           welcome_fr?: string | null
           welcome_transcript_en?: string | null
           welcome_transcript_fr?: string | null
+          welcome_video_path_en?: string | null
+          welcome_video_path_fr?: string | null
         }
         Relationships: [
           {

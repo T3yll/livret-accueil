@@ -6,7 +6,7 @@ import { Field, Select, TextArea } from "@/components/ui/field";
 import { formKey, initialFormState, initialValue, type FormState } from "@/lib/forms";
 import type { Tables } from "@/types/database";
 import { saveProperty } from "./actions";
-import { AudioInput } from "@/components/admin/audio-input";
+import { VideoInput } from "@/components/admin/video-input";
 import { CoverPhotoInput } from "./cover-photo-input";
 
 type Props = {
@@ -95,36 +95,44 @@ export function PropertyForm({ property, hosts, defaultHostId }: Props) {
 
       {property && (
         <fieldset className="flex flex-col gap-4">
-          <legend className="mb-2 font-heading text-2xl">Note vocale d&apos;accueil</legend>
-          <p className="max-w-2xl text-sm text-muted">
-            Écoutée par le voyageur à la première ouverture du livret. 30 à 60 secondes, au format M4A (mémo vocal) ou MP3.
-          </p>
+          <legend className="mb-2 font-heading text-2xl">Vidéo d&apos;accueil</legend>
+          <div className="flex max-w-2xl flex-col gap-1 text-sm text-muted">
+            <p>
+              Regardée par le voyageur à la première ouverture du livret. 30 à 60 secondes, filmée en vertical, face caméra.
+            </p>
+            <p>
+              Avant de filmer sur iPhone : Réglages → Appareil photo → Enregistrer une vidéo →{" "}
+              <strong className="text-text">720p HD à 30 i/s</strong>, et Formats →{" "}
+              <strong className="text-text">Le plus compatible</strong> (sinon certains Android ne la liront pas). 50 Mo
+              au maximum. Pas de vidéo hors connexion : sans réseau, le voyageur voit le texte.
+            </p>
+          </div>
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="flex flex-col gap-4">
-              <AudioInput
-                name="welcome_audio_path_fr"
-                label="Note vocale en français"
-                initialPath={initialValue(state, "welcome_audio_path_fr", property.welcome_audio_path_fr)}
-                pathPrefix={`properties/${property.id}/welcome-fr`}
+              <VideoInput
+                name="welcome_video_path_fr"
+                label="Vidéo en français"
+                initialPath={initialValue(state, "welcome_video_path_fr", property.welcome_video_path_fr)}
+                pathPrefix={`properties/${property.id}/welcome-video-fr`}
               />
               <TextArea
-                label="Transcription en français"
+                label="Texte de la vidéo en français"
                 name="welcome_transcript_fr"
                 lang="fr"
                 rows={5}
                 defaultValue={initialValue(state, "welcome_transcript_fr", property.welcome_transcript_fr)}
-                hint="Le texte exact de la note, pour ceux qui ne peuvent pas écouter."
+                hint="Ce que vous dites dans la vidéo, pour ceux qui ne peuvent pas mettre le son ou n'ont pas de réseau."
               />
             </div>
             <div className="flex flex-col gap-4">
-              <AudioInput
-                name="welcome_audio_path_en"
-                label="Note vocale en anglais"
-                initialPath={initialValue(state, "welcome_audio_path_en", property.welcome_audio_path_en)}
-                pathPrefix={`properties/${property.id}/welcome-en`}
+              <VideoInput
+                name="welcome_video_path_en"
+                label="Vidéo en anglais (facultative)"
+                initialPath={initialValue(state, "welcome_video_path_en", property.welcome_video_path_en)}
+                pathPrefix={`properties/${property.id}/welcome-video-en`}
               />
               <TextArea
-                label="Transcription en anglais"
+                label="Texte de la vidéo en anglais"
                 name="welcome_transcript_en"
                 lang="en"
                 rows={5}
