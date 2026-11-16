@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Guide } from "./guide";
-import { experiencesDuring, formatDate, formatEventDate, formatEventTime, formatHikeDistance, formatHikeDuration, formatStayDays, formatStayRange, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, shownWithoutGroup, weekdayName } from "./places-view";
+import { experiencesDuring, formatDate, formatEventDate, formatEventDates, formatEventTime, formatHikeDistance, formatHikeDuration, formatStayDays, formatStayRange, guidePlaces, healthPlaces, isInGroup, PLACE_GROUPS, shownWithoutGroup, weekdayName } from "./places-view";
 
 const place = (overrides: Partial<Guide["places"][number]>): Guide["places"][number] => ({
   id: "x",
@@ -137,12 +137,25 @@ describe("experiencesDuring", () => {
     );
     expect(experiencesDuring([notExp, closed], stay).map((x) => x.event.starts_on)).toEqual(["2026-12-14"]);
   });
+
+  it("regroupe les dates d'un même rendez-vous sur une ligne", () => {
+    const village = withKm(place({ id: "v", is_experience: true, events: [ev("2026-12-12"), ev("2026-12-13"), ev("2026-12-14")] }));
+    const market = withKm(place({ id: "m", is_experience: true, events: [ev("2026-12-15", "13:30:00")] }));
+    const result = experiencesDuring([market, village], stay);
+    expect(result.map((x) => [x.place.id, x.dates])).toEqual([
+      ["v", ["2026-12-12", "2026-12-13", "2026-12-14"]],
+      ["m", ["2026-12-15"]],
+    ]);
+  });
 });
 
 describe("formatEventDate / formatEventTime", () => {
   it("formate dans la langue du livret", () => {
     expect(formatEventDate("2026-12-12", "fr")).toBe("sam. 12 déc.");
     expect(formatEventDate("2026-12-12", "en")).toBe("Sat 12 Dec");
+    expect(formatEventDates(["2026-12-28", "2026-12-29", "2026-12-30"], "fr")).toBe("lun. 28 déc. → mer. 30 déc.");
+    expect(formatEventDates(["2026-12-15", "2026-12-22"], "fr")).toBe("mar. 15 déc., mar. 22 déc.");
+    expect(formatEventDates(["2026-12-01", "2026-12-08", "2026-12-15", "2026-12-22"], "fr")).toBe("mar. 1 déc., mar. 8 déc., mar. 15 déc.…");
     expect(formatEventTime("20:30:00", "fr")).toBe("20:30");
     expect(formatEventTime("20:30:00", "en")).toBe("20:30"); // en-GB : format 24 h
   });

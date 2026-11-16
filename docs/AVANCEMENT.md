@@ -186,6 +186,15 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
 
 **Tous les points P2 sont développés.**
 
+- Expériences de l'hiver saisies le 16 nov. (`supabase/data/2026-11-experiences-hiver.sql`, fiches officielles Lot Tourisme
+  Occitanie et Dordogne-Périgord Tourisme ; pas d'Airbnb : conditions d'utilisation) : marché aux truffes de Lalbenque
+  (mardis 1er déc. → 2 mars, fête les 29-30 janv.), Village de Noël de Gourdon (17 → 31 déc.), fête de la truffe de
+  Sarlat (16-17 janv.), Fest'Oie de Sarlat (6-7 mars). Lalbenque et Gourdon : nouveaux lieux avec fermeture hors saison.
+  Encart de l'accueil : les dates d'un même rendez-vous sont regroupées (« lun. 28 déc. → jeu. 31 déc. »).
+  **À reconfirmer avant la démo** (programmes de Lalbenque et Gourdon pas encore publiés). Rien trouvé de daté au
+  printemps ni pour Castelnaud et Marqueyssac à Noël 2026 (pages encore sur 2025-2026).
+- **Randonnées mises de côté par Rémi (16 nov.)** : départs à confirmer et coups de cœur à choisir plus tard.
+
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la
 précédente (ordre imposé par Supabase), pas à la date réelle.
 

@@ -91,24 +91,43 @@ export function formatStayDays(days: string[], locale: Locale): string {
 }
 
 export type PlaceEvent = GuidePlace["events"][number];
-export type StayExperience = { place: PlaceWithDistance; event: PlaceEvent };
+// Un rendez-vous pendant le séjour : les dates d'un même lieu, même libellé et même heure sont regroupées
+// (un village de Noël ouvert tous les jours prend une ligne, pas cinq). `event` = la première date.
+export type StayExperience = { place: PlaceWithDistance; event: PlaceEvent; dates: string[] };
 
-// Expériences ayant une date pendant le séjour (arrivée et départ compris), par date puis heure.
+// Expériences ayant une date pendant le séjour (arrivée et départ compris), par première date puis heure.
 // Une date qui tombe pendant une fermeture du lieu est écartée : la fermeture fait foi.
 export function experiencesDuring(places: PlaceWithDistance[], { from, to }: Stay): StayExperience[] {
-  return places
-    .filter((place) => place.is_experience)
-    .flatMap((place) =>
-      place.events
-        .filter((event) => event.starts_on >= from && event.starts_on <= to)
-        .filter((event) => !place.closures.some((c) => c.starts_on <= event.starts_on && event.starts_on <= c.ends_on))
-        .map((event) => ({ place, event })),
-    )
-    .sort(
-      (a, b) =>
-        a.event.starts_on.localeCompare(b.event.starts_on) ||
-        (a.event.start_time ?? "").localeCompare(b.event.start_time ?? ""),
-    );
+  const groups = new Map<string, StayExperience>();
+  for (const place of places) {
+    if (!place.is_experience) continue;
+    const events = [...place.events].sort((a, b) => a.starts_on.localeCompare(b.starts_on));
+    for (const event of events) {
+      if (event.starts_on < from || event.starts_on > to) continue;
+      if (place.closures.some((c) => c.starts_on <= event.starts_on && event.starts_on <= c.ends_on)) continue;
+      const key = [place.id, event.label_fr, event.label_en, event.start_time, event.end_time, event.booking_url].join("|");
+      const group = groups.get(key);
+      if (group) group.dates.push(event.starts_on);
+      else groups.set(key, { place, event, dates: [event.starts_on] });
+    }
+  }
+  return [...groups.values()].sort(
+    (a, b) =>
+      a.event.starts_on.localeCompare(b.event.starts_on) ||
+      (a.event.start_time ?? "").localeCompare(b.event.start_time ?? ""),
+  );
+}
+
+const nextDay = (date: string) => new Date(Date.parse(`${date}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+
+// « sam. 12 déc. » ; jours qui se suivent : « lun. 28 déc. → jeu. 31 déc. » ;
+// sinon la liste : « mar. 15 déc., mar. 22 déc. » (3 au plus, puis « … »).
+export function formatEventDates(dates: string[], locale: Locale): string {
+  if (dates.length === 1) return formatEventDate(dates[0], locale);
+  const consecutive = dates.every((d, i) => i === 0 || d === nextDay(dates[i - 1]));
+  if (consecutive) return `${formatEventDate(dates[0], locale)} → ${formatEventDate(dates[dates.length - 1], locale)}`;
+  const shown = dates.slice(0, 3).map((d) => formatEventDate(d, locale)).join(", ");
+  return dates.length > 3 ? `${shown}…` : shown;
 }
 
 // Dates à venir d'une expérience (le JSON garde la veille, à cause du fuseau du serveur).

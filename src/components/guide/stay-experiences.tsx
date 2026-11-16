@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { localizedWithLang } from "@/lib/localized";
-import { experiencesDuring, formatEventDate, formatEventTime, type PlaceWithDistance } from "@/lib/places-view";
+import { experiencesDuring, formatEventDates, formatEventTime, type PlaceWithDistance } from "@/lib/places-view";
 import { useStay } from "@/lib/use-stay";
 
 // Au plus 5 rendez-vous à l'accueil : au-delà, la carte et les fiches prennent le relais.
@@ -30,7 +30,7 @@ export function StayExperiences({ slug, places }: { slug: string; places: PlaceW
         <p className="text-sm text-muted">{t("intro")}</p>
       </div>
       <ul className="flex flex-col gap-2">
-        {items.slice(0, MAX_ITEMS).map(({ place, event }) => {
+        {items.slice(0, MAX_ITEMS).map(({ place, event, dates }) => {
           const label = localizedWithLang(event, "label", locale);
           const bookingUrl = event.booking_url ?? place.booking_url;
           const time = event.start_time
@@ -46,7 +46,7 @@ export function StayExperiences({ slug, places }: { slug: string; places: PlaceW
               >
                 <span className="flex flex-1 flex-col">
                   <span className="text-sm font-semibold text-primary">
-                    {formatEventDate(event.starts_on, locale)}
+                    {formatEventDates(dates, locale)}
                     {time && ` · ${time}`}
                   </span>
                   <span lang={label?.lang} className="font-semibold">
