@@ -1,5 +1,6 @@
 import createIntlMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withEnglishFallback } from "@/i18n/accept-language";
 import { routing } from "@/i18n/routing";
 import { redirectKeepingCookies, updateSession } from "@/lib/supabase/proxy";
 
@@ -25,7 +26,13 @@ export default async function proxy(request: NextRequest) {
   }
 
   // Côté voyageur : langue détectée, puis /g/… → /fr/g/… ou /en/g/…
-  return intlMiddleware(request);
+  // (un choix fait avec le bouton FR/EN, gardé dans un cookie, passe avant l'en-tête).
+  const accept = request.headers.get("accept-language");
+  const preferred = withEnglishFallback(accept);
+  if (preferred === accept) return intlMiddleware(request);
+  const headers = new Headers(request.headers);
+  headers.set("accept-language", preferred ?? "");
+  return intlMiddleware(new NextRequest(request, { headers }));
 }
 
 export const config = {

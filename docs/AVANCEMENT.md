@@ -134,7 +134,7 @@ Fait au 9 novembre (plan validé par Rémi) :
 - Audio hors connexion : `audioResponse` dans `sw.js`, fichier gardé entier et servi par morceaux (Range, exigé par Safari).
   Testé serveur coupé dans Edge avec un faux fichier. **À vérifier sur iPhone et Android avec les vraies notes.**
 
-- Accueil : choix de la langue en première étape ; dates facultatives mais rappel visible sans dates (accueil, carte, liste).
+- Accueil : dates facultatives mais rappel visible sans dates (accueil, carte, liste).
 - Préparer mon séjour : section `prepare` (fourni oui/non, machine à café, toilettes sèches, à ne pas oublier, gare et taxi),
   saisie dans l'admin, itinéraire en voiture repris de l'adresse ; encart « Arrivée dans N jours » en tête de l'accueil
   avant l'arrivée. Itinéraire retiré de l'accueil (toujours dans Arrivée et Préparer). Contenu d'exemple sur le gîte de démo.
@@ -198,6 +198,9 @@ pastille de séjour en tête des filtres de la carte (Séjour, Aujourd'hui, Tout
   emplacement place Saint-Martin à confirmer). Fermetures avant/après les dates. Saint-Céré écarté (trop loin).
   Printemps 2027 : rien de publié pour l'instant (fête des fromages de Rocamadour probablement le 16 mai, à la
   Pentecôte, mais non annoncée : non saisie). À rechercher de nouveau en février-mars.
+- Langue (16 nov., décision de Rémi) : plus de choix de langue dans la fenêtre d'accueil ; le livret s'ouvre dans la
+  langue du téléphone (en-tête Accept-Language, déjà lu par le proxy). Téléphone ni FR ni EN : anglais
+  (`src/i18n/accept-language.ts`). Le bouton FR/EN reste en haut ; son choix (cookie) passe avant l'en-tête.
 - **Randonnées mises de côté par Rémi (16 nov.)** : départs à confirmer et coups de cœur à choisir plus tard.
 
 Migrations : deux fichiers séparés quand une valeur d'enum est ajoutée puis utilisée. Elles sont datées après la

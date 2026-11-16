@@ -234,8 +234,7 @@
     "skip": "Skip",
     "datesQuestion": "When are you here?",
     "datesSubmit": "See what will be open",
-    "reopen": "Listen to {name}'s message again",
-    "chooseLanguage": "Choose your language"
+    "reopen": "Listen to {name}'s message again"
   },
   "Prepare": {
     "provided": "What's provided",
