@@ -224,8 +224,6 @@
   },
   "Welcome": {
     "greeting": "Bonjour, je suis {name}.",
-    "intro": "{hosts}, les propriétaires de ce lieu, m'ont confié leurs petits coins préférés pour vous.",
-    "introNoHosts": "Les propriétaires de ce lieu m'ont confié leurs petits coins préférés pour vous.",
     "pause": "Mettre en pause",
     "transcript": "Lire le texte",
     "continue": "Continuer",

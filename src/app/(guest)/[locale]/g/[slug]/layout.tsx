@@ -58,7 +58,6 @@ export default async function GuideLayout({ children, params }: LayoutProps<"/[l
       {guide && (
         <WelcomeIntro
           slug={slug}
-          hosts={guide.property.host_display_names}
           video={video ? { src: mediaUrl(video.text), lang: video.lang } : null}
           // Le texte dans la langue de la vidéo (une vidéo française en repli garde son texte français).
           transcript={video ? localized(guide.property, "welcome_transcript", video.lang as Locale) : null}

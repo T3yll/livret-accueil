@@ -31,7 +31,6 @@ export function openWelcome() {
 
 type Props = {
   slug: string;
-  hosts: string | null;
   video: { src: string; lang: string } | null;
   transcript: string | null;
 };
@@ -70,7 +69,6 @@ export function WelcomeIntro({ slug, ...content }: Props) {
 
 function WelcomeDialog({
   slug,
-  hosts,
   video,
   transcript,
   onClose,
@@ -103,11 +101,10 @@ function WelcomeDialog({
     >
       {step === "hello" ? (
         <div className="flex flex-col items-center gap-4 text-center">
-          <CuratorAvatar size={88} />
+          <CuratorAvatar size={64} />
           <h2 id="welcome-title" className="text-[28px] leading-tight">
             {t("greeting", { name: curator.name })}
           </h2>
-          <p>{hosts ? t("intro", { hosts }) : t("introNoHosts")}</p>
           {video && <WelcomeVideo src={video.src} lang={video.lang} label={t("watch", { name: curator.name })} transcript={transcript} />}
           <div className="flex w-full flex-col gap-1">
             {/* Dates déjà connues (lien de l'hébergeur) : on ne repose pas la question. */}

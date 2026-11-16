@@ -224,8 +224,6 @@
   },
   "Welcome": {
     "greeting": "Hello, I'm {name}.",
-    "intro": "{hosts}, the owners of this place, have shared their favourite little spots with me for you.",
-    "introNoHosts": "The owners of this place have shared their favourite little spots with me for you.",
     "pause": "Pause",
     "transcript": "Read the text",
     "continue": "Continue",

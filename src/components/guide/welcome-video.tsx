@@ -49,7 +49,7 @@ export function WelcomeVideo({ src, lang, label, transcript }: { src: string; la
         src={`${src}#t=0.1`}
         lang={lang}
         aria-label={label}
-        className="mx-auto max-h-[50dvh] w-auto max-w-full rounded-2xl bg-text"
+        className="mx-auto max-h-[42dvh] w-auto max-w-full rounded-2xl bg-text"
       />
       {transcript && (
         <details className="text-left text-sm">
